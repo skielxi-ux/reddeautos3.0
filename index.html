@@ -349,7 +349,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .main-head .sub{color:var(--paper-dim);font-size:13.5px;margin:0;}
 
   .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px;}
-  .kpi{border:1px solid var(--line);padding:18px;border-radius:var(--radius);}
+  .kpi{border:1px solid var(--line);padding:18px;border-radius:var(--radius);position:relative;}
+  .kpi-info-btn{position:absolute;top:8px;right:8px;width:20px;height:20px;border:none;background:transparent;color:var(--paper-dim);opacity:.55;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+  .kpi-info-btn:hover{opacity:1;color:var(--red);background:var(--line);}
   .kpi .lbl{font-family:var(--font-mono);font-size:10.5px;color:var(--paper-dim);letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
   .kpi .val{font-family:var(--font-display);font-size:28px;font-weight:600;}
   .kpi .val.red{color:var(--red-dark);}
@@ -1560,6 +1562,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 </div>
 
 <!-- ================= AUTH MODALS ================= -->
+<div id="modal-kpiinfo" class="modal-backdrop hidden">
+  <div class="modal" style="position:relative;max-width:440px;">
+    <button class="avatar-modal-close" onclick="closeModal('kpiinfo')"><i class="fa-solid fa-xmark"></i></button>
+    <h3 id="kpiinfo-titulo">KPI</h3>
+    <p id="kpiinfo-texto" style="font-size:13.5px;line-height:1.7;color:var(--paper-dim);margin-top:8px;"></p>
+    <div class="modal-close-row">
+      <button class="btn btn-solid" onclick="closeModal('kpiinfo')">Entendido</button>
+    </div>
+  </div>
+</div>
+
 <div id="modal-terminos" class="modal-backdrop hidden">
   <div class="modal modal-xl" style="position:relative;">
     <button class="avatar-modal-close" onclick="closeModal('terminos')"><i class="fa-solid fa-xmark"></i></button>
@@ -4089,6 +4102,11 @@ function listingCardReal(v){
 
 /* ---------------- modal helpers ---------------- */
 function openModal(name){document.getElementById('modal-'+name).classList.remove('hidden');}
+function openKpiInfo(titulo, texto){
+  document.getElementById('kpiinfo-titulo').textContent = titulo;
+  document.getElementById('kpiinfo-texto').textContent = texto;
+  openModal('kpiinfo');
+}
 function closeModal(name){
   document.getElementById('modal-'+name).classList.add('hidden');
   if(name==='propdetail' && currentSwiper){ try{ currentSwiper.destroy(true,true); }catch(e){} currentSwiper=null; }
@@ -4401,7 +4419,7 @@ async function cargarDatosAdmin(view){
   if (necesitaAgencias)    tareas.agencias = supa.from('agencias').select('*').order('created_at', { ascending: false });
   if (necesitaMatches)     tareas.matches  = supa.from('matches').select('id, estado, created_at, contactado_at, visita_agendada_at, comision_aceptada_at, motivo_cancelacion, comision_monto, comision_moneda, comision_estado, agencia_vendedora, agencia_compradora, veh:vehiculo_id(marca,modelo,anio,precio,moneda,comision), bus:busqueda_id(cliente_nombre), vend:agencia_vendedora(nombre), comp:agencia_compradora(nombre)');
   if (necesitaCounts) {
-    tareas.vehCount = supa.from('vehiculos').select('id', { count: 'exact', head: true }).eq('es_gremio', false);
+    tareas.vehCount = supa.from('vehiculos').select('id', { count: 'exact', head: true }).eq('es_gremio', false).eq('estado', 'activo');
     tareas.busCount = supa.from('busquedas').select('id', { count: 'exact', head: true }).eq('estado', 'activa');
   }
   if (necesitaProveedores)  tareas.proveedores = supa.from('proveedores').select('*').order('nombre');
@@ -5057,11 +5075,29 @@ const adminRenderers = {
     const concretadas = ADMIN_MATCHES.filter(m=>m.estado==='concretada');
     const caidas = ADMIN_MATCHES.filter(m=>m.estado==='cancelada');
     const pendientes = ADMIN_MATCHES.filter(m=>m.estado==='pendiente');
-    const gmv = concretadas.reduce((s,m)=>s+(m.veh?.precio||0), 0);
-    const comisiones = concretadas.reduce((s,m)=>{
-      const pct = parseFloat((m.veh?.comision||'0').replace(',','.').replace('%','')) || 0;
-      return s + (m.veh?.precio||0) * (pct/100);
-    }, 0);
+
+    // GMV y comisiones discriminados por moneda: sumar ARS y USD juntos daría un número sin
+    // sentido (son dos monedas distintas). Las comisiones se toman del monto/moneda real que
+    // quedó guardado en el match al cerrarse (comision_monto/comision_moneda), no recalculadas
+    // a partir del % actual del vehículo, que puede haber cambiado desde entonces.
+    const gmvPorMoneda = {};
+    concretadas.forEach(m => {
+      const moneda = m.veh?.moneda || 'ARS';
+      gmvPorMoneda[moneda] = (gmvPorMoneda[moneda] || 0) + (m.veh?.precio || 0);
+    });
+    const gmvArs = gmvPorMoneda['ARS'] || 0;
+    const gmvUsd = gmvPorMoneda['USD'] || 0;
+
+    const comisionesPorMoneda = {};
+    concretadas.forEach(m => {
+      if (m.comision_monto) {
+        const moneda = m.comision_moneda || 'ARS';
+        comisionesPorMoneda[moneda] = (comisionesPorMoneda[moneda] || 0) + Number(m.comision_monto);
+      }
+    });
+    const comisionesArs = comisionesPorMoneda['ARS'] || 0;
+    const comisionesUsd = comisionesPorMoneda['USD'] || 0;
+
     const finalizados = concretadas.length + caidas.length;
     const tasaConversion = finalizados ? Math.round(concretadas.length/finalizados*100) : null;
 
@@ -5080,9 +5116,11 @@ const adminRenderers = {
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Operaciones concretadas</div><div class="val kpi-green">${concretadas.length}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-percent"></i>Tasa de conversión</div><div class="val">${tasaConversion===null?'—':tasaConversion+'%'}</div></div>
-      <div class="kpi"><div class="lbl"><i class="fa-solid fa-hand-holding-dollar"></i>Comisiones generadas</div><div class="val mono">${fmtARS(comisiones)}</div></div>
-      <div class="kpi"><div class="lbl"><i class="fa-solid fa-coins"></i>GMV</div><div class="val mono">${fmtARS(gmv)}</div></div>
-      <div class="kpi"><div class="lbl"><i class="fa-solid fa-arrows-rotate"></i>MRR</div><div class="val mono">${fmtARS(mrr)}</div></div>
+      <div class="kpi"><button class="kpi-info-btn" onclick="openKpiInfo('MRR','Ingreso Mensual Recurrente: lo que Red de Autos factura por mes en suscripciones de las agencias activas, calculado como (agencias en Plan Pro × \$190.000) + (agencias en Plan Premium × \$390.000). No incluye las comisiones que cobran las agencias entre sí por sus operaciones, solo lo que pagan por el plan.')"><i class="fa-solid fa-circle-info"></i></button><div class="lbl"><i class="fa-solid fa-arrows-rotate"></i>MRR</div><div class="val mono">${fmtARS(mrr)}</div></div>
+      <div class="kpi"><div class="lbl"><i class="fa-solid fa-hand-holding-dollar"></i>Comisiones generadas (ARS)</div><div class="val mono">${fmtARS(comisionesArs)}</div></div>
+      <div class="kpi"><div class="lbl"><i class="fa-solid fa-hand-holding-dollar"></i>Comisiones generadas (USD)</div><div class="val mono">${comisionesUsd ? fmtMoney(comisionesUsd,'USD') : '—'}</div></div>
+      <div class="kpi"><button class="kpi-info-btn" onclick="openKpiInfo('GMV (ARS)','Gross Merchandise Value (Valor Bruto de Mercancía) en pesos: es la suma de los precios de los vehículos cargados en pesos en todas las operaciones concretadas de este período. Mide el volumen total de negocio que circuló por la red, no lo que factura Red de Autos.')"><i class="fa-solid fa-circle-info"></i></button><div class="lbl"><i class="fa-solid fa-coins"></i>GMV (ARS)</div><div class="val mono">${fmtARS(gmvArs)}</div></div>
+      <div class="kpi"><button class="kpi-info-btn" onclick="openKpiInfo('GMV (USD)','Gross Merchandise Value (Valor Bruto de Mercancía) en dólares: es la suma de los precios de los vehículos cargados en dólares en todas las operaciones concretadas de este período. Se muestra por separado del GMV en pesos porque son monedas distintas y sumarlas directamente no tendría sentido.')"><i class="fa-solid fa-circle-info"></i></button><div class="lbl"><i class="fa-solid fa-coins"></i>GMV (USD)</div><div class="val mono">${gmvUsd ? fmtMoney(gmvUsd,'USD') : '—'}</div></div>
     </div>
 
     <div class="admin-section-title">Salud del negocio</div>
