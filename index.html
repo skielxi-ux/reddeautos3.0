@@ -1841,6 +1841,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <div class="nav-item" data-aview="denuncias" onclick="showAdmin('denuncias')"><i class="fa-solid fa-flag"></i> Denuncias <span class="dot" id="reportdot"></span></div>
         <div class="nav-item" data-aview="codigos" onclick="showAdmin('codigos')"><i class="fa-solid fa-key"></i> Códigos de invitación</div>
         <div class="nav-item" data-aview="proveedores-admin" onclick="showAdmin('proveedores-admin')"><i class="fa-solid fa-truck-field"></i> Proveedores</div>
+        <div class="nav-item" data-aview="pagos" onclick="showAdmin('pagos')"><i class="fa-solid fa-calendar-days"></i> Pagos <span class="nav-count-badge" id="admin-pagos-badge"></span></div>
 
         <div class="nav-item" data-aview="operaciones" onclick="showAdmin('operaciones')"><i class="fa-solid fa-file-signature"></i> Operaciones</div>
         <div class="nav-item" data-aview="matches" onclick="showAdmin('matches')"><i class="fa-solid fa-link"></i> Matches</div>
@@ -4380,6 +4381,45 @@ async function logout(){
 function daysSince(dateStr){ return Math.floor((new Date() - new Date(dateStr)) / (1000*60*60*24)); }
 function agenciesAtRisk(){ return ADMIN_AGENCIES.filter(a=>a.status==='Activo' && daysSince(a.registeredAt)>30 && a.ops===0); }
 function newAgencies(){ return ADMIN_AGENCIES.filter(a=>daysSince(a.registeredAt)<=30); }
+
+// Ciclo de pago mensual de cada agencia: el día de vencimiento es siempre el mismo día del mes
+// en que se dio de alta (ej. alta el 11/09 → primer vencimiento el 11/10, y así cada mes). No hay
+// que guardar ni actualizar nada a mano: se recalcula solo cada vez que se abre la pestaña.
+// El ciclo solo avanza al mes siguiente cuando el vencimiento actual ya fue cubierto por un pago
+// registrado (ultimoPago) — si no, se queda "frenado" en ese vencimiento y se marca Vencido.
+function _ultimoDiaMes(anio, mes){ return new Date(anio, mes + 1, 0).getDate(); }
+function cicloPagoAgencia(registeredAtIso, ultimoPagoStr){
+  const alta = new Date(registeredAtIso);
+  const anchorDay = alta.getDate();
+  const sumarMes = (fecha) => {
+    const d = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 1);
+    d.setDate(Math.min(anchorDay, _ultimoDiaMes(d.getFullYear(), d.getMonth())));
+    d.setHours(0,0,0,0);
+    return d;
+  };
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const ultimoPago = ultimoPagoStr ? new Date(ultimoPagoStr + 'T00:00:00') : null;
+
+  let inicioPeriodo = new Date(alta.getFullYear(), alta.getMonth(), alta.getDate());
+  let vencimiento = sumarMes(inicioPeriodo);
+  while (vencimiento <= hoy && ultimoPago && ultimoPago >= vencimiento) {
+    inicioPeriodo = vencimiento;
+    vencimiento = sumarMes(vencimiento);
+  }
+  return { inicioPeriodo, vencimiento };
+}
+// Estado de pago vigente de una agencia (a = objeto de ADMIN_AGENCIES, con registeredAt y ultimoPago)
+function estadoPagoAgencia(a){
+  const { inicioPeriodo, vencimiento } = cicloPagoAgencia(a.registeredAt, a.ultimoPago);
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const ultimoPago = a.ultimoPago ? new Date(a.ultimoPago + 'T00:00:00') : null;
+  let estado;
+  if (ultimoPago && ultimoPago >= inicioPeriodo) estado = 'Pagado';
+  else if (hoy > vencimiento) estado = 'Vencido';
+  else estado = 'Pendiente';
+  return { vencimiento, estado };
+}
+function fmtFechaCorta(d){ return d.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' }); }
 function fmtARS(n){ return 'ARS ' + Math.round(n).toLocaleString('es-AR'); }
 
 let ADMIN_AGENCIES = [];
@@ -4400,7 +4440,7 @@ let proveedorAdminBuscarQuery = '';
 async function cargarDatosAdmin(view){
   // Antes esta función traía TODO (8 consultas a Supabase) sin importar a qué pantalla ibas —
   // por eso el menú se sentía lento. Ahora cada pantalla pide solo lo que realmente usa.
-  const necesitaAgencias    = ['dashboard','concesionarias','ingresos','denuncias'].includes(view);
+  const necesitaAgencias    = ['dashboard','concesionarias','ingresos','denuncias','pagos'].includes(view);
   const necesitaMatches     = ['dashboard','concesionarias','operaciones','matches'].includes(view);
   const necesitaCounts      = view === 'dashboard';
   const necesitaProveedores = view === 'proveedores-admin';
@@ -4499,6 +4539,7 @@ async function cargarDatosAdmin(view){
       registeredAt: a.created_at,
       plan: a.plan === 'premium' ? 'Premium' : 'Pro',
       phone: (a.telefono || '').replace(/\D/g, ''),
+      ultimoPago: a.ultimo_pago_registrado || null,
     }));
   }
 
@@ -4506,6 +4547,12 @@ async function cargarDatosAdmin(view){
   if (badge) {
     const n = ADMIN_SOLICITUDES_PLAN.length + ADMIN_SOLICITUDES_BAJA.length;
     if (n > 0) { badge.textContent = n; badge.style.display = 'inline-flex'; } else { badge.style.display = 'none'; }
+  }
+
+  const pagosBadge = document.getElementById('admin-pagos-badge');
+  if (pagosBadge) {
+    const vencidos = ADMIN_AGENCIES.filter(a => a.status === 'Activo' && estadoPagoAgencia(a).estado === 'Vencido').length;
+    if (vencidos > 0) { pagosBadge.textContent = vencidos; pagosBadge.style.display = 'inline-flex'; } else { pagosBadge.style.display = 'none'; }
   }
 
   if (necesitaProveedores) await cargarStatsClicsProveedores();
@@ -4595,6 +4642,18 @@ async function showAdmin(view){
   const openTickets = ADMIN_TICKETS_ABIERTOS_COUNT;
   const ticketDot = document.getElementById('ticketdot');
   if(ticketDot) ticketDot.style.display = openTickets ? 'block' : 'none';
+}
+async function marcarPagoAgencia(id){
+  const { error } = await supa.rpc('registrar_pago_agencia', { p_agencia_id: id });
+  if (error) { toast('Error al registrar el pago: ' + (error.message || 'error desconocido')); console.error('marcarPagoAgencia:', error); return; }
+  toast('Pago registrado');
+  await showAdmin('pagos');
+}
+async function marcarPagoPendienteAgencia(id){
+  const { error } = await supa.rpc('revertir_pago_agencia', { p_agencia_id: id });
+  if (error) { toast('Error al actualizar el estado de pago: ' + (error.message || 'error desconocido')); console.error('marcarPagoPendienteAgencia:', error); return; }
+  toast('Pago marcado como pendiente');
+  await showAdmin('pagos');
 }
 function openNuevaAgenciaModal(){
   document.getElementById('na-nombre').value = '';
@@ -4834,6 +4893,8 @@ function adminStatusPill(status, label){
     'Inactivo':'background:var(--ink-3);color:var(--paper-dim);border-color:var(--line-strong);',
     'Pausado':'background:#FDEDEC;color:#A32D2D;border-color:#F7C1C1;',
     'Usado':'background:var(--ink-3);color:var(--paper-dim);border-color:var(--line-strong);',
+    'Pagado':'background:#f0fdf4;color:#166534;border-color:#bbf7d0;',
+    'Vencido':'background:#FDEDEC;color:#A32D2D;border-color:#F7C1C1;',
   };
   return `<span class="pill" style="${map[status]||''}">${label||status}</span>`;
 }
@@ -5338,6 +5399,39 @@ const adminRenderers = {
       </tbody>
     </table>
     <p style="font-size:12.5px;color:var(--ink);margin-top:14px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-bell" style="margin-top:2px;color:var(--red);"></i><span>MRR y el desglose por concesionaria se calculan en base a los planes reales asignados. "Ingresos totales" es un acumulado ilustrativo (6 meses de MRR), ya que el prototipo no lleva un historial de facturación real.</span></p>
+  `;
+  },
+  pagos: ()=>{
+    const activas = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
+    const filas = activas.map(a => ({ a, ...estadoPagoAgencia(a) })).sort((x,y)=>x.vencimiento - y.vencimiento);
+    const vencidas = filas.filter(f=>f.estado==='Vencido').length;
+    const pendientes = filas.filter(f=>f.estado==='Pendiente').length;
+    const pagadas = filas.filter(f=>f.estado==='Pagado').length;
+    return `
+    <div class="main-head"><div><h1>Pagos</h1><p class="sub">Vencimiento mensual de cada agencia y estado de pago de la suscripción</p></div></div>
+    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px;">
+      <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Pagadas este período</div><div class="val kpi-green">${pagadas}</div></div>
+      <div class="kpi"><div class="lbl"><i class="fa-solid fa-clock"></i>Pendientes</div><div class="val">${pendientes}</div></div>
+      <div class="kpi"><div class="lbl"><i class="fa-solid fa-triangle-exclamation"></i>Vencidas</div><div class="val kpi-red">${vencidas}</div></div>
+    </div>
+    <table>
+      <thead><tr><th>Agencia</th><th>Plan</th><th>Próximo vencimiento</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+        ${filas.length ? filas.map(f => `<tr>
+          <td style="color:var(--red);font-weight:700;">${esc(f.a.name)}</td>
+          <td>${f.a.plan}</td>
+          <td class="mono">${fmtFechaCorta(f.vencimiento)}</td>
+          <td>${adminStatusPill(f.estado)}</td>
+          <td style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${f.estado === 'Pagado'
+              ? `<button class="btn btn-sm btn-eliminar-pastel" onclick="marcarPagoPendienteAgencia('${f.a.id}')"><i class="fa-solid fa-rotate-left"></i> Marcar pendiente</button>`
+              : `<button class="btn btn-sm whatsapp-btn" onclick="marcarPagoAgencia('${f.a.id}')"><i class="fa-solid fa-check"></i> Marcar pagado</button>`
+            }
+          </td>
+        </tr>`).join('') : `<tr><td colspan="5" class="empty-row">No hay agencias activas.</td></tr>`}
+      </tbody>
+    </table>
+    <p style="font-size:12.5px;color:var(--ink);margin-top:14px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-bell" style="margin-top:2px;color:var(--red);"></i><span>El vencimiento se calcula solo, siempre el mismo día del mes en que se dio de alta cada agencia (ej. alta el 11/09 → vence el 11/10, luego el 11/11, y así cada mes). Al marcar "Pagado" queda cubierto el período vigente; al llegar el próximo vencimiento vuelve a aparecer como Pendiente automáticamente.</span></p>
   `;
   },
   soporte: ()=>{
