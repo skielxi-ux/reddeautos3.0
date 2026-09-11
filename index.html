@@ -7409,9 +7409,8 @@ performance: ()=>{
       comisionesPorMoneda[m.comisionMoneda] = (comisionesPorMoneda[m.comisionMoneda] || 0) + Number(m.comisionMonto);
     }
   });
-  const comisionesHTML = Object.keys(comisionesPorMoneda).length
-    ? Object.entries(comisionesPorMoneda).map(([moneda, monto]) => fmtMoney(monto, moneda)).join(' + ')
-    : '—';
+  const comisionesUsd = comisionesPorMoneda['USD'] || 0;
+  const comisionesArs = comisionesPorMoneda['ARS'] || 0;
 
   const anioActual = new Date().getFullYear();
   const aniosDisponibles = [anioActual - 1, anioActual, anioActual + 1];
@@ -7436,9 +7435,15 @@ performance: ()=>{
       <div class="kpi"><div class="lbl">Caídas</div><div class="val" style="color:#C0392B;">${caidas.length}</div></div>
       <div class="kpi"><div class="lbl">Tasa de conversión</div><div class="val">${tasaConversion}%</div></div>
     </div>
-    <div class="card" style="margin-top:16px;">
-      <div class="lbl">Ingreso por comisiones</div>
-      <div class="val" style="font-size:28px;">${comisionesHTML}</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;">
+      <div class="card" style="flex:1;min-width:220px;margin-top:0;">
+        <div class="lbl">Ingreso por comisiones en USD</div>
+        <div class="val" style="font-size:28px;">${comisionesUsd ? fmtMoney(comisionesUsd, 'USD') : '—'}</div>
+      </div>
+      <div class="card" style="flex:1;min-width:220px;margin-top:0;">
+        <div class="lbl">Ingreso por comisiones en ARS</div>
+        <div class="val" style="font-size:28px;">${comisionesArs ? fmtMoney(comisionesArs, 'ARS') : '—'}</div>
+      </div>
     </div>
     <div style="display:flex;gap:40px;flex-wrap:wrap;margin-top:20px;">
       <div style="flex:1;min-width:220px;">
