@@ -141,6 +141,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .btn-tengoalgo:hover{border-color:#73e7b7;}
   .btn-eliminar-pastel{background:#FFFFFF;color:#E2726B;border:1px solid #E2726B;}
   .btn-eliminar-pastel:hover{background:#FFFFFF;color:#E2726B;border-color:#E2726B;}
+  .le-infobanner{display:flex;gap:10px;align-items:flex-start;background:#F5F4F0;border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:12.5px;line-height:1.6;color:var(--paper-dim);margin-bottom:18px;}
+  .le-infobanner i{color:var(--red);margin-top:2px;}
+  .le-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;}
   .btn-editar-violeta{background:#FFFFFF;color:var(--red);border:1px solid var(--red);}
   .btn-editar-violeta:hover{background:#FFFFFF;color:var(--red);border-color:var(--red);}
   .btn-hover-fill:hover{background:var(--red);color:#FFFFFF;border-color:var(--red);}
@@ -1792,15 +1795,20 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       </div>
 
       <div class="nav-group">
-        <div class="nav-group-label">Mi Agencia</div>
+        <div class="nav-group-label">Mi Concesionaria</div>
         <div class="nav-item" data-view="vehículos" onclick="showApp('vehículos')"><i class="fa-solid fa-car"></i> Mi Stock</div>
         <div class="nav-item" data-view="clientes" onclick="showApp('clientes')"><i class="fa-solid fa-users"></i> Mis Clientes</div>
         <div class="nav-item" data-view="comisiones" onclick="showApp('comisiones')"><i class="fa-solid fa-sack-dollar"></i> Comisiones</div>
+        <div class="nav-item" data-view="leadsexternos" onclick="showApp('leadsexternos')"><i class="fa-solid fa-address-book"></i> Leads Externos</div>
       </div>
 
       <div class="nav-group">
         <div class="nav-group-label">Gremio</div>
         <div class="nav-item" data-view="exclusiva" onclick="showApp('exclusiva')"><i class="fa-solid fa-gem"></i> Oportunidades Exclusivas</div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label">Red de Aliados</div>
         <div class="nav-item" data-view="asociadas" onclick="showApp('asociadas')"><i class="fa-solid fa-handshake"></i> Agencias Asociadas</div>
         <div class="nav-item" data-view="proveedores" onclick="showApp('proveedores')"><i class="fa-solid fa-truck-field"></i> Proveedores</div>
       </div>
@@ -1860,6 +1868,71 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 </div>
 
 <!-- ================= MODALS: forms ================= -->
+<div id="modal-leadexterno" class="modal-backdrop hidden">
+  <div class="modal modal-wide" style="position:relative;">
+    <button class="avatar-modal-close" onclick="closeModal('leadexterno')"><i class="fa-solid fa-xmark"></i></button>
+    <h3 id="leadexterno-modal-title">Agregar lead externo</h3>
+    <p class="sub">Para clientes que te consultaron por un vehículo publicado en otra plataforma (no en Red de Autos) — esto queda 100% privado, no se comparte con la red.</p>
+
+    <div class="field"><label>Nombre del cliente</label><input id="le-nombre" placeholder="Nombre completo"></div>
+
+    <div style="display:flex;gap:14px;">
+      <div class="field" style="flex:1;"><label>Teléfono</label><input id="le-telefono" placeholder="381..."></div>
+      <div class="field" style="flex:1;"><label>Email</label><input id="le-email" placeholder="cliente@mail.com"></div>
+    </div>
+
+    <div class="field"><label>Vehículo por el que consultó</label><input id="le-vehiculo" placeholder="Ej: Toyota Corolla 2020 - MercadoLibre"></div>
+
+    <div style="display:flex;gap:14px;">
+      <div class="field" style="flex:1;">
+        <label>Tipo de vehículo</label>
+        <select id="le-tipo">
+          <option>Sedán</option><option>SUV</option><option>Hatchback</option><option>Pickup</option><option>Coupé</option><option>Camioneta</option><option>Utilitario</option>
+        </select>
+      </div>
+      <div class="field" style="flex:1;">
+        <label>¿De dónde vino la consulta?</label>
+        <select id="le-origen">
+          <option>MercadoLibre</option><option>Facebook</option><option>Andaremos</option><option>Otro</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Interés del lead</label>
+      <select id="le-interes">
+        <option value="frio">Frío</option>
+        <option value="tibio" selected>Tibio</option>
+        <option value="caliente">Caliente</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Foto del aviso (opcional)</label>
+      <input type="file" id="le-foto-input" accept="image/*" onchange="handleLeadExternoFotoChange(event)">
+      <div id="le-foto-preview"></div>
+    </div>
+
+    <div class="modal-close-row">
+      <button class="btn" onclick="closeModal('leadexterno')">Cancelar</button>
+      <button class="btn btn-solid" id="leadexterno-submit-btn" onclick="submitLeadExterno()">Guardar lead</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-leadexternonotas" class="modal-backdrop hidden">
+  <div class="modal" style="position:relative;max-width:440px;">
+    <button class="avatar-modal-close" onclick="closeModal('leadexternonotas')"><i class="fa-solid fa-xmark"></i></button>
+    <h3>Notas</h3>
+    <p class="sub" id="lenotas-nombre"></p>
+    <div class="field"><textarea id="lenotas-texto" rows="6" placeholder="Anotá lo que quieras recordar de este lead..."></textarea></div>
+    <div class="modal-close-row">
+      <button class="btn" onclick="closeModal('leadexternonotas')">Cancelar</button>
+      <button class="btn btn-solid" onclick="guardarNotasLeadExterno()">Guardar nota</button>
+    </div>
+  </div>
+</div>
+
 <div id="modal-newclient" class="modal-backdrop hidden">
   <div class="modal modal-wide">
     <h3 id="newclient-modal-title">Agregar cliente</h3>
@@ -2469,6 +2542,195 @@ async function cargarMisTickets(){
   if (error) { console.error('cargarMisTickets:', error); toast('Error al cargar tus consultas: ' + error.message); misTicketsReal = []; return; }
   misTicketsReal = (data || []).map(t => ({ ...t, ticket_mensajes: (t.ticket_mensajes || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)) }));
 }
+
+/* ================= LEADS EXTERNOS =================
+   Clientes que consultaron por un vehículo publicado en OTRA plataforma (MercadoLibre, Facebook,
+   Andaremos, etc.). Es 100% privado de cada agencia: no se comparte con la red ni genera matches,
+   es solo para llevar el seguimiento propio de esas consultas. */
+let LEADS_EXTERNOS = [];
+let leadsExternosBuscarQuery = '';
+let editandoLeadExternoId = null;
+let leadExternoFotoDataUrl = null;
+let notasLeadExternoId = null;
+
+async function cargarLeadsExternos(){
+  if (!currentAgencia) { LEADS_EXTERNOS = []; return; }
+  const { data, error } = await supa.from('leads_externos').select('*').eq('agencia_id', currentAgencia.id).order('created_at', { ascending: false });
+  if (error) { console.error('cargarLeadsExternos:', error); toast('Error al cargar los leads externos: ' + error.message); LEADS_EXTERNOS = []; return; }
+  LEADS_EXTERNOS = data || [];
+}
+
+function onLeadsExternosBuscarInput(v){
+  leadsExternosBuscarQuery = v;
+  document.getElementById('leadsexternos-lista').innerHTML = leadsExternosTablaHTML();
+}
+
+function leadsExternosFiltrados(){
+  const q = leadsExternosBuscarQuery.trim().toLowerCase();
+  if (!q) return LEADS_EXTERNOS;
+  return LEADS_EXTERNOS.filter(l => (l.nombre || '').toLowerCase().includes(q));
+}
+
+const INTERES_LEAD_COLORS = {
+  frio: { bg:'#EFF6FF', border:'#BFDBFE', text:'#1D4ED8', label:'Frío' },
+  tibio: { bg:'#FEF3E2', border:'#FAC775', text:'#854F0B', label:'Tibio' },
+  caliente: { bg:'#FDEDEC', border:'#F7C1C1', text:'#A32D2D', label:'Caliente' },
+};
+function leadsExternosTablaHTML(){
+  const lista = leadsExternosFiltrados();
+  if (!lista.length) {
+    return `<div class="card"><p style="color:var(--paper-dim);margin:0;">${LEADS_EXTERNOS.length ? 'No hay leads que coincidan con la búsqueda.' : 'Todavía no cargaste ningún lead externo.'}</p></div>`;
+  }
+  return `
+  <table>
+    <thead><tr><th>Cliente</th><th>Teléfono</th><th>Vehículo consultado</th><th>Tipo</th><th>Origen</th><th>Interés</th><th></th></tr></thead>
+    <tbody>
+      ${lista.map(l => {
+        const c = INTERES_LEAD_COLORS[l.interes] || INTERES_LEAD_COLORS.frio;
+        return `<tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="stock-thumb" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#EDEBE3;font-weight:700;font-size:11.5px;color:var(--ink);">${esc(initials(l.nombre))}</div>
+              <span>${esc(l.nombre)}</span>
+            </div>
+          </td>
+          <td>${esc(l.telefono || '—')}</td>
+          <td>${esc(l.vehiculo || '—')}</td>
+          <td>${esc(l.tipo_vehiculo || '—')}</td>
+          <td>${esc(l.origen || '—')}</td>
+          <td>
+            <select onchange="cambiarInteresLeadExterno('${l.id}', this.value)" style="background:${c.bg};border:1px solid ${c.border};color:${c.text};font-weight:700;font-size:12px;padding:6px 10px;border-radius:20px;">
+              <option value="frio" ${l.interes==='frio'?'selected':''}>Frío</option>
+              <option value="tibio" ${l.interes==='tibio'?'selected':''}>Tibio</option>
+              <option value="caliente" ${l.interes==='caliente'?'selected':''}>Caliente</option>
+            </select>
+          </td>
+          <td style="white-space:nowrap;display:flex;gap:6px;">
+            ${l.telefono ? `<button class="btn btn-sm whatsapp-btn" onclick="whatsappLeadExterno('${l.id}')" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>` : ''}
+            <button class="btn btn-sm" onclick="abrirNotasLeadExterno('${l.id}')"><i class="fa-solid fa-note-sticky"></i> Notas</button>
+            <button class="btn btn-sm" onclick="openLeadExternoModal('${l.id}')"><i class="fa-solid fa-pen"></i> Editar</button>
+            <button class="btn btn-sm btn-eliminar-pastel" onclick="eliminarLeadExterno('${l.id}')"><i class="fa-solid fa-trash"></i> Eliminar</button>
+          </td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table>`;
+}
+
+function openLeadExternoModal(id){
+  editandoLeadExternoId = id || null;
+  leadExternoFotoDataUrl = null;
+  const l = id ? LEADS_EXTERNOS.find(x => x.id === id) : null;
+  document.getElementById('leadexterno-modal-title').textContent = id ? 'Editar lead externo' : 'Agregar lead externo';
+  document.getElementById('le-nombre').value = l?.nombre || '';
+  document.getElementById('le-telefono').value = l?.telefono || '';
+  document.getElementById('le-email').value = l?.email || '';
+  document.getElementById('le-vehiculo').value = l?.vehiculo || '';
+  document.getElementById('le-tipo').value = l?.tipo_vehiculo || 'Sedán';
+  document.getElementById('le-origen').value = l?.origen || 'MercadoLibre';
+  document.getElementById('le-interes').value = l?.interes || 'tibio';
+  document.getElementById('le-foto-preview').innerHTML = l?.foto_url ? `<img src="${l.foto_url}" style="max-width:100%;border-radius:8px;margin-top:8px;">` : '';
+  document.getElementById('le-foto-input').value = '';
+  openModal('leadexterno');
+}
+
+function handleLeadExternoFotoChange(event){
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    leadExternoFotoDataUrl = e.target.result;
+    document.getElementById('le-foto-preview').innerHTML = `<img src="${e.target.result}" style="max-width:100%;border-radius:8px;margin-top:8px;">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function submitLeadExterno(){
+  if (!currentAgencia) return;
+  const nombre = document.getElementById('le-nombre').value.trim();
+  if (!nombre) { toast('El nombre del cliente es obligatorio.'); return; }
+  const btn = document.getElementById('leadexterno-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+  try {
+    let foto_url = editandoLeadExternoId ? (LEADS_EXTERNOS.find(x => x.id === editandoLeadExternoId)?.foto_url || null) : null;
+    if (leadExternoFotoDataUrl) {
+      const path = `leads-externos/${currentAgencia.id}/${Date.now()}.jpg`;
+      foto_url = await supaUpload('red-de-autos', path, leadExternoFotoDataUrl);
+    }
+    const payload = {
+      agencia_id: currentAgencia.id,
+      nombre,
+      telefono: document.getElementById('le-telefono').value.trim() || null,
+      email: document.getElementById('le-email').value.trim() || null,
+      vehiculo: document.getElementById('le-vehiculo').value.trim() || null,
+      tipo_vehiculo: document.getElementById('le-tipo').value,
+      origen: document.getElementById('le-origen').value,
+      interes: document.getElementById('le-interes').value,
+      foto_url,
+    };
+    let error;
+    if (editandoLeadExternoId) {
+      ({ error } = await supa.from('leads_externos').update(payload).eq('id', editandoLeadExternoId));
+    } else {
+      ({ error } = await supa.from('leads_externos').insert(payload));
+    }
+    if (error) throw error;
+    closeModal('leadexterno');
+    toast(editandoLeadExternoId ? 'Lead actualizado' : 'Lead agregado');
+    await cargarLeadsExternos();
+    document.getElementById('main-content').innerHTML = renderers.leadsexternos();
+  } catch (err) {
+    console.error('submitLeadExterno:', err);
+    toast('Error al guardar el lead: ' + (err.message || 'error desconocido'));
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Guardar lead'; }
+  }
+}
+
+async function eliminarLeadExterno(id){
+  if (!confirm('¿Eliminar este lead externo? Esta acción no se puede deshacer.')) return;
+  const { error } = await supa.from('leads_externos').delete().eq('id', id);
+  if (error) { toast('Error al eliminar: ' + error.message); console.error('eliminarLeadExterno:', error); return; }
+  toast('Lead eliminado');
+  await cargarLeadsExternos();
+  document.getElementById('main-content').innerHTML = renderers.leadsexternos();
+}
+
+async function cambiarInteresLeadExterno(id, value){
+  const { error } = await supa.from('leads_externos').update({ interes: value }).eq('id', id);
+  if (error) { toast('Error al actualizar el interés: ' + error.message); console.error('cambiarInteresLeadExterno:', error); return; }
+  const l = LEADS_EXTERNOS.find(x => x.id === id);
+  if (l) l.interes = value;
+  document.getElementById('main-content').innerHTML = renderers.leadsexternos();
+}
+
+function abrirNotasLeadExterno(id){
+  notasLeadExternoId = id;
+  const l = LEADS_EXTERNOS.find(x => x.id === id);
+  document.getElementById('lenotas-nombre').textContent = l?.nombre || '';
+  document.getElementById('lenotas-texto').value = l?.notas || '';
+  openModal('leadexternonotas');
+}
+
+async function guardarNotasLeadExterno(){
+  if (!notasLeadExternoId) return;
+  const notas = document.getElementById('lenotas-texto').value.trim();
+  const { error } = await supa.from('leads_externos').update({ notas }).eq('id', notasLeadExternoId);
+  if (error) { toast('Error al guardar la nota: ' + error.message); console.error('guardarNotasLeadExterno:', error); return; }
+  const l = LEADS_EXTERNOS.find(x => x.id === notasLeadExternoId);
+  if (l) l.notas = notas;
+  closeModal('leadexternonotas');
+  toast('Nota guardada');
+}
+
+function whatsappLeadExterno(id){
+  const l = LEADS_EXTERNOS.find(x => x.id === id);
+  if (!l || !l.telefono) { toast('Este lead no tiene teléfono cargado.'); return; }
+  const tel = l.telefono.replace(/\D/g, '');
+  const msg = `Hola ${l.nombre}! Te escribimos por tu consulta sobre ${l.vehiculo || 'el vehículo'} que vimos en ${l.origen || 'nuestra publicación'}.`;
+  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
 async function submitSupportTicket(){
   if (!currentAgencia) { toast('Sesión no iniciada.'); return; }
   const subject = document.getElementById('ticket-subject').value.trim();
@@ -7401,6 +7663,9 @@ async function showApp(view){
     document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarMisTickets();
     await marcarTicketNotifsLeidas();
+  } else if (view === 'leadsexternos') {
+    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
+    await cargarLeadsExternos();
   }
   document.getElementById('main-content').innerHTML = renderers[view] ? renderers[view]() : '<p>Vista no encontrada.</p>';
 }
@@ -7636,6 +7901,35 @@ comisiones: ()=>{
   <div class="main-head"><div><h1>Comisiones</h1><p class="sub">Comisiones a pagar y a cobrar por tus operaciones concretadas</p></div></div>
   ${seccion('Por pagar', 'fa-arrow-up', 'var(--red)', porPagar)}
   ${seccion('Por cobrar', 'fa-arrow-down', '#3F7A46', porCobrar)}
+  `;
+},
+
+leadsexternos: ()=>{
+  const total = LEADS_EXTERNOS.length;
+  const frios = LEADS_EXTERNOS.filter(l => l.interes === 'frio').length;
+  const tibios = LEADS_EXTERNOS.filter(l => l.interes === 'tibio').length;
+  const calientes = LEADS_EXTERNOS.filter(l => l.interes === 'caliente').length;
+  return `
+  <div class="main-head">
+    <div><h1>Leads Externos</h1><p class="sub">Clientes que te consultaron por un vehículo publicado en otra plataforma</p></div>
+    <button class="btn btn-solid" onclick="openLeadExternoModal()"><i class="fa-solid fa-plus"></i> Agregar lead</button>
+  </div>
+
+  <div class="le-infobanner">
+    <i class="fa-solid fa-circle-info"></i>
+    <span><strong>Esto es 100% privado.</strong> No se comparte con la red ni genera matches — es solo para que lleves el seguimiento de consultas que te llegan desde otras plataformas (MercadoLibre, Facebook, Andaremos, etc.).</span>
+  </div>
+
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin:20px 0;">
+    <div class="kpi"><div class="lbl">TOTAL LEADS</div><div class="val">${total}</div></div>
+    <div class="kpi"><div class="lbl"><span class="le-dot" style="background:#2563EB;"></span>FRÍOS</div><div class="val" style="color:#2563EB;">${frios}</div></div>
+    <div class="kpi"><div class="lbl"><span class="le-dot" style="background:#C2790A;"></span>TIBIOS</div><div class="val" style="color:#C2790A;">${tibios}</div></div>
+    <div class="kpi"><div class="lbl"><span class="le-dot" style="background:#A32D2D;"></span>CALIENTES</div><div class="val" style="color:#A32D2D;">${calientes}</div></div>
+  </div>
+
+  <input placeholder="Buscar por nombre..." value="${esc(leadsExternosBuscarQuery)}" oninput="onLeadsExternosBuscarInput(this.value)" style="width:100%;padding:12px 16px;border-radius:10px;border:1px solid var(--line);font-family:var(--font-body);font-size:13.5px;margin-bottom:20px;background:#FAFAF7;">
+
+  <div id="leadsexternos-lista">${leadsExternosTablaHTML()}</div>
   `;
 },
 
