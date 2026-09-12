@@ -6132,10 +6132,15 @@ function renderMatchPipelineStepper(etapa){
 async function aceptarComisionMatch(matchId){
   const m = misMatchesReal.find(x=>x.id===matchId);
   if (!m) return;
-  const { error } = await supa.from('matches').update({ comision_aceptada_at: new Date().toISOString() }).eq('id', matchId);
-  if (error) { toast('Error al aceptar la comisión.'); console.error('aceptarComisionMatch:', error); return; }
-  crearNotificacion(m.otraAgenciaId, 'match_etapa', '¡Comisión aceptada!', `${currentAgencia?.nombre || 'La agencia'} aceptó la comisión propuesta (${m.comisionVehiculo || '—'}) para ${m.vehiculo}. Ya pueden coordinar por WhatsApp.`, m.id);
-  toast('Comisión aceptada. Ya podés contactar a la otra agencia.');
+  const { data, error } = await supa.rpc('aceptar_comision_match', { p_match_id: matchId });
+  if (error) { toast('Error al aceptar la comisión: ' + (error.message || 'error desconocido')); console.error('aceptarComisionMatch:', error); return; }
+  if (data === 'reservado_por_otro') {
+    toast('Este vehículo ya fue reservado por otra agencia mientras tanto. La operación quedó caída.');
+  } else {
+    // Solo si realmente se reservó (no si llegamos tarde) tiene sentido avisarle a la otra agencia.
+    crearNotificacion(m.otraAgenciaId, 'match_etapa', '¡Comisión aceptada!', `${currentAgencia?.nombre || 'La agencia'} aceptó la comisión propuesta (${m.comisionVehiculo || '—'}) para ${m.vehiculo}. Ya pueden coordinar por WhatsApp.`, m.id);
+    toast('Comisión aceptada. Ya podés contactar a la otra agencia.');
+  }
   await showApp('matches');
 }
 // Rechazar la comisión propuesta cierra la operación directamente como caída (sin pasar por el
@@ -6405,6 +6410,14 @@ async function confirmarCerrarMatch(){
     else console.warn('confirmarCerrarMatch: match sin vehiculoId, no se pudo marcar el vehículo como inactivo.', mCerrado);
     if (mCerrado.busquedaId) tareas.push(supa.from('busquedas').update({ estado: 'resuelta' }).eq('id', mCerrado.busquedaId));
     else console.warn('confirmarCerrarMatch: match sin busquedaId, no se pudo marcar la búsqueda como resuelta.', mCerrado);
+    // Si quedaba algún otro match pendiente para este mismo vehículo (nunca llegó a que le acepten
+    // la comisión, así que la RPC de reserva no lo había cancelado todavía), se cancela solo acá:
+    // el vehículo ya se vendió en esta otra operación. Como somos la agencia vendedora, somos parte
+    // de todos esos matches (mismo vehículo = misma vendedora), así que no hace falta RPC.
+    if (mCerrado.vehiculoId) {
+      tareas.push(supa.from('matches').update({ estado: 'cancelada', motivo_cancelacion: 'Vehículo vendido en otra operación', cerrado_at: new Date().toISOString() })
+        .eq('vehiculo_id', mCerrado.vehiculoId).neq('id', mCerrado.id).eq('estado', 'pendiente'));
+    }
     const resultados = await Promise.all(tareas);
     const huboError = resultados.some(r => r.error);
     resultados.forEach(r => { if (r.error) console.warn('confirmarCerrarMatch (post-cierre):', r.error); });
