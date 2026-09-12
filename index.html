@@ -1921,15 +1921,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 </div>
 
 <div id="modal-leadexternonotas" class="modal-backdrop hidden">
-  <div class="modal" style="position:relative;max-width:440px;">
-    <button class="avatar-modal-close" onclick="closeModal('leadexternonotas')"><i class="fa-solid fa-xmark"></i></button>
-    <h3>Notas</h3>
-    <p class="sub" id="lenotas-nombre"></p>
-    <div class="field"><textarea id="lenotas-texto" rows="6" placeholder="Anotá lo que quieras recordar de este lead..."></textarea></div>
-    <div class="modal-close-row">
-      <button class="btn" onclick="closeModal('leadexternonotas')">Cancelar</button>
-      <button class="btn btn-solid" onclick="guardarNotasLeadExterno()">Guardar nota</button>
-    </div>
+  <div class="modal" style="position:relative;max-width:480px;">
+    <div id="leadexternonotas-body"></div>
   </div>
 </div>
 
@@ -2702,25 +2695,83 @@ async function cambiarInteresLeadExterno(id, value){
   const l = LEADS_EXTERNOS.find(x => x.id === id);
   if (l) l.interes = value;
   document.getElementById('main-content').innerHTML = renderers.leadsexternos();
+  if (notasLeadExternoId === id) {
+    document.getElementById('leadexternonotas-body').innerHTML = renderNotasLeadExternoModal();
+  }
+}
+
+const MESES_ABREV_ES = ['ene','feb','mar','abr','may','jun','jul','ago','sept','oct','nov','dic'];
+function fmtFechaNota(iso){
+  const d = new Date(iso);
+  const dia = d.getDate();
+  const mes = MESES_ABREV_ES[d.getMonth()];
+  const anio = d.getFullYear();
+  let horas = d.getHours();
+  const min = String(d.getMinutes()).padStart(2, '0');
+  const ampm = horas >= 12 ? 'p. m.' : 'a. m.';
+  horas = horas % 12; if (horas === 0) horas = 12;
+  return `${dia} de ${mes} de ${anio}, ${horas}:${min} ${ampm}`;
+}
+
+function renderNotasLeadExternoModal(){
+  const l = LEADS_EXTERNOS.find(x => x.id === notasLeadExternoId);
+  if (!l) return '';
+  const notas = Array.isArray(l.notas) ? l.notas : [];
+  const c = INTERES_LEAD_COLORS[l.interes] || INTERES_LEAD_COLORS.frio;
+  return `
+    ${l.foto_url
+      ? `<img src="${l.foto_url}" style="width:100%;max-height:260px;object-fit:cover;border-radius:10px;margin-bottom:18px;">`
+      : `<div style="width:100%;height:160px;border-radius:10px;background:#F5F4F0;display:flex;align-items:center;justify-content:center;color:var(--paper-dim);font-size:28px;margin-bottom:18px;"><i class="fa-solid fa-car"></i></div>`
+    }
+    <div style="font-weight:700;font-size:13px;margin-bottom:6px;">${esc(l.nombre)}${l.vehiculo ? ' · ' + esc(l.vehiculo) : ''}</div>
+
+    <label style="font-weight:700;font-size:13px;display:block;margin:14px 0 6px;">Interés actual</label>
+    <select onchange="cambiarInteresLeadExterno('${l.id}', this.value)" style="width:100%;background:${c.bg};border:1px solid ${c.border};color:${c.text};font-weight:700;padding:10px 12px;border-radius:10px;">
+      <option value="frio" ${l.interes==='frio'?'selected':''}>&#128308; Frío</option>
+      <option value="tibio" ${l.interes==='tibio'?'selected':''}>&#128992; Tibio</option>
+      <option value="caliente" ${l.interes==='caliente'?'selected':''}>&#128308; Caliente</option>
+    </select>
+
+    <label style="font-weight:700;font-size:13px;display:block;margin:18px 0 6px;">Historial de interacciones</label>
+    <div id="lenotas-historial" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;margin-bottom:14px;">
+      ${notas.length ? notas.slice().reverse().map(n => `
+        <div style="background:#F5F4F0;border-radius:8px;padding:10px 12px;">
+          <div style="font-size:11px;color:var(--paper-dim);margin-bottom:3px;">${esc(fmtFechaNota(n.fecha))}</div>
+          <div style="font-size:13px;font-weight:600;">${esc(n.texto)}</div>
+        </div>`).join('')
+      : `<div style="font-size:12.5px;color:var(--paper-dim);">Todavía no hay notas para este lead.</div>`}
+    </div>
+
+    <textarea id="lenotas-texto" rows="3" placeholder="Ej: Lo llamé, dijo que lo va a pensar hasta el fin de semana..."></textarea>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
+      <button class="btn btn-solid" style="background:#25D366;border-color:#25D366;" onclick="agregarNotaLeadExterno()"><i class="fa-solid fa-plus"></i> Agregar nota</button>
+      <button class="btn" onclick="closeModal('leadexternonotas')">Cerrar</button>
+    </div>
+  `;
 }
 
 function abrirNotasLeadExterno(id){
   notasLeadExternoId = id;
-  const l = LEADS_EXTERNOS.find(x => x.id === id);
-  document.getElementById('lenotas-nombre').textContent = l?.nombre || '';
-  document.getElementById('lenotas-texto').value = l?.notas || '';
+  document.getElementById('leadexternonotas-body').innerHTML = renderNotasLeadExternoModal();
   openModal('leadexternonotas');
 }
 
-async function guardarNotasLeadExterno(){
+async function agregarNotaLeadExterno(){
   if (!notasLeadExternoId) return;
-  const notas = document.getElementById('lenotas-texto').value.trim();
-  const { error } = await supa.from('leads_externos').update({ notas }).eq('id', notasLeadExternoId);
-  if (error) { toast('Error al guardar la nota: ' + error.message); console.error('guardarNotasLeadExterno:', error); return; }
+  const textarea = document.getElementById('lenotas-texto');
+  const texto = textarea.value.trim();
+  if (!texto) { toast('Escribí algo para agregar a las notas.'); return; }
   const l = LEADS_EXTERNOS.find(x => x.id === notasLeadExternoId);
-  if (l) l.notas = notas;
-  closeModal('leadexternonotas');
-  toast('Nota guardada');
+  if (!l) return;
+  const notasActuales = Array.isArray(l.notas) ? l.notas : [];
+  const nuevaNota = { fecha: new Date().toISOString(), texto };
+  const notasNuevas = [...notasActuales, nuevaNota];
+  const { error } = await supa.from('leads_externos').update({ notas: notasNuevas }).eq('id', notasLeadExternoId);
+  if (error) { toast('Error al guardar la nota: ' + error.message); console.error('agregarNotaLeadExterno:', error); return; }
+  l.notas = notasNuevas;
+  document.getElementById('leadexternonotas-body').innerHTML = renderNotasLeadExternoModal();
+  toast('Nota agregada');
 }
 
 function whatsappLeadExterno(id){
