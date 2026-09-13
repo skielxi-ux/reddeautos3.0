@@ -1846,6 +1846,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <div class="nav-item" data-view="redbusca" onclick="showApp('redbusca')"><i class="fa-solid fa-bullhorn"></i> La Red está buscando</div>
         <div class="nav-item" data-view="busquedas" onclick="showApp('busquedas')"><i class="fa-solid fa-list-check"></i> Mis Búsquedas</div>
         <div class="nav-item" data-view="matches" onclick="showApp('matches')"><i class="fa-solid fa-link"></i> Mis Matches <span class="dot" id="matchdot"></span><span class="nav-count-badge" id="matchpendientebadge"></span></div>
+        <div class="nav-item" data-view="manuales" onclick="showApp('manuales')"><i class="fa-solid fa-comment-dots"></i> Matches Manuales <span class="nav-count-badge" id="matchmanualpendientebadge"></span></div>
         <div class="nav-item" data-view="notificaciones" onclick="showApp('notificaciones')"><i class="fa-solid fa-bell"></i> Notificaciones <span class="dot" id="notifdot"></span></div>
       </div>
 
@@ -2379,6 +2380,20 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   <div class="modal modal-xl" style="position:relative;padding:0;">
     <button class="avatar-modal-close" style="position:absolute;top:16px;right:16px;z-index:20;background:rgba(255,255,255,.9);" onclick="closeModal('propdetail')"><i class="fa-solid fa-xmark"></i></button>
     <div id="propdetail-body"></div>
+  </div>
+</div>
+
+<div id="modal-contactomanual" class="modal-backdrop hidden">
+  <div class="modal" style="position:relative;">
+    <button class="avatar-modal-close" onclick="closeModal('contactomanual')"><i class="fa-solid fa-xmark"></i></button>
+    <h3>¿Para qué cliente es esta consulta?</h3>
+    <p class="sub">Así queda registrado en "Matches Manuales" y podés hacerle seguimiento a esta operación.</p>
+    <div class="field"><label>Nombre del cliente</label><input id="cm-cliente-nombre" placeholder="Nombre y apellido"></div>
+    <div class="field"><label>Teléfono del cliente (opcional)</label><input id="cm-cliente-telefono" placeholder="Para tu propio registro, no se comparte"></div>
+    <div class="modal-close-row">
+      <button class="btn" onclick="closeModal('contactomanual')">Cancelar</button>
+      <button class="btn btn-solid btn-contact-lime" id="contactomanual-confirm-btn" onclick="confirmarContactoManual()"><i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp</button>
+    </div>
   </div>
 </div>
 
@@ -3031,7 +3046,7 @@ async function submitRating(){
   ratingTargetAgencyId = null;
   ratingTargetMatchId = null;
   toast('Calificación enviada para ' + agencyName);
-  await showApp('matches');
+  await showApp(vistaMatchesActual());
 }
 
 /* ---------------- modal denunciar ---------------- */
@@ -4264,7 +4279,7 @@ function gremioCardHTML(v, esPropio){
       <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
         ${esPropio
           ? `<button class="btn btn-sm btn-editar-violeta" onclick="openEditGremioModal('${v.id}')"><i class="fa-solid fa-pen"></i> Editar</button><button class="btn btn-sm btn-eliminar-pastel" onclick="deleteGremio('${v.id}')"><i class="fa-solid fa-trash"></i> Eliminar</button>`
-          : (waHref ? `<a class="btn btn-sm whatsapp-btn" style="text-decoration:none;" href="${esc(waHref)}" target="_blank"><i class="fa-brands fa-whatsapp"></i> Contactar</a>` : '')}
+          : (waHref ? `<button class="btn btn-sm whatsapp-btn" onclick="abrirContactoManual('${v.id}')"><i class="fa-brands fa-whatsapp"></i> Contactar</button>` : '')}
       </div>
     </div>
   </div>`;
@@ -5922,9 +5937,11 @@ async function cargarMisMatches(){
       otraAgenciaId, otraAgencia, otraAgenciaTel, otraAgenciaVerificada, otraAgenciaDireccion, otraAgenciaHorarios, otraAgenciaContacto,
       // Si soy el vendedor, el cliente es de la otra agencia — nombre protegido, como en el diseño de Exe.
       // El teléfono del cliente solo lo tenemos (y solo lo usamos) cuando el match es nuestro como compradores.
-      clienteNombre: soyVendedor ? `Cliente de ${otraAgencia}` : (bus.cliente_nombre || '—'),
-      clienteTelefono: soyVendedor ? '' : (bus.cliente_telefono || ''),
+      // Los matches manuales no vienen de una búsqueda (bus vacío), así que el dato sale directo del match.
+      clienteNombre: soyVendedor ? `Cliente de ${otraAgencia}` : (bus.cliente_nombre || m.cliente_nombre || '—'),
+      clienteTelefono: soyVendedor ? '' : (bus.cliente_telefono || m.cliente_telefono || ''),
       clienteProtegido: soyVendedor,
+      origen: m.origen || 'automatico',
       estado: m.estado || 'pendiente',
       etapa,
       contactadoAt: m.contactado_at || null,
@@ -5945,6 +5962,7 @@ async function cargarMisMatches(){
     };
   });
   actualizarMatchPendienteBadge();
+  actualizarMatchManualPendienteBadge();
   actualizarMatchDot();
 }
 // El puntito rojo significa "tenés un match NUEVO sin ver" (se apaga al entrar a Mis Matches).
@@ -5956,7 +5974,14 @@ function actualizarMatchDot(){
 function actualizarMatchPendienteBadge(){
   const badge = document.getElementById('matchpendientebadge');
   if (!badge) return;
-  const n = misMatchesReal.filter(m => m.estado === 'pendiente').length;
+  const n = misMatchesReal.filter(m => m.estado === 'pendiente' && m.origen !== 'manual').length;
+  if (n > 0) { badge.textContent = n; badge.style.display = 'inline-flex'; }
+  else { badge.style.display = 'none'; }
+}
+function actualizarMatchManualPendienteBadge(){
+  const badge = document.getElementById('matchmanualpendientebadge');
+  if (!badge) return;
+  const n = misMatchesReal.filter(m => m.estado === 'pendiente' && m.origen === 'manual').length;
   if (n > 0) { badge.textContent = n; badge.style.display = 'inline-flex'; }
   else { badge.style.display = 'none'; }
 }
@@ -6002,6 +6027,13 @@ function renderMatchPipelineStepper(etapa){
 
 // Touchpoint 1 del pipeline: la agencia compradora (la que tiene el cliente) tiene que aceptar la
 // comisión que ya viene cargada en el vehículo antes de poder coordinar por WhatsApp con la vendedora.
+// Igual que showApp('matches'), pero respeta si estábamos parados en "Mis Matches" o en
+// "Matches Manuales" — antes, aceptar/rechazar comisión, contactar, cerrar, etc. siempre te
+// sacaban a Mis Matches sin importar desde qué pestaña habías hecho la acción.
+function vistaMatchesActual(){
+  const active = document.querySelector('.nav-item.active')?.dataset.view;
+  return active === 'manuales' ? 'manuales' : 'matches';
+}
 async function aceptarComisionMatch(matchId){
   const m = misMatchesReal.find(x=>x.id===matchId);
   if (!m) return;
@@ -6014,7 +6046,7 @@ async function aceptarComisionMatch(matchId){
     crearNotificacion(m.otraAgenciaId, 'match_etapa', '¡Comisión aceptada!', `${currentAgencia?.nombre || 'La agencia'} aceptó la comisión propuesta (${m.comisionVehiculo || '—'}) para ${m.vehiculo}. Ya pueden coordinar por WhatsApp.`, m.id);
     toast('Comisión aceptada. Ya podés contactar a la otra agencia.');
   }
-  await showApp('matches');
+  await showApp(vistaMatchesActual());
 }
 // Rechazar la comisión propuesta cierra la operación directamente como caída (sin pasar por el
 // modal genérico de cierre, que queda reservado para cuando ya se avanzó en la negociación).
@@ -6026,7 +6058,7 @@ async function rechazarComisionMatch(matchId){
     if (error) { toast('Error al rechazar la comisión.'); console.error('rechazarComisionMatch:', error); return; }
     crearNotificacion(m.otraAgenciaId, 'match_cerrado', 'Comisión rechazada', `${currentAgencia?.nombre || 'La agencia'} rechazó la comisión propuesta para ${m.vehiculo}. La operación quedó caída.`, m.id);
     toast('Comisión rechazada. Operación marcada como caída.');
-    await showApp('matches');
+    await showApp(vistaMatchesActual());
   });
 }
 // Marca el match como "contactado" (una sola vez) y abre WhatsApp a la contraparte
@@ -6048,7 +6080,7 @@ async function contactarMatch(matchId){
     else crearNotificacion(m.otraAgenciaId, 'match_etapa', 'Te contactaron por un match', `${currentAgencia?.nombre || 'Una agencia'} te escribió por el match de ${m.vehiculo}.`, m.id);
   }
   window.open(url, '_blank');
-  await showApp('matches');
+  await showApp(vistaMatchesActual());
 }
 // Marca el match como "cliente informado". Si soy la agencia compradora (tengo el teléfono del
 // cliente), le abre un WhatsApp pre-armado avisándole dónde y con quién visitar el vehículo.
@@ -6069,7 +6101,7 @@ async function informarClienteMatch(matchId){
   } else {
     toast('Match actualizado');
   }
-  await showApp('matches');
+  await showApp(vistaMatchesActual());
 }
 // Retrocede el match un paso en el pipeline (por si se avanzó por error)
 async function retrocederMatch(matchId){
@@ -6083,7 +6115,7 @@ async function retrocederMatch(matchId){
     const { error } = await supa.from('matches').update(payload).eq('id', matchId);
     if (error) { toast('Error al retroceder el match.'); console.error('retrocederMatch:', error); return; }
     toast('Match retrocedido un paso');
-    await showApp('matches');
+    await showApp(vistaMatchesActual());
   });
 }
 
@@ -6317,7 +6349,7 @@ async function confirmarCerrarMatch(){
   toast(esConcretada ? 'Operación marcada como concretada' : 'Operación marcada como caída');
 
   _cerrarMatchId = null; _cerrarMatchResultado = null; _cerrarMatchSoloCaida = false;
-  await showApp('matches');
+  await showApp(vistaMatchesActual());
 }
 
 /* ---------------- reabrir operación (concretada o caída) — solo la agencia vendedora ---------------- */
@@ -6375,7 +6407,7 @@ async function confirmarReabrirMatch(){
   toast('Operación reabierta');
 
   _reabrirMatchId = null;
-  await showApp('matches');
+  await showApp(vistaMatchesActual());
 }
 
 /* ---------------- carga de comisión (la completa la agencia compradora, que es quien la cobra) ---------------- */
@@ -6404,7 +6436,7 @@ async function confirmarCargarComision(){
   closeModal('cargarcomision');
   toast('Comisión guardada');
   _comisionMatchId = null;
-  await showApp('matches');
+  await showApp(vistaMatchesActual());
 
   if (m) {
     setTimeout(() => {
@@ -6490,6 +6522,72 @@ function notificarContactoWhatsapp(vehiculoId){
   crearNotificacion(v.agencia_id, 'whatsapp_recibido', 'Te contactaron por WhatsApp', `Alguien está interesado en tu ${vehTxt}.`, v.id);
 }
 
+/* ---------------- Contacto manual (Explorar la Red / Gremio) ---------------- */
+// Antes, apretar "Contactar Agencia" solo abría WhatsApp — no quedaba ningún registro de esa
+// operación (ni comisión, ni seguimiento, ni aparecía en Ventas realizadas). Ahora cada contacto
+// crea un match real (origen='manual'), separado del feed de matches automáticos, visible en la
+// pestaña "Matches Manuales" de ambas agencias.
+function _buscarVehiculoParaContacto(vehiculoId){
+  return redStock.find(x=>x.id===vehiculoId) || redGremioReal.find(x=>x.id===vehiculoId) || null;
+}
+let _contactoManualVehiculoId = null;
+function abrirContactoManual(vehiculoId){
+  _contactoManualVehiculoId = vehiculoId;
+  document.getElementById('cm-cliente-nombre').value = '';
+  document.getElementById('cm-cliente-telefono').value = '';
+  openModal('contactomanual');
+}
+// A diferencia de un match automático, el contacto manual no reserva el vehículo ni bloquea a
+// otras agencias — varias pueden "tantear" el mismo auto en paralelo (quedan varios matches
+// manuales en estado 'propuesta', uno por cada agencia que contactó). La reserva real recién pasa
+// cuando alguna, desde Matches Manuales, aprieta "Aceptar comisión" — ahí se dispara la misma
+// función que ya usan los matches automáticos (aceptarComisionMatch), que sí reserva el vehículo
+// y cancela a las demás. Contactar es solo "avisar que estoy interesado", no "me lo quedo".
+async function confirmarContactoManual(){
+  if (!currentAgencia) return;
+  const v = _buscarVehiculoParaContacto(_contactoManualVehiculoId);
+  if (!v || !v.agencia_id) { toast('No se pudo encontrar el vehículo.'); return; }
+  const nombreCliente = document.getElementById('cm-cliente-nombre').value.trim();
+  if (!nombreCliente) { toast('Ingresá el nombre del cliente antes de continuar.'); return; }
+  const telefonoCliente = document.getElementById('cm-cliente-telefono').value.trim();
+
+  const waHref = v.agencias?.telefono
+    ? `https://wa.me/${v.agencias.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(construirMensajeWhatsappVehiculo(v.agencias?.nombre, [v.marca,v.modelo].filter(Boolean).join(' ')))}`
+    : null;
+  if (!waHref) { toast('Esta agencia todavía no cargó un teléfono de contacto.'); return; }
+
+  const btn = document.getElementById('contactomanual-confirm-btn');
+  btn.disabled = true; btn.textContent = 'Contactando...';
+
+  try {
+    const { error: errIns } = await supa.from('matches').insert({
+      vehiculo_id: v.id,
+      agencia_vendedora: v.agencia_id,
+      agencia_compradora: currentAgencia.id,
+      estado: 'pendiente',
+      origen: 'manual',
+      cliente_nombre: nombreCliente,
+      cliente_telefono: telefonoCliente || null,
+    });
+    if (errIns) throw errIns;
+
+    registrarClicReal('vehiculo', v.id, 'whatsapp');
+    const vehTxt = [v.marca, v.modelo].filter(Boolean).join(' ') || 'vehículo';
+    crearNotificacion(v.agencia_id, 'whatsapp_recibido', 'Te contactaron por WhatsApp', `Alguien está interesado en tu ${vehTxt}.`, v.id);
+
+    closeModal('contactomanual');
+    window.open(waHref, '_blank');
+    toast('Contacto registrado en Matches Manuales. Si el cliente sigue interesado, aceptá la comisión desde ahí para reservar el vehículo.');
+    await cargarMisMatches();
+  } catch (e) {
+    console.error('confirmarContactoManual:', e);
+    toast('Error al registrar el contacto: ' + (e.message || ''));
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp';
+  }
+}
+
 let notificacionesReal = [];
 async function cargarNotificacionesReal(){
   notificacionesReal = [];
@@ -6524,7 +6622,11 @@ async function abrirNotificacion(id){
   if (!n) return;
   await marcarNotifLeidaReal(id);
   if (n.tipo === 'whatsapp_recibido' || n.tipo === 'me_interesa') { showApp('vehículos'); return; }
-  if (n.tipo && n.tipo.startsWith('match')) { showApp('matches'); return; }
+  if (n.tipo && n.tipo.startsWith('match')) {
+    const m = misMatchesReal.find(x => x.id === n.referencia_id);
+    showApp(m?.origen === 'manual' ? 'manuales' : 'matches');
+    return;
+  }
   if (n.tipo === 'ticket_respondido') { showApp('soporte'); return; }
   showApp('notificaciones');
 }
@@ -6970,7 +7072,7 @@ function renderDetailModalReal(v){
       ${mapHTML}
       <div class="propdetail-agency">Publicada por <strong>${esc(v.agencias?.nombre || 'Agencia')}</strong>${verificadaBadgeHTML(v.agencias?.verificada)}</div>
       <div class="propdetail-actions">
-        ${waHref ? `<button class="btn btn-solid btn-contact-lime" onclick="registrarClicReal('vehiculo','${v.id}','whatsapp');notificarContactoWhatsapp('${v.id}');window.open('${waHref}','_blank')"><i class="fa-brands fa-whatsapp"></i> Contactar Agencia</button>` : ''}
+        ${waHref ? `<button class="btn btn-solid btn-contact-lime" onclick="abrirContactoManual('${v.id}')"><i class="fa-brands fa-whatsapp"></i> Contactar Agencia</button>` : ''}
         <button class="btn" onclick="closeModal('propdetail')">Cerrar</button>
       </div>
     </div>
@@ -7026,7 +7128,7 @@ async function cargarDashboardData(){
   const [stockRes, busquedasRes, matchesRes, califRes] = await Promise.all([
     supa.from('vehiculos').select('*').eq('agencia_id', currentAgencia.id),
     supa.from('busquedas').select('*').eq('agencia_id', currentAgencia.id),
-    supa.from('matches').select('*').or(`agencia_vendedora.eq.${currentAgencia.id},agencia_compradora.eq.${currentAgencia.id}`),
+    supa.from('matches').select('*, veh:vehiculo_id(precio, moneda)').or(`agencia_vendedora.eq.${currentAgencia.id},agencia_compradora.eq.${currentAgencia.id}`),
     supa.from('calificaciones').select('estrellas').eq('agencia_destino_id', currentAgencia.id).eq('visible', true)
   ]);
   dashStock = stockRes.data || [];
@@ -7463,6 +7565,8 @@ async function showApp(view){
     }
     await Promise.all(tareas);
     await marcarMatchNuevoNotifsLeidas();
+  } else if (view === 'manuales') {
+    await cargarMisMatches();
   } else if (view === 'exclusiva') {
     await cargarMisGremio();
     await cargarRedGremio();
@@ -7519,6 +7623,39 @@ function matchesFiltroBarHTML(){
       </select>
       <select onchange="cambiarMatchesFiltroAnio(this.value)" ${matchesFiltroMes==='todos'?'disabled':''}>
         ${anios.map(a=>`<option value="${a}" ${matchesFiltroAnio===a?'selected':''}>${a}</option>`).join('')}
+      </select>
+    </div>
+  </div>`;
+}
+
+// Estado propio de "Matches Manuales" — separado del de Mis Matches para no pisarse entre pestañas.
+let matchesManualesTab = 'pipeline';
+let matchesManualesFiltroMes = 'todos';
+let matchesManualesFiltroAnio = new Date().getFullYear();
+let matchesManualesListaOculta = false;
+function setMatchesManualesTab(tab){ matchesManualesTab = tab; showApp('manuales'); }
+function cambiarMatchesManualesFiltroMes(v){ matchesManualesFiltroMes = v; showApp('manuales'); }
+function cambiarMatchesManualesFiltroAnio(v){ matchesManualesFiltroAnio = Number(v); showApp('manuales'); }
+function toggleMatchesManualesLista(){ matchesManualesListaOculta = !matchesManualesListaOculta; showApp('manuales'); }
+function enMesFiltroMatchesManuales(fechaIso){
+  if (matchesManualesFiltroMes === 'todos') return true;
+  if (!fechaIso) return false;
+  const d = new Date(fechaIso);
+  return (d.getMonth() + 1) === Number(matchesManualesFiltroMes) && d.getFullYear() === matchesManualesFiltroAnio;
+}
+function matchesManualesFiltroBarHTML(){
+  const anioActual = new Date().getFullYear();
+  const anios = [anioActual - 1, anioActual, anioActual + 1];
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+    <button class="btn btn-solid" onclick="toggleMatchesManualesLista()"><i class="fa-solid ${matchesManualesListaOculta?'fa-eye':'fa-eye-slash'}"></i> ${matchesManualesListaOculta?'Mostrar lista':'Ocultar lista'}</button>
+    <div style="display:flex;gap:10px;">
+      <select onchange="cambiarMatchesManualesFiltroMes(this.value)">
+        <option value="todos" ${matchesManualesFiltroMes==='todos'?'selected':''}>Todos los meses</option>
+        ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${matchesManualesFiltroMes===String(i+1)?'selected':''}>${m}</option>`).join('')}
+      </select>
+      <select onchange="cambiarMatchesManualesFiltroAnio(this.value)" ${matchesManualesFiltroMes==='todos'?'disabled':''}>
+        ${anios.map(a=>`<option value="${a}" ${matchesManualesFiltroAnio===a?'selected':''}>${a}</option>`).join('')}
       </select>
     </div>
   </div>`;
@@ -7622,6 +7759,17 @@ performance: ()=>{
   const comisionesUsd = comisionesPorMoneda['USD'] || 0;
   const comisionesArs = comisionesPorMoneda['ARS'] || 0;
 
+  // Ventas realizadas: el precio del vehículo cuando SOS la vendedora, a diferencia de la
+  // comisión de arriba (que cobra la compradora). Mismo criterio de mes/año que el resto del resumen.
+  const ventasPorMoneda = {};
+  concretadas.forEach(m => {
+    if (m.soyVendedor && m.precioVehiculoNumerico) {
+      ventasPorMoneda[m.monedaVehiculo] = (ventasPorMoneda[m.monedaVehiculo] || 0) + Number(m.precioVehiculoNumerico);
+    }
+  });
+  const ventasUsd = ventasPorMoneda['USD'] || 0;
+  const ventasArs = ventasPorMoneda['ARS'] || 0;
+
   const anioActual = new Date().getFullYear();
   const aniosDisponibles = [anioActual - 1, anioActual, anioActual + 1];
 
@@ -7653,6 +7801,16 @@ performance: ()=>{
       <div class="card" style="flex:1;min-width:220px;margin-top:0;">
         <div class="lbl">Ingreso por comisiones en ARS</div>
         <div class="val" style="font-size:28px;">${comisionesArs ? fmtMoney(comisionesArs, 'ARS') : '—'}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;">
+      <div class="card" style="flex:1;min-width:220px;margin-top:0;">
+        <div class="lbl">Ventas realizadas en USD</div>
+        <div class="val" style="font-size:28px;">${ventasUsd ? fmtMoney(ventasUsd, 'USD') : '—'}</div>
+      </div>
+      <div class="card" style="flex:1;min-width:220px;margin-top:0;">
+        <div class="lbl">Ventas realizadas en ARS</div>
+        <div class="val" style="font-size:28px;">${ventasArs ? fmtMoney(ventasArs, 'ARS') : '—'}</div>
       </div>
     </div>
     <div style="display:flex;gap:40px;flex-wrap:wrap;margin-top:20px;">
@@ -7797,6 +7955,25 @@ dashboard: ()=>`
       return [ars ? fmtMoney(ars,'ARS') : null, usd ? fmtMoney(usd,'USD') : null].filter(Boolean).join(' + ');
     })()}</div></div>
     <div class="kpi"><div class="lbl">Tasa de conversión</div><div class="val">${dashMatches.length? Math.round(dashMatches.filter(m=>m.estado==='concretada').length / dashMatches.length * 100) : 0}%</div></div>
+  </div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:26px;">
+    ${(() => {
+      // Ventas realizadas: vale cuando SOS la vendedora (tenías el auto en stock y se concretó), a
+      // diferencia de "Ingreso por comisiones" arriba, que es lo que cobrás como compradora.
+      const vendidas = dashMatches.filter(m=>m.estado==='concretada' && m.agencia_vendedora===currentAgencia.id && m.veh?.precio);
+      const ars = vendidas.filter(m=>(m.veh?.moneda||'ARS')==='ARS').reduce((s,m)=>s+Number(m.veh.precio||0),0);
+      const usd = vendidas.filter(m=>m.veh?.moneda==='USD').reduce((s,m)=>s+Number(m.veh.precio||0),0);
+      return `
+        <div class="kpi" style="flex:1;min-width:220px;">
+          <div class="lbl">Ventas realizadas en USD</div>
+          <div class="val" style="font-size:19px;">${usd ? fmtMoney(usd,'USD') : '—'}</div>
+        </div>
+        <div class="kpi" style="flex:1;min-width:220px;">
+          <div class="lbl">Ventas realizadas en ARS</div>
+          <div class="val" style="font-size:19px;">${ars ? fmtMoney(ars,'ARS') : '—'}</div>
+        </div>
+      `;
+    })()}
   </div>
   <div class="two-col">
     <div class="card">
@@ -8028,9 +8205,10 @@ busquedas: ()=>`
 
 matches: ()=>{
   let body;
-  const pendientes = misMatchesReal.filter(m=>m.estado==='pendiente');
-  const concretadas = misMatchesReal.filter(m=>m.estado==='concretada');
-  const caidas = misMatchesReal.filter(m=>m.estado==='cancelada');
+  const misMatchesAutomaticos = misMatchesReal.filter(m=>m.origen!=='manual');
+  const pendientes = misMatchesAutomaticos.filter(m=>m.estado==='pendiente');
+  const concretadas = misMatchesAutomaticos.filter(m=>m.estado==='concretada');
+  const caidas = misMatchesAutomaticos.filter(m=>m.estado==='cancelada');
   if(matchesTab==='favoritas'){
     const favs = redStock.filter(v=>misIntereses.includes(v.id));
     body = favs.length
@@ -8059,6 +8237,32 @@ matches: ()=>{
     <button class="view-toggle-btn ${matchesTab==='favoritas'?'active':''}" onclick="setMatchesTab('favoritas')"><i class="fa-solid fa-heart"></i> Vehículos que me interesan</button>
     <button class="view-toggle-btn ${matchesTab==='concretadas'?'active':''}" onclick="setMatchesTab('concretadas')"><i class="fa-solid fa-circle-check"></i> Operaciones concretadas</button>
     <button class="view-toggle-btn ${matchesTab==='caidas'?'active':''}" onclick="setMatchesTab('caidas')"><i class="fa-solid fa-circle-xmark"></i> Operaciones caídas</button>
+  </div>
+  ${body}
+`;
+},
+
+manuales: ()=>{
+  let body;
+  const misMatchesManuales = misMatchesReal.filter(m=>m.origen==='manual');
+  const pendientes = misMatchesManuales.filter(m=>m.estado==='pendiente');
+  const concretadas = misMatchesManuales.filter(m=>m.estado==='concretada');
+  const caidas = misMatchesManuales.filter(m=>m.estado==='cancelada');
+  if(matchesManualesTab==='concretadas'){
+    const concretadasFiltradas = concretadas.filter(m => enMesFiltroMatchesManuales(m.cerradoAtRaw));
+    body = matchesManualesFiltroBarHTML() + (matchesManualesListaOculta ? '' : renderMatchSections(concretadasFiltradas, 'No hay operaciones concretadas para el período seleccionado.'));
+  } else if(matchesManualesTab==='caidas'){
+    const caidasFiltradas = caidas.filter(m => enMesFiltroMatchesManuales(m.cerradoAtRaw));
+    body = matchesManualesFiltroBarHTML() + (matchesManualesListaOculta ? '' : renderMatchSections(caidasFiltradas, 'No hay operaciones caídas para el período seleccionado.'));
+  } else {
+    body = renderMatchSections(pendientes, 'Todavía no hay matches manuales. Se crean solos cuando contactás o te contactan por WhatsApp desde una card de Explorar la Red o Gremio.');
+  }
+  return `
+  <div class="main-head"><div><h1>Matches Manuales</h1><p class="sub">Contactos directos por WhatsApp desde Explorar la Red y Gremio — ${pendientes.length} pendiente${pendientes.length===1?'':'s'} · ${concretadas.length} concretada${concretadas.length===1?'':'s'} · ${caidas.length} caída${caidas.length===1?'':'s'}</p></div></div>
+  <div class="view-toggle">
+    <button class="view-toggle-btn ${matchesManualesTab==='pipeline'?'active':''}" onclick="setMatchesManualesTab('pipeline')"><i class="fa-solid fa-timeline"></i> Pipeline</button>
+    <button class="view-toggle-btn ${matchesManualesTab==='concretadas'?'active':''}" onclick="setMatchesManualesTab('concretadas')"><i class="fa-solid fa-circle-check"></i> Operaciones concretadas</button>
+    <button class="view-toggle-btn ${matchesManualesTab==='caidas'?'active':''}" onclick="setMatchesManualesTab('caidas')"><i class="fa-solid fa-circle-xmark"></i> Operaciones caídas</button>
   </div>
   ${body}
 `;
