@@ -132,6 +132,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .btn:hover{border-color:var(--red);color:var(--red-dark);}
   .agency-name{color:#E25C5C;font-weight:700;}
   @keyframes pulse-ring{0%{transform:scale(.5);opacity:.7;}100%{transform:scale(1.5);opacity:0;}}
+  @keyframes view-spin{to{transform:rotate(360deg);}}
+  .view-loading{display:flex;align-items:center;justify-content:center;min-height:260px;}
+  .view-loading .spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--red);animation:view-spin .7s linear infinite;}
   .search-pulse{position:relative;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;margin-right:9px;vertical-align:middle;flex-shrink:0;}
   .search-pulse .ring{position:absolute;width:26px;height:26px;border-radius:50%;border:2px solid var(--red);opacity:0;animation:pulse-ring 1.8s ease-out infinite;}
   .search-pulse .ring:nth-child(2){animation-delay:.6s;}
@@ -207,6 +210,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .pill.pill-red{color:#FFFFFF;background:var(--red);border-color:var(--red);}
   .pill.pill-sage{color:#166534;background:#f0fdf4;border-color:#bbf7d0;}
+  .pill.pill-verificada{color:#FFFFFF;background:#3897F0;border-color:#3897F0;}
 
   /* ---- panel de administrador ---- */
   #view-admin .admin-section-title{color:var(--red);}
@@ -1973,102 +1977,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </div>
 
-<div id="modal-newclient" class="modal-backdrop hidden">
-  <div class="modal modal-wide">
-    <h3 id="newclient-modal-title">Agregar cliente</h3>
-    <p class="sub">Elegí qué tipo de cliente es. Se publica en la red cuando corresponde, para generar matches.</p>
-
-    <div class="client-type-toggle">
-      <button type="button" class="client-type-btn" id="type-btn-buscador" onclick="setNewClientType('buscador')">
-        <span class="client-type-name">Cliente buscador</span>
-        <span class="client-type-desc">Busca comprar o consignar un vehículo</span>
-      </button>
-      <button type="button" class="client-type-btn" id="type-btn-vendedor" onclick="setNewClientType('vendedor')">
-        <span class="client-type-name">Cliente vendedor</span>
-        <span class="client-type-desc">Trae su vehículo para vender o consignar</span>
-      </button>
-    </div>
-
-    <div class="avatar-picker-trigger">
-      <div class="avatar-circle" id="c-avatar-preview"><i class="fa-solid fa-user"></i></div>
-      <button class="btn btn-sm" type="button" onclick="openModal('avatarpicker')"><i class="fa-solid fa-image"></i> Elegir avatar</button>
-    </div>
-    <div class="row-2">
-      <div class="field"><label>Nombre completo</label><input id="c-nombre" placeholder="Nombre y apellido"></div>
-      <div class="field"><label>Teléfono (WhatsApp)</label><input id="c-tel" placeholder="+54 9 ..."></div>
-    </div>
-
-    <div id="fields-buscador">
-      <div class="row-2">
-        <div class="field"><label>Operación que busca</label><select id="c-op"><option>Compra</option><option>Consignación</option></select></div>
-        <div class="field"><label>Tipo de vehículo</label><select id="c-tipo"><option>Sedán</option><option>SUV</option><option>Hatchback</option><option>Pickup</option><option>Coupé</option><option>Camioneta</option><option>Utilitario</option></select></div>
-      </div>
-      <div class="row-2">
-        <div class="field"><label>Ciudad</label><select id="c-ciudad"><option>Tucumán</option><option>Yerba Buena</option><option>Tafí Viejo</option></select></div>
-        <div class="field"><label>Zona preferida</label><input id="c-zona" placeholder="Ej: Barrio Norte (opcional)"></div>
-      </div>
-      <div class="row-3">
-        <div class="field"><label>Presupuesto máximo</label><input id="c-presu" type="number" placeholder="90000"></div>
-        <div class="field"><label>Puertas</label><input id="c-amb" type="number" placeholder="4"></div>
-        <div class="field"><label>Urgencia</label><select id="c-urg"><option>Alta — esta semana</option><option>Media — 2 a 3 semanas</option><option>Baja — 1 mes o más</option></select></div>
-      </div>
-      <div class="field"><label>Notas internas</label><textarea id="c-notas" rows="2" placeholder="Financiamiento, permuta, preferencias..."></textarea></div>
-    </div>
-
-    <div id="fields-vendedor" class="hidden">
-      <div class="row-2">
-        <div class="field"><label>Operación</label><select id="p-op"><option>Venta</option><option>Consignación</option></select></div>
-        <div class="field"><label>Tipo de vehículo</label><select id="p-tipo"><option>Sedán</option><option>SUV</option><option>Hatchback</option><option>Pickup</option><option>Coupé</option><option>Camioneta</option><option>Utilitario</option></select></div>
-      </div>
-      <div class="row-2">
-        <div class="field"><label>Ciudad</label><select id="p-ciudad"><option>Tucumán</option><option>Yerba Buena</option><option>Tafí Viejo</option></select></div>
-        <div class="field"><label>Barrio / Zona</label><input id="p-zona" placeholder="Ej: Barrio Norte"></div>
-      </div>
-      <div class="row-3">
-        <div class="field"><label>Kilometraje (km)</label><input id="p-m2" type="number" placeholder="45000"></div>
-        <div class="field"><label>Versión / Motor</label><input id="p-m2total" type="text" placeholder="1.6 GLS Nafta"></div>
-        <div class="field"><label>Puertas</label><input id="p-amb" type="number" placeholder="4"></div>
-      </div>
-      <div class="row-3">
-        <div class="field"><label>Dueños anteriores</label><input id="p-banos" type="number" placeholder="1"></div>
-        <div class="field"><label>Año (antigüedad)</label><input id="p-ant" type="number" placeholder="3"></div>
-        <div class="field"></div>
-      </div>
-      <div class="field">
-        <label>Equipamiento</label>
-        <div class="amenities-row">
-          <label class="amenity-check"><input type="checkbox" id="p-toilette"> Financiación propia</label>
-          <label class="amenity-check"><input type="checkbox" id="p-piscina"> Aire acondicionado</label>
-          <label class="amenity-check"><input type="checkbox" id="p-cochera"> Techo corredizo</label>
-          <label class="amenity-check"><input type="checkbox" id="p-galeria"> Service oficial al día</label>
-          <label class="amenity-check"><input type="checkbox" id="p-parrilla"> Único dueño</label>
-        </div>
-      </div>
-      <div class="row-2">
-        <div class="field"><label>Precio</label><input id="p-precio" type="number" placeholder="85000"></div>
-        <div class="field"><label>Moneda</label><select id="p-moneda"><option>USD</option><option>ARS</option></select></div>
-      </div>
-      <div class="field"><label>Comisión para concesionaria referidora</label>
-        <select id="p-com"><option>1%</option><option>1.5%</option><option>2%</option><option selected>3%</option><option>4%</option><option>Monto fijo a convenir</option></select>
-      </div>
-      <div class="field">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-          <label style="margin-bottom:0;">Descripción / extras</label>
-          <button type="button" class="btn btn-sm btn-editar-violeta btn-hover-fill" onclick="generateDescriptionAI()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generar con IA</button>
-        </div>
-        <textarea id="p-desc" rows="3" placeholder="Service oficial al día, único dueño, permuta, financiación, disponibilidad para prueba de manejo..."></textarea>
-      </div>
-      <p style="font-size:11px;color:var(--paper-dim);">Al publicar en la red, te comprometés a respetar los Términos y Condiciones y a pagar la comisión acordada al concretarse una operación por match.</p>
-
-    </div>
-
-    <div class="modal-close-row">
-      <button class="btn" onclick="closeModal('newclient')">Cancelar</button>
-      <button class="btn btn-solid" id="newclient-submit-btn" onclick="submitNewClient()">Guardar cliente</button>
-    </div>
-  </div>
-</div>
-
 <div id="modal-newsearch" class="modal-backdrop hidden">
   <div class="modal modal-wide">
     <h3 id="newsearch-modal-title">Agregar vehículo buscado</h3>
@@ -2461,19 +2369,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </div>
 
-<div id="modal-counteroffer" class="modal-backdrop hidden">
-  <div class="modal" style="position:relative;">
-    <button class="avatar-modal-close" onclick="closeModal('counteroffer')"><i class="fa-solid fa-xmark"></i></button>
-    <h3 id="counteroffer-title">Proponer una nueva comisión</h3>
-    <p class="sub" id="counteroffer-sub">Le vas a enviar esta propuesta a la otra concesionaria.</p>
-    <div class="field"><label>Comisión propuesta</label><input id="counteroffer-input" placeholder="Ej: 4% o &quot;Monto fijo a convenir&quot;"></div>
-    <div class="modal-close-row">
-      <button class="btn" onclick="closeModal('counteroffer')">Cancelar</button>
-      <button class="btn btn-solid" onclick="submitCounterOfferModal()">Enviar contraoferta</button>
-    </div>
-  </div>
-</div>
-
 <div id="modal-denunciar" class="modal-backdrop hidden">
   <div class="modal" style="position:relative;">
     <button class="avatar-modal-close" onclick="closeModal('denunciar')"><i class="fa-solid fa-xmark"></i></button>
@@ -2556,25 +2451,10 @@ function escJs(v){
 }
 
 /* ---------------- state ---------------- */
-const AGENCY = {name:"AutoValle Motors", city:"Tucumán", plan:"Pro"};
-
-let myProps = [];
-let myClients = [];
-let idSeq = 3;
 let misBusquedasReal = [];
 let misClientesReal = [];
 let clientesSearchQuery = '';
 
-/* Antes había datos hardcodeados de "otras agencias" acá — se eliminaron.
-   La Red / Explorar la Red se conecta a Supabase en el próximo paso. */
-const networkProps = [];
-const networkSearches = [];
-
-let matches = [];
-let notifications = [
-  {id:'n1', icon:'fa-link', color:'red', title:'Nuevo match con Valle Premium Autos', text:'Tu vehículo en Barrio Norte coincide con lo que busca su cliente Elena Suárez.', date:'2026-07-07T16:25:00', read:false},
-  {id:'n2', icon:'fa-star', color:'gold', title:'Recibiste una nueva review', text:'Norte Motors te calificó con 5 estrellas tras una operación.', date:'2026-07-06T12:00:00', read:true},
-];
 let misTicketsReal = [];
 async function cargarMisTickets(){
   if (!currentAgencia) { misTicketsReal = []; return; }
@@ -2902,27 +2782,6 @@ async function limpiarMisTicketsReal(){
     showApp('soporte');
   });
 }
-function addNotification(icon, color, title, text){
-  notifications.unshift({id:'n'+(idSeq++), icon, color, title, text, date:new Date().toISOString(), read:false});
-  updateNotifDot();
-}
-function updateNotifDot(){
-  const dot = document.getElementById('notifdot');
-  if(dot) dot.style.display = notifications.some(n=>!n.read) ? 'block' : 'none';
-}
-function markNotificationRead(id){
-  const n = notifications.find(x=>x.id===id);
-  if(n && !n.read){ n.read = true; showApp('notificaciones'); }
-}
-function markAllNotificationsRead(){
-  notifications.forEach(n=>n.read=true);
-  showApp('notificaciones');
-}
-function clearNotifications(){
-  notifications = [];
-  updateNotifDot();
-  showApp('notificaciones');
-}
 // Ciudades hardcodeadas por ahora (ver charla pendiente sobre cómo cargar más ciudades).
 const CIUDADES_RED = ['Tucumán', 'Yerba Buena', 'Tafí Viejo'];
 
@@ -3183,7 +3042,7 @@ function abrirPerfilAgenciaPublico(agencyId){
     <div class="agencyprofile-header">
       <div class="stock-thumb" style="width:64px;height:64px;border-radius:50%;flex-shrink:0;">${a.logo_url?`<img src="${a.logo_url}" alt="${esc(a.nombre)}">`:`<i class="fa-solid fa-car"></i>`}</div>
       <div>
-        <div class="agency-detail-name">${esc(a.nombre)}${a.oficial?` <span class="pill pill-sage" style="vertical-align:middle;"><i class="fa-solid fa-circle-check"></i> Concesionaria oficial</span>`:''}</div>
+        <div class="agency-detail-name">${esc(a.nombre)}${a.oficial?` <span class="pill pill-sage" style="vertical-align:middle;"><i class="fa-solid fa-circle-check"></i> Concesionaria oficial</span>`:''}${verificadaBadgeHTML(a.verificada)}</div>
         <div class="agency-detail-meta">${esc(a.ciudad || '—')}${esc(a.direccion ? ' · ' + a.direccion : '')}</div>
       </div>
     </div>
@@ -3292,30 +3151,18 @@ function clientAvatarHTML(c){
   }
   return `<div class="avatar-circle" style="cursor:pointer;" onclick="openAvatarPickerFor('client','${c.id}')" title="Cambiar avatar">${esc(initials(c.nombre))}</div>`;
 }
-function ownerAvatarHTML(p){
-  if(p.avatar !== null && p.avatar !== undefined && AVATAR_IMAGES[p.avatar]){
-    return `<div class="avatar-circle" style="cursor:pointer;" onclick="openAvatarPickerFor('prop','${p.id}')" title="Cambiar avatar">${avatarImgHTML(p.avatar)}</div>`;
-  }
-  return `<div class="avatar-circle" style="cursor:pointer;" onclick="openAvatarPickerFor('prop','${p.id}')" title="Cambiar avatar">${initials(p.vendedor)}</div>`;
-}
 let pendingAvatar = null;
 let avatarPickerContext = {mode:'new'};
 function findClientLikeById(id){
   let arr = misClientesReal, item = arr.find(x=>x.id===id);
   if(item) return {item, arr};
   arr = misBusquedasReal; item = arr.find(x=>x.id===id);
-  if(item) return {item, arr};
-  arr = myClients; item = arr.find(x=>x.id===id);
   return {item: item||null, arr: item?arr:null};
 }
 function renderAvatarGrid(){
   let selectedIdx = pendingAvatar;
   if(avatarPickerContext.mode==='edit'){
-    if(avatarPickerContext.target==='prop'){
-      selectedIdx = (myProps.find(x=>x.id===avatarPickerContext.id)||{}).avatar;
-    } else {
-      selectedIdx = (findClientLikeById(avatarPickerContext.id).item||{}).avatar;
-    }
+    selectedIdx = (findClientLikeById(avatarPickerContext.id).item||{}).avatar;
   }
   document.getElementById('avatar-grid').innerHTML = AVATAR_IMAGES.map((src,idx)=>
     `<button type="button" class="avatar-option ${selectedIdx===idx?'selected':''}" onclick="selectAvatarPreset(${idx})">${avatarImgHTML(idx)}</button>`
@@ -3327,22 +3174,17 @@ function openAvatarPickerFor(target, id){
   openModal('avatarpicker');
 }
 function applyAvatarInEditMode(value){
-  if(avatarPickerContext.target==='prop'){
-    const item = myProps.find(x=>x.id===avatarPickerContext.id);
-    if(item){ item.avatar = value; persistData(); }
-  } else {
-    const { item } = findClientLikeById(avatarPickerContext.id);
-    if(item){
-      const clienteKey = item.clienteId || item.id;
-      item.avatar = value;
-      // sincronizamos el mismo cliente si aparece tanto en Mis Clientes como en La Red está buscando
-      [misClientesReal, misBusquedasReal].forEach(arr=>{
-        arr.forEach(x=>{ if((x.clienteId||x.id)===clienteKey) x.avatar = value; });
-      });
-      supa.from('clientes').update({ avatar: value }).eq('id', clienteKey).then(({error})=>{
-        if(error){ console.error('guardar avatar:', error); toast('No se pudo guardar el avatar de forma permanente: ' + error.message); }
-      });
-    }
+  const { item } = findClientLikeById(avatarPickerContext.id);
+  if(item){
+    const clienteKey = item.clienteId || item.id;
+    item.avatar = value;
+    // sincronizamos el mismo cliente si aparece tanto en Mis Clientes como en La Red está buscando
+    [misClientesReal, misBusquedasReal].forEach(arr=>{
+      arr.forEach(x=>{ if((x.clienteId||x.id)===clienteKey) x.avatar = value; });
+    });
+    supa.from('clientes').update({ avatar: value }).eq('id', clienteKey).then(({error})=>{
+      if(error){ console.error('guardar avatar:', error); toast('No se pudo guardar el avatar de forma permanente: ' + error.message); }
+    });
   }
   closeModal('avatarpicker');
   const active = document.querySelector('.nav-item.active');
@@ -3360,194 +3202,6 @@ function useInitialsAvatar(){
   pendingAvatar = null;
   document.getElementById('c-avatar-preview').innerHTML = `<i class="fa-solid fa-user"></i>`;
   closeModal('avatarpicker');
-}
-
-/* ---------------- alta unificada de cliente (buscador / vendedor) ---------------- */
-let newClientType = 'buscador';
-function setNewClientType(type){
-  newClientType = type;
-  document.getElementById('type-btn-buscador').classList.toggle('selected', type==='buscador');
-  document.getElementById('type-btn-vendedor').classList.toggle('selected', type==='vendedor');
-  document.getElementById('fields-buscador').classList.toggle('hidden', type!=='buscador');
-  document.getElementById('fields-vendedor').classList.toggle('hidden', type!=='vendedor');
-}
-function generateDescriptionAI(){
-  const tipo = document.getElementById('p-tipo').value;
-  const op = document.getElementById('p-op').value;
-  const zona = document.getElementById('p-zona').value;
-  const ciudad = document.getElementById('p-ciudad').value;
-  const m2 = document.getElementById('p-m2').value;
-  const m2total = document.getElementById('p-m2total').value;
-  const amb = document.getElementById('p-amb').value;
-  const banos = document.getElementById('p-banos').value;
-  const ant = document.getElementById('p-ant').value;
-  const amenities = [];
-  if(document.getElementById('p-toilette').checked) amenities.push('toilette');
-  if(document.getElementById('p-piscina').checked) amenities.push('piscina');
-  if(document.getElementById('p-cochera').checked) amenities.push('cochera');
-  if(document.getElementById('p-galeria').checked) amenities.push('service oficial');
-  if(document.getElementById('p-parrilla').checked) amenities.push('único dueño');
-
-  let frase = `${tipo}${amb?' de '+amb+' puertas':''}${op==='Venta'?' en venta':' en consignación'}${zona?' en '+zona:''}${ciudad?', '+ciudad:''}.`;
-
-  const detalles = [];
-  if(m2) detalles.push(`${m2} km`);
-  if(m2total) detalles.push(`versión ${m2total}`);
-  if(banos) detalles.push(`${banos} dueño${banos>1?'s':''} anterior${banos>1?'es':''}`);
-  if(detalles.length) frase += ` Cuenta con ${detalles.join(', ')}.`;
-
-  if(amenities.length===1) frase += ` Dispone de ${amenities[0]}.`;
-  else if(amenities.length>1) frase += ` Dispone de ${amenities.slice(0,-1).join(', ')} y ${amenities[amenities.length-1]}.`;
-
-  if(ant) frase += ` Antigüedad: ${ant} años.`;
-
-  if(amb>=3 || detalles.length>=2) frase += ' Ideal para familia, muy cuidado y en excelente estado general.';
-  else frase += ' Muy buena opción, cuidado y con service al día.';
-
-  document.getElementById('p-desc').value = frase;
-  toast('Descripción generada');
-}
-let editingContext = null;
-function openNewClientModal(presetType){
-  editingContext = null;
-  document.getElementById('newclient-modal-title').textContent = 'Agregar cliente';
-  document.getElementById('newclient-submit-btn').textContent = 'Guardar cliente';
-  avatarPickerContext = {mode:'new'};
-  pendingAvatar = null;
-  document.getElementById('c-avatar-preview').innerHTML = `<i class="fa-solid fa-user"></i>`;
-  document.getElementById('c-nombre').value = '';
-  document.getElementById('c-tel').value = '';
-  renderAvatarGrid();
-  setNewClientType(presetType || 'buscador');
-  openModal('newclient');
-}
-function fillAvatarPreview(avatar){
-  pendingAvatar = (avatar!==undefined && avatar!==null) ? avatar : null;
-  document.getElementById('c-avatar-preview').innerHTML = (pendingAvatar!==null && AVATAR_IMAGES[pendingAvatar]) ? avatarImgHTML(pendingAvatar) : `<i class="fa-solid fa-user"></i>`;
-}
-function openEditClientModal(id){
-  const c = myClients.find(x=>x.id===id);
-  if(!c) return;
-  editingContext = {type:'client', id};
-  avatarPickerContext = {mode:'new'};
-  fillAvatarPreview(c.avatar);
-  document.getElementById('c-nombre').value = c.nombre || '';
-  document.getElementById('c-tel').value = c.tel || '';
-  document.getElementById('c-op').value = c.op;
-  document.getElementById('c-tipo').value = c.tipo;
-  document.getElementById('c-ciudad').value = c.ciudad;
-  document.getElementById('c-zona').value = (c.zona && c.zona!=='—') ? c.zona : '';
-  document.getElementById('c-presu').value = c.presu || '';
-  document.getElementById('c-amb').value = c.amb || '';
-  document.getElementById('c-urg').value = c.urg;
-  document.getElementById('c-notas').value = c.notas || '';
-  setNewClientType('buscador');
-  document.getElementById('newclient-modal-title').textContent = 'Editar cliente';
-  document.getElementById('newclient-submit-btn').textContent = 'Guardar cambios';
-  openModal('newclient');
-}
-function openEditPropModal(id){
-  const p = myProps.find(x=>x.id===id);
-  if(!p) return;
-  editingContext = {type:'prop', id};
-  avatarPickerContext = {mode:'new'};
-  fillAvatarPreview(p.avatar);
-  document.getElementById('c-nombre').value = p.vendedor || '';
-  document.getElementById('c-tel').value = p.vendedorTel || '';
-  document.getElementById('p-op').value = p.op;
-  document.getElementById('p-tipo').value = p.tipo;
-  document.getElementById('p-ciudad').value = p.ciudad;
-  document.getElementById('p-zona').value = (p.zona && p.zona!=='—') ? p.zona : '';
-  document.getElementById('p-m2').value = (p.m2 && p.m2!=='—') ? p.m2 : '';
-  document.getElementById('p-m2total').value = (p.m2total && p.m2total!=='—') ? p.m2total : '';
-  document.getElementById('p-amb').value = (p.amb && p.amb!=='—') ? p.amb : '';
-  document.getElementById('p-banos').value = (p.banos && p.banos!=='—') ? p.banos : '';
-  document.getElementById('p-ant').value = (p.ant && p.ant!=='—') ? p.ant : '';
-  document.getElementById('p-toilette').checked = !!p.toilette;
-  document.getElementById('p-piscina').checked = !!p.piscina;
-  document.getElementById('p-cochera').checked = !!p.cochera;
-  document.getElementById('p-galeria').checked = !!p.galeria;
-  document.getElementById('p-parrilla').checked = !!p.parrilla;
-  document.getElementById('p-precio').value = p.precio || '';
-  document.getElementById('p-moneda').value = p.moneda;
-  document.getElementById('p-com').value = p.com;
-  document.getElementById('p-desc').value = p.desc || '';
-  setNewClientType('vendedor');
-  document.getElementById('newclient-modal-title').textContent = 'Editar vehículo';
-  document.getElementById('newclient-submit-btn').textContent = 'Guardar cambios';
-  openModal('newclient');
-}
-function submitNewClient(){
-  const nombre = document.getElementById('c-nombre').value || 'Sin nombre';
-  const tel = document.getElementById('c-tel').value || '—';
-  if(newClientType==='vendedor'){
-    const data = {
-      op:document.getElementById('p-op').value,
-      tipo:document.getElementById('p-tipo').value,
-      vendedor:nombre,
-      vendedorTel:tel,
-      ciudad:document.getElementById('p-ciudad').value,
-      zona:document.getElementById('p-zona').value || '—',
-      m2:document.getElementById('p-m2').value || '—',
-      m2total:document.getElementById('p-m2total').value || '—',
-      amb:document.getElementById('p-amb').value || '—',
-      banos:document.getElementById('p-banos').value || '—',
-      ant:document.getElementById('p-ant').value || '—',
-      toilette:document.getElementById('p-toilette').checked,
-      piscina:document.getElementById('p-piscina').checked,
-      cochera:document.getElementById('p-cochera').checked,
-      galeria:document.getElementById('p-galeria').checked,
-      parrilla:document.getElementById('p-parrilla').checked,
-      precio:Number(document.getElementById('p-precio').value)||0,
-      moneda:document.getElementById('p-moneda').value,
-      com:document.getElementById('p-com').value,
-      desc:document.getElementById('p-desc').value,
-      avatar:pendingAvatar
-    };
-    if(editingContext && editingContext.type==='prop'){
-      const p = myProps.find(x=>x.id===editingContext.id);
-      if(p) Object.assign(p, data);
-      toast('Vehículo actualizada');
-    } else {
-      data.id = 'p'+(idSeq++);
-      data.estado = 'Activo';
-      myProps.push(data);
-      toast('Propietario y vehículo publicados en la red');
-    }
-    computeMatches();
-    persistData();
-    closeModal('newclient');
-    editingContext = null;
-    showApp(document.querySelector('.nav-item.active')?.dataset.view==='vehículos' ? 'vehículos' : 'clientes');
-  } else {
-    const data = {
-      nombre, tel,
-      op:document.getElementById('c-op').value,
-      tipo:document.getElementById('c-tipo').value,
-      ciudad:document.getElementById('c-ciudad').value,
-      zona:document.getElementById('c-zona').value || '—',
-      presu:Number(document.getElementById('c-presu').value)||0,
-      amb:document.getElementById('c-amb').value || null,
-      urg:document.getElementById('c-urg').value,
-      notas:document.getElementById('c-notas').value,
-      avatar:pendingAvatar
-    };
-    if(editingContext && editingContext.type==='client'){
-      const c = myClients.find(x=>x.id===editingContext.id);
-      if(c) Object.assign(c, data);
-      toast('Cliente actualizado');
-    } else {
-      data.id = 'c'+(idSeq++);
-      myClients.push(data);
-      toast('Cliente guardado');
-    }
-    computeMatches();
-    persistData();
-    closeModal('newclient');
-    editingContext = null;
-    const active = document.querySelector('.nav-item.active');
-    showApp(active ? active.dataset.view : 'clientes');
-  }
 }
 
 /* ---------------- alta de búsqueda de vehículo (Mis Búsquedas) ---------------- */
@@ -4345,7 +3999,7 @@ async function cargarMisGremio(){
 async function cargarRedGremio(){
   redGremioReal = [];
   if (!currentAgencia) return;
-  const { data, error } = await supa.from('vehiculos').select('*, agencias!left(nombre, ciudad, telefono, lat, lon)').eq('es_gremio', true).eq('estado', 'activo').neq('agencia_id', currentAgencia.id).order('created_at', { ascending: false });
+  const { data, error } = await supa.from('vehiculos').select('*, agencias!left(nombre, ciudad, telefono, lat, lon, verificada)').eq('es_gremio', true).eq('estado', 'activo').neq('agencia_id', currentAgencia.id).order('created_at', { ascending: false });
   if (error) { console.error('cargarRedGremio:', error); toast('Error al cargar precios gremio de la red: ' + error.message); return; }
   redGremioReal = data || [];
 }
@@ -4363,7 +4017,7 @@ function gremioCardHTML(v, esPropio){
     </div>
     <div style="padding:16px;">
       <div style="font-weight:800;font-size:15px;color:var(--ink);cursor:pointer;" onclick="abrirDetalleGremio('${v.id}', ${esPropio})">${esc(v.marca||'')} ${esc(v.modelo||'')} ${v.anio||''}</div>
-      <div style="font-size:12.5px;color:var(--paper-dim);margin:2px 0 10px;">${esc([v.km?Number(v.km).toLocaleString('es-AR')+' km':null, v.transmision].filter(Boolean).join(' · '))}${esc(esPropio ? '' : ' · '+(v.agencias?.nombre||'Agencia'))}</div>
+      <div style="font-size:12.5px;color:var(--paper-dim);margin:2px 0 10px;">${esc([v.km?Number(v.km).toLocaleString('es-AR')+' km':null, v.transmision].filter(Boolean).join(' · '))}${esc(esPropio ? '' : ' · '+(v.agencias?.nombre||'Agencia'))}${(!esPropio && v.agencias?.verificada) ? `<i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:11px;margin-left:4px;" title="Agencia verificada por Red de Autos"></i>` : ''}</div>
       <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
         <span style="text-decoration:line-through;color:var(--paper-dim);font-size:13px;">${esc(fmtMoney(v.precio, v.moneda))}</span>
         <span style="font-weight:800;font-size:19px;color:var(--red-dark);">${esc(fmtMoney(v.precio_gremio, v.moneda))}</span>
@@ -4447,7 +4101,7 @@ function listingCardReal(v){
         <div class="listing-commission"><i class="fa-solid fa-hand-holding-dollar"></i> Comisión: <strong>${esc(v.comision||'—')}</strong></div>
         <div style="display:flex;align-items:center;gap:8px;margin:10px 0;">
           <div class="stock-thumb" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;">${agLogo ? `<img src="${agLogo}" alt="${esc(agName)}">` : `<i class="fa-solid fa-car" style="font-size:11px;"></i>`}</div>
-          <span style="font-size:13px;color:var(--paper-dim);font-weight:600;">${esc(agName)}</span>
+          <span style="font-size:13px;color:var(--paper-dim);font-weight:600;">${esc(agName)}</span>${v.agencias?.verificada ? `<i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:12px;" title="Agencia verificada por Red de Autos"></i>` : ''}
         </div>
         <div class="listing-divider"></div>
         <div class="listing-specs">
@@ -4900,6 +4554,7 @@ async function cargarDatosAdmin(view){
       plan: a.plan === 'premium' ? 'Premium' : 'Pro',
       phone: (a.telefono || '').replace(/\D/g, ''),
       ultimoPago: a.ultimo_pago_registrado || null,
+      verificada: !!a.verificada,
     }));
   }
 
@@ -4994,9 +4649,13 @@ async function adminLogout(){
 
 async function showAdmin(view){
   document.querySelectorAll('#view-admin .nav-item').forEach(n=>n.classList.toggle('active', n.dataset.aview===view));
-  document.getElementById('admin-main-content').innerHTML = '<p class="sub">Cargando...</p>';
+  const adminMainEl = document.getElementById('admin-main-content');
+  const loaderTimeout = setTimeout(() => {
+    adminMainEl.innerHTML = '<div class="view-loading"><div class="spinner"></div></div>';
+  }, 250);
   await cargarDatosAdmin(view);
-  document.getElementById('admin-main-content').innerHTML = adminRenderers[view] ? adminRenderers[view]() : '';
+  clearTimeout(loaderTimeout);
+  adminMainEl.innerHTML = adminRenderers[view] ? adminRenderers[view]() : '';
   const reportDot = document.getElementById('reportdot');
   if(reportDot) reportDot.style.display = ADMIN_DENUNCIAS_ABIERTAS_COUNT ? 'block' : 'none';
   const openTickets = ADMIN_TICKETS_ABIERTOS_COUNT;
@@ -5068,6 +4727,12 @@ async function toggleSuspenderAgencia(id, estaPausada){
   const { error } = await supa.from('agencias').update({ estado: nuevoEstado }).eq('id', id);
   if (error) { toast('Error al actualizar la agencia.'); console.error('toggleSuspenderAgencia:', error); return; }
   toast(estaPausada ? 'Agencia reactivada' : 'Agencia suspendida');
+  await showAdmin('concesionarias');
+}
+async function toggleVerificarAgencia(id, estaVerificada){
+  const { error } = await supa.rpc('verificar_agencia', { p_agencia_id: id, p_verificada: !estaVerificada });
+  if (error) { toast('Error al actualizar la verificación de la agencia.'); console.error('toggleVerificarAgencia:', error); return; }
+  toast(estaVerificada ? 'Verificación quitada' : 'Agencia verificada');
   await showAdmin('concesionarias');
 }
 // Eliminar: borra la fila de la base de datos directamente — no es reversible.
@@ -5239,6 +4904,9 @@ function ticketThreadHTML(t, side){
       ${cajaRespuesta}
     </div>`;
 }
+function verificadaBadgeHTML(verificada){
+  return verificada ? ` <span class="pill pill-verificada" title="Agencia verificada por Red de Autos"><i class="fa-solid fa-circle-check"></i> Verificada</span>` : '';
+}
 function adminStatusPill(status, label){
   const map = {
     'Verificada':'background:#f0fdf4;color:#166534;border-color:#bbf7d0;',
@@ -5272,8 +4940,9 @@ function reportWhatsappBtn(r){
   return `<a href="${url}" target="_blank" class="btn btn-sm whatsapp-btn" style="text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp</a>`;
 }
 function adminAgencyRowsHTML(list){
-  return list.length ? list.map(a=>`<tr><td style="color:var(--red);font-weight:700;">${a.name}</td><td>${a.city||'—'}</td><td>${a.tipo}</td><td>${a.plan}</td><td>${a.ops}</td><td>${adminStatusPill(a.status)}</td><td style="display:flex;gap:8px;flex-wrap:wrap;">
+  return list.length ? list.map(a=>`<tr><td style="color:var(--red);font-weight:700;">${a.name}${verificadaBadgeHTML(a.verificada)}</td><td>${a.city||'—'}</td><td>${a.tipo}</td><td>${a.plan}</td><td>${a.ops}</td><td>${adminStatusPill(a.status)}</td><td style="display:flex;gap:8px;flex-wrap:wrap;">
     <button class="btn btn-sm btn-editar-violeta btn-hover-fill" onclick="openAgencyDetail('${a.id}')"><i class="fa-solid fa-eye"></i> Ver detalle</button>
+    <button class="btn btn-sm ${esc(a.verificada?'btn-eliminar-pastel':'whatsapp-btn')}" onclick="toggleVerificarAgencia('${a.id}', ${a.verificada})"><i class="fa-solid ${a.verificada?'fa-circle-minus':'fa-circle-check'}"></i> ${a.verificada?'Quitar verificación':'Verificar agencia'}</button>
     <button class="btn btn-sm ${esc(a.status==='Pausado'?'whatsapp-btn':'btn-eliminar-pastel')}" onclick="toggleSuspenderAgencia('${a.id}', ${a.status==='Pausado'})"><i class="fa-solid ${a.status==='Pausado'?'fa-rotate-left':'fa-ban'}"></i> ${a.status==='Pausado'?'Reactivar':'Suspender'}</button>
     <button class="btn btn-sm btn-eliminar-pastel" onclick="eliminarAgenciaAdmin('${a.id}','${(a.name||'').replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i> Eliminar</button>
   </td></tr>`).join('') : `<tr><td colspan="7" class="empty-row">No se encontraron agencias con ese nombre.</td></tr>`;
@@ -5460,7 +5129,7 @@ async function openAgencyDetail(agencyId){
   document.getElementById('agencydetail-header').innerHTML = `
     <div class="agency-detail-header">
       <div>
-        <div class="agency-detail-name">${a.name}</div>
+        <div class="agency-detail-name">${a.name}${verificadaBadgeHTML(a.verificada)}</div>
         <div class="agency-detail-meta">${a.city} · Registrada el ${new Date(a.registeredAt).toLocaleDateString('es-AR')} (hace ${daysSince(a.registeredAt)} días)</div>
       </div>
       ${adminStatusPill(a.status)}
@@ -5471,7 +5140,7 @@ async function openAgencyDetail(agencyId){
   openModal('agencydetail');
 
   const [{ data: vehiculos, error: eVeh }, { data: reviews, error: eRev }] = await Promise.all([
-    supa.from('vehiculos').select('*, agencias!left(nombre, ciudad)').eq('agencia_id', a.id).eq('estado', 'activo').order('created_at', { ascending: false }),
+    supa.from('vehiculos').select('*, agencias!left(nombre, ciudad, verificada)').eq('agencia_id', a.id).eq('estado', 'activo').order('created_at', { ascending: false }),
     supa.from('calificaciones').select('estrellas, comentario, created_at, autor:agencia_autor_id(nombre)').eq('agencia_destino_id', a.id).eq('visible', true).order('created_at', { ascending: false }),
   ]);
   if (eVeh) console.error('openAgencyDetail vehiculos:', eVeh);
@@ -5871,40 +5540,6 @@ function toast(msg){
   setTimeout(()=>t.classList.add('hidden'), 2400);
 }
 
-/* ---------------- matching logic ---------------- */
-let matchStatuses = {};
-function matchKey(m){ return `${m.mine}-${m.prop.id}-${m.search.id||m.search.agency}`; }
-function computeMatches(){
-  matches = [];
-  myProps.forEach(p=>{
-    networkSearches.forEach(s=>{
-      if(p.tipo===s.tipo && p.ciudad===s.ciudad && sameOp(p.op,s.op) && p.precio<=s.presu*1.1){
-        matches.push({prop:p, search:s, mine:'prop'});
-      }
-    });
-  });
-  myClients.forEach(c=>{
-    networkProps.forEach(p=>{
-      if(c.marca && c.marca===p.marca && c.ciudad===p.ciudad && sameOp(p.op,c.op) && p.precio<=c.presu*1.1){
-        matches.push({prop:p, search:c, mine:'client'});
-      }
-    });
-  });
-  matches.forEach(m=>{
-    const key = matchKey(m);
-    if(!(key in matchStatuses)) matchStatuses[key] = {status:'nuevos', claimedAt:new Date().toISOString(), offers:[{by:(m.mine==='prop'?'me':'them'), value:m.prop.com, at:new Date().toISOString()}]};
-    if(!matchStatuses[key].offers) matchStatuses[key].offers = [{by:(m.mine==='prop'?'me':'them'), value:m.prop.com, at:matchStatuses[key].claimedAt}];
-    m.status = matchStatuses[key].status;
-    m.claimedAt = matchStatuses[key].claimedAt;
-    m.agreedAt = matchStatuses[key].agreedAt || null;
-    m.agreedValue = matchStatuses[key].agreedValue || null;
-    m.offers = matchStatuses[key].offers;
-  });
-  document.getElementById('matchdot').style.display = matches.some(m=>m.status==='nuevos')? 'block':'none';
-}
-function opFamily(op){ return (op==='Compra'||op==='Venta') ? 'venta' : 'consignación'; }
-function sameOp(propOp, searchOp){ return opFamily(propOp)===opFamily(searchOp); }
-
 // ══════════════════════════════════════════════════
 //  MOTOR DE MATCHES — mismos criterios que la app de producción
 // ══════════════════════════════════════════════════
@@ -6004,7 +5639,7 @@ async function cargarMisMatches(){
   if (!currentAgencia) { actualizarMatchPendienteBadge(); actualizarMatchDot(); return; }
   const { data, error } = await supa
     .from('matches')
-    .select('*, veh:vehiculo_id(marca,modelo,anio,precio,moneda,km,transmision,comision,agencia_id,fotos), bus:busqueda_id(marca,modelo,anio_desde,anio_hasta,precio_max,cliente_nombre,cliente_telefono), vend:agencia_vendedora(nombre,telefono,direccion,horarios,contacto), comp:agencia_compradora(nombre,telefono,direccion,horarios,contacto)')
+    .select('*, veh:vehiculo_id(marca,modelo,anio,precio,moneda,km,transmision,comision,agencia_id,fotos), bus:busqueda_id(marca,modelo,anio_desde,anio_hasta,precio_max,cliente_nombre,cliente_telefono), vend:agencia_vendedora(nombre,telefono,direccion,horarios,contacto,verificada), comp:agencia_compradora(nombre,telefono,direccion,horarios,contacto,verificada)')
     .or(`agencia_vendedora.eq.${currentAgencia.id},agencia_compradora.eq.${currentAgencia.id}`)
     .order('created_at', { ascending: false });
   if (error) { console.error('cargarMisMatches:', error); toast('Error al cargar matches: ' + error.message); actualizarMatchPendienteBadge(); actualizarMatchDot(); return; }
@@ -6024,6 +5659,7 @@ async function cargarMisMatches(){
     const otraAgenciaId = soyVendedor ? m.agencia_compradora : m.agencia_vendedora;
     const otraAgencia = soyVendedor ? (m.comp?.nombre || '—') : (m.vend?.nombre || '—');
     const otraAgenciaTel = soyVendedor ? (m.comp?.telefono || '') : (m.vend?.telefono || '');
+    const otraAgenciaVerificada = soyVendedor ? !!m.comp?.verificada : !!m.vend?.verificada;
     // Datos de la agencia vendedora (siempre "vend"), para el mensaje de visita al cliente
     const otraAgenciaDireccion = soyVendedor ? '' : (m.vend?.direccion || '');
     const otraAgenciaHorarios = soyVendedor ? '' : (m.vend?.horarios || '');
@@ -6046,7 +5682,7 @@ async function cargarMisMatches(){
       detalle: [veh.km ? Number(veh.km).toLocaleString('es-AR') + ' km' : null, veh.transmision].filter(Boolean).join(' · '),
       precio: veh.precio ? fmtMoney(veh.precio, veh.moneda) : (bus.precio_max ? 'Hasta ' + fmtMoney(bus.precio_max, 'USD') : '—'),
       soyVendedor,
-      otraAgenciaId, otraAgencia, otraAgenciaTel, otraAgenciaDireccion, otraAgenciaHorarios, otraAgenciaContacto,
+      otraAgenciaId, otraAgencia, otraAgenciaTel, otraAgenciaVerificada, otraAgenciaDireccion, otraAgenciaHorarios, otraAgenciaContacto,
       // Si soy el vendedor, el cliente es de la otra agencia — nombre protegido, como en el diseño de Exe.
       // El teléfono del cliente solo lo tenemos (y solo lo usamos) cuando el match es nuestro como compradores.
       clienteNombre: soyVendedor ? `Cliente de ${otraAgencia}` : (bus.cliente_nombre || '—'),
@@ -6324,7 +5960,7 @@ function matchCardHTML(m){
         <div class="flow-connector"></div>
         <div class="flow-node">
           <span class="dot-icon"><i class="fa-solid fa-building"></i></span>
-          <div class="text"><strong>${esc(m.otraAgencia)}</strong><span>${m.soyVendedor ? 'La búsqueda' : 'Tiene el vehículo'}</span></div>
+          <div class="text"><strong>${esc(m.otraAgencia)}</strong>${m.otraAgenciaVerificada ? `<i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:11px;margin-left:4px;" title="Agencia verificada por Red de Autos"></i>` : ''}<span>${m.soyVendedor ? 'La búsqueda' : 'Tiene el vehículo'}</span></div>
         </div>
         <div class="flow-connector"></div>
         <div class="flow-node">
@@ -6705,10 +6341,14 @@ let _matchesFavoritasLoaded = false;
 async function setMatchesTab(tab){
   matchesTab = tab;
   if (tab === 'favoritas' && !_matchesFavoritasLoaded) {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
+    const mainEl = document.getElementById('main-content');
+    const loaderTimeout = setTimeout(() => {
+      mainEl.innerHTML = '<div class="view-loading"><div class="spinner"></div></div>';
+    }, 250);
     await cargarRedStock();
     await cargarEstadisticasRed();
     _matchesFavoritasLoaded = true;
+    clearTimeout(loaderTimeout);
   }
   document.getElementById('main-content').innerHTML = renderers['matches'] ? renderers['matches']() : '';
 }
@@ -7008,137 +6648,6 @@ async function updatePassword(){
   toast('Contraseña actualizada');
 }
 
-function acceptCommission(key){
-  const m = matches.find(x=>matchKey(x)===key);
-  const otherName = m ? matchFlowData(m).otherAgency : 'la otra concesionaria';
-  const offers = matchStatuses[key].offers || [];
-  const last = offers[offers.length-1];
-  matchStatuses[key].status = 'acordado';
-  matchStatuses[key].agreedAt = new Date().toISOString();
-  matchStatuses[key].agreedValue = last ? last.value : null;
-  computeMatches();
-  addNotification('fa-handshake','red','Comisión acordada con '+otherName, 'Ya podés contactar directamente por WhatsApp.');
-  toast('Comisión acordada — ya podés contactar directamente');
-  showApp('matches');
-}
-let counterOfferContext = {key:null, mode:'mine'};
-function openCounterOfferPrompt(key){
-  counterOfferContext = {key, mode:'mine'};
-  document.getElementById('counteroffer-title').textContent = 'Proponer una nueva comisión';
-  document.getElementById('counteroffer-sub').textContent = 'Le vas a enviar esta propuesta a la otra concesionaria.';
-  document.getElementById('counteroffer-input').value = '';
-  openModal('counteroffer');
-}
-function openSimulateCounterModal(key){
-  counterOfferContext = {key, mode:'simulate'};
-  document.getElementById('counteroffer-title').textContent = 'Simular contraoferta';
-  document.getElementById('counteroffer-sub').textContent = 'En la vida real, esto lo escribiría la otra concesionaria desde su propia cuenta.';
-  document.getElementById('counteroffer-input').value = '';
-  openModal('counteroffer');
-}
-function submitCounterOfferModal(){
-  const value = document.getElementById('counteroffer-input').value.trim();
-  if(!value){ toast('Ingresá un valor antes de enviar'); return; }
-  const key = counterOfferContext.key;
-  const m = matches.find(x=>matchKey(x)===key);
-  const otherName = m ? matchFlowData(m).otherAgency : 'la otra concesionaria';
-  if(counterOfferContext.mode==='mine'){
-    matchStatuses[key].offers.push({by:'me', value, at:new Date().toISOString()});
-    toast('Contraoferta enviada');
-  } else {
-    matchStatuses[key].offers.push({by:'them', value, at:new Date().toISOString()});
-    addNotification('fa-rotate','red', otherName+' te hizo una contraoferta', 'Propuso '+value+'. Entrá al match para responder.');
-    toast('(Simulado) La otra concesionaria hizo una contraoferta');
-  }
-  closeModal('counteroffer');
-  computeMatches();
-  showApp('matches');
-}
-function simulateOtherResponse(key, action){
-  const m = matches.find(x=>matchKey(x)===key);
-  const otherName = m ? matchFlowData(m).otherAgency : 'la otra concesionaria';
-  const offers = matchStatuses[key].offers;
-  if(action==='accept'){
-    const last = offers[offers.length-1];
-    matchStatuses[key].status = 'acordado';
-    matchStatuses[key].agreedAt = new Date().toISOString();
-    matchStatuses[key].agreedValue = last ? last.value : null;
-    addNotification('fa-handshake','red', otherName+' aceptó tu propuesta', 'La comisión quedó acordada en '+(last?last.value:'')+'.');
-    toast('(Simulado) La otra concesionaria aceptó tu contraoferta');
-  } else if(action==='counter'){
-    openSimulateCounterModal(key);
-    return;
-  } else if(action==='reject'){
-    matchStatuses[key].status = 'caidas';
-    addNotification('fa-circle-xmark','red', otherName+' rechazó la negociación', 'El match pasó a Operaciones caídas.');
-    toast('(Simulado) La otra concesionaria rechazó la negociación');
-  }
-  computeMatches();
-  showApp('matches');
-}
-function contactMatch(key){
-  matchStatuses[key].status = 'seguimiento';
-  computeMatches();
-  toast('Abriendo WhatsApp para contactar');
-  showApp('matches');
-}
-function scheduleVisit(key){
-  matchStatuses[key].status = 'visita';
-  computeMatches();
-  toast('Visita agendada');
-  showApp('matches');
-}
-function finalizeOperation(key){
-  const m = matches.find(x=>matchKey(x)===key);
-  const otherName = m ? matchFlowData(m).otherAgency : 'la otra concesionaria';
-  matchStatuses[key].status = 'concretadas';
-  computeMatches();
-  addNotification('fa-flag-checkered','green','¡Operación finalizada con '+otherName+'!', 'La operación quedó registrada en Operaciones concretadas.');
-  toast('¡Operación finalizada! Excelente trabajo.');
-  showApp('matches');
-}
-function reopenMatch(key){
-  matchStatuses[key].status = 'nuevos';
-  matchStatuses[key].agreedAt = null;
-  computeMatches();
-  toast('Match reabierto');
-  showApp('matches');
-}
-function dropMatch(key){
-  const m = matches.find(x=>matchKey(x)===key);
-  const otherName = m ? matchFlowData(m).otherAgency : 'la otra concesionaria';
-  matchStatuses[key].status = 'caidas';
-  computeMatches();
-  addNotification('fa-circle-xmark','red','Match con '+otherName+' cayó', 'Podés reabrirlo en cualquier momento desde Operaciones caídas.');
-  toast('Match movido a Operaciones caídas');
-  showApp('matches');
-}
-function matchFlowData(m){
-  if(m.mine==='client'){
-    const c = m.search, p = m.prop;
-    const zona = (c.zona && c.zona!=='—') ? c.zona : c.ciudad;
-    return {
-      pillLabel: 'Yo busco',
-      node1Sub: 'Tu concesionaria',
-      otherAgency: p.agency,
-      node2Sub: '(Match con colega)',
-      clientName: c.nombre,
-      clientTag: '(Mi cliente)',
-      node3Sub: `${c.tipo}${c.amb? ' '+c.amb+' puertas':''} en ${zona}`
-    };
-  } else {
-    const p = m.prop, s = m.search;
-    return {
-      pillLabel: 'Yo vendo',
-      node1Sub: 'Tu concesionaria',
-      otherAgency: s.agency,
-      node2Sub: '(Match con colega)',
-      clientName: `Cliente de ${s.agency}`,
-      clientTag: '(Nombre protegido)',
-      node3Sub: `Busca ${s.op==='Venta'?'comprador':'consignante'} para ${s.tipo.toLowerCase()} en ${s.zona}`
-    };
-  }
-}
 let currentSwiper = null;
 const CITY_COORDS = {
   'Tucumán': [-26.8241, -65.2226],
@@ -7222,7 +6731,7 @@ function renderDetailModalReal(v){
         <div><span class="lbl"><i class="fa-solid fa-percent"></i>Comisión</span><span class="val">${esc(v.comision||'—')}</span></div>
       </div>
       ${mapHTML}
-      <div class="propdetail-agency">Publicada por <strong>${esc(v.agencias?.nombre || 'Agencia')}</strong></div>
+      <div class="propdetail-agency">Publicada por <strong>${esc(v.agencias?.nombre || 'Agencia')}</strong>${verificadaBadgeHTML(v.agencias?.verificada)}</div>
       <div class="propdetail-actions">
         ${waHref ? `<button class="btn btn-solid btn-contact-lime" onclick="registrarClicReal('vehiculo','${v.id}','whatsapp');notificarContactoWhatsapp('${v.id}');window.open('${waHref}','_blank')"><i class="fa-brands fa-whatsapp"></i> Contactar Agencia</button>` : ''}
         <button class="btn" onclick="closeModal('propdetail')">Cerrar</button>
@@ -7247,129 +6756,8 @@ function formatDateTime(iso){
   const timeStr = d.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
   return `${dateStr}, ${timeStr}`;
 }
-const PIPELINE_STAGES = [
-  {key:'nuevos', label:'Nuevo', icon:'fa-file-signature'},
-  {key:'acordado', label:'Comisión acordada', icon:'fa-handshake'},
-  {key:'seguimiento', label:'Contactado', icon:'fa-brands fa-whatsapp'},
-  {key:'visita', label:'Visita', icon:'fa-calendar-check'},
-  {key:'concretadas', label:'Finalizado', icon:'fa-circle-check'},
-];
-function pipelineStepperHTML(status){
-  if(status==='caidas'){
-    return `<div class="pipeline-steps pipeline-caida"><i class="fa-solid fa-circle-xmark"></i> Operación caída</div>`;
-  }
-  const idx = PIPELINE_STAGES.findIndex(s=>s.key===status);
-  return `<div class="pipeline-steps">${PIPELINE_STAGES.map((s,i)=>`
-    <div class="pipeline-step ${i<=idx?'done':''} ${i===idx?'current':''}">
-      <span class="pipeline-dot"><i class="${s.icon.includes('fa-brands')?s.icon:'fa-solid '+s.icon}"></i></span>
-      <span class="pipeline-label">${s.label}</span>
-    </div>
-    ${i<PIPELINE_STAGES.length-1?`<div class="pipeline-line ${i<idx?'done':''}"></div>`:''}
-  `).join('')}</div>`;
-}
-function negotiationHTML(m, key){
-  const offers = m.offers || [];
-  const last = offers[offers.length-1];
-  if(!last) return '';
-  if(last.by==='them'){
-    return `<div class="commission-proposal">
-      <div class="commission-proposal-text"><i class="fa-solid fa-file-signature"></i> Comisión propuesta: <strong>${last.value}</strong></div>
-      <button class="btn btn-sm whatsapp-btn" onclick="acceptCommission('${key}')"><i class="fa-solid fa-check"></i> Aceptar comisión</button>
-      <button class="btn btn-sm btn-editar-violeta" onclick="openCounterOfferPrompt('${key}')"><i class="fa-solid fa-rotate"></i> Contraofertar</button>
-      <button class="btn btn-sm btn-eliminar-pastel" onclick="dropMatch('${key}')"><i class="fa-solid fa-trash"></i> Eliminar match</button>
-    </div>`;
-  }
-  const waitingLabel = offers.length===1 ? 'Tu propuesta' : 'Tu contraoferta';
-  return `<div class="commission-proposal commission-proposal-waiting">
-    <div class="commission-proposal-text"><i class="fa-solid fa-paper-plane"></i> ${waitingLabel}: <strong>${last.value}</strong> — esperando respuesta</div>
-    <div class="simulate-row">
-      <span class="simulate-label"><i class="fa-solid fa-flask"></i> Simular respuesta de la otra concesionaria:</span>
-      <button class="btn btn-sm whatsapp-btn" onclick="simulateOtherResponse('${key}','accept')">Acepta</button>
-      <button class="btn btn-sm btn-editar-violeta" onclick="simulateOtherResponse('${key}','counter')">Contraoferta</button>
-      <button class="btn btn-sm btn-eliminar-pastel" onclick="simulateOtherResponse('${key}','reject')">Rechaza</button>
-      <button class="btn btn-sm btn-eliminar-pastel" onclick="dropMatch('${key}')"><i class="fa-solid fa-trash"></i> Eliminar match</button>
-    </div>
-  </div>`;
-}
-function matchActionsHTML(m, key){
-  const status = m.status;
-  const iOwnProperty = m.mine==='prop'; // solo quien tiene el vehículo puede finalizar la operación
-  if(status==='concretadas'){
-    return `<div class="match-done-note"><i class="fa-solid fa-circle-check"></i> Operación finalizada</div>`;
-  }
-  if(status==='caidas'){
-    return `<button class="btn btn-sm btn-editar-violeta" onclick="reopenMatch('${key}')"><i class="fa-solid fa-rotate-left"></i> Reabrir match</button>`;
-  }
-  let primaryBtn = '';
-  let eliminarInline = false;
-  if(status==='nuevos'){
-    primaryBtn = negotiationHTML(m, key);
-    eliminarInline = true;
-  } else if(status==='acordado'){
-    primaryBtn = `<button class="btn btn-sm whatsapp-btn" onclick="contactMatch('${key}')"><i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp</button>`;
-  } else if(status==='seguimiento'){
-    primaryBtn = `<button class="btn btn-sm whatsapp-btn" onclick="scheduleVisit('${key}')"><i class="fa-solid fa-calendar-check"></i> Agendar visita</button>`;
-  } else if(status==='visita'){
-    if(iOwnProperty){
-      primaryBtn = `<button class="btn btn-sm whatsapp-btn" onclick="finalizeOperation('${key}')"><i class="fa-solid fa-flag-checkered"></i> Operación finalizada</button>`;
-    } else {
-      primaryBtn = `<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${m.prop.agency} finalice la operación</div>`;
-    }
-  }
-  return eliminarInline ? primaryBtn : `${primaryBtn}<button class="btn btn-sm btn-eliminar-pastel" onclick="dropMatch('${key}')"><i class="fa-solid fa-trash"></i> Eliminar match</button>`;
-}
-function matchRowHTML(m){
-  const d = matchFlowData(m);
-  const key = matchKey(m);
-  return `
-    <div class="match-row">
-      <div class="match-claim-note"><i class="fa-solid fa-clock"></i> Reclamado el ${formatDateTime(m.claimedAt)}${m.agreedAt?` · Comisión acordada (${m.agreedValue}) el ${formatDateTime(m.agreedAt)}`:''}</div>
-      ${pipelineStepperHTML(m.status)}
-      <div class="match-row-main">
-        <div class="match-flow">
-          <div class="flow-node">
-            <span class="dot dot-icon"><i class="fa-solid fa-car"></i></span>
-            <div class="text">
-              <div class="flow-pill">${d.pillLabel}</div>
-              <strong class="flow-my-agency">${AGENCY.name}</strong>
-              <span>${d.node1Sub}</span>
-            </div>
-          </div>
-          <div class="flow-connector"></div>
-          <div class="flow-node"><span class="dot dot-icon"><i class="fa-solid fa-car"></i></span><div class="text"><strong>${d.otherAgency}</strong><span>${d.node2Sub}</span></div></div>
-          <div class="flow-connector"></div>
-          <div class="flow-node"><span class="dot dot-icon"><i class="fa-solid fa-user"></i></span><div class="text"><strong>${d.clientName}${d.clientTag?' '+d.clientTag:''}</strong><span>${d.node3Sub}</span></div></div>
-        </div>
-        <div class="match-actions">
-          ${matchActionsHTML(m, key)}
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-/* ---------------- persistencia entre sesiones ---------------- */
-async function persistData(){
-  try{
-    await window.storage.set('agencia-datos', JSON.stringify({myProps, myClients, idSeq}), false);
-  }catch(e){ /* el entorno actual no soporta guardado persistente; los datos siguen solo en memoria */ }
-}
-async function loadPersistedData(){
-  try{
-    const res = await window.storage.get('agencia-datos', false);
-    if(res && res.value){
-      const parsed = JSON.parse(res.value);
-      myProps = parsed.myProps || [];
-      myClients = parsed.myClients || [];
-      idSeq = parsed.idSeq || idSeq;
-      computeMatches();
-    }
-  }catch(e){ /* no hay datos guardados todavía */ }
-}
-
 /* ---------------- eliminar ---------------- */
 // deleteProp (real, conectada a Supabase) está definida arriba, junto a submitNewStock
-function deleteClient(id){myClients = myClients.filter(c=>c.id!==id); computeMatches(); persistData(); const active=document.querySelector('.nav-item.active'); showApp(active?active.dataset.view:'clientes');}
 
 // deleteBusqueda (real, conectada a Supabase) — borra la búsqueda de la tabla `busquedas`
 async function deleteBusqueda(id){
@@ -7512,7 +6900,7 @@ async function cargarMisBusquedas(){
 async function cargarRedStock(){
   const { data, error } = await supa
     .from('vehiculos')
-    .select('*, agencias!left(nombre, ciudad, telefono, logo_url, lat, lon, plan)')
+    .select('*, agencias!left(nombre, ciudad, telefono, logo_url, lat, lon, plan, verificada)')
     .eq('estado', 'activo')
     .order('created_at', { ascending: false });
 
@@ -7655,7 +7043,7 @@ async function cargarRedBusca(){
   if (!currentAgencia) { redBusquedas = []; return; }
   const { data, error } = await supa
     .from('busquedas')
-    .select('*, clientes!left(marca, modelo, anio_desde, anio_hasta, precio_max, km_max, transmision, urgencia, color), agencias!left(nombre, telefono, ciudad)')
+    .select('*, clientes!left(marca, modelo, anio_desde, anio_hasta, precio_max, km_max, transmision, urgencia, color), agencias!left(nombre, telefono, ciudad, verificada)')
     .eq('estado', 'activa')
     .neq('agencia_id', currentAgencia.id)
     .order('created_at', { ascending: false });
@@ -7750,7 +7138,7 @@ function abrirDetalleBusquedaRed(busquedaId){
       <div class="propdetail-top">
         <div>
           <div class="propdetail-title">${esc(marca||'Cualquier marca')} ${esc(modelo||'')}</div>
-          <div class="propdetail-addr">Publicado por ${esc(b.agencias?.nombre || 'Agencia')} · ${esc(b.agencias?.ciudad || '—')}</div>
+          <div class="propdetail-addr">Publicado por ${esc(b.agencias?.nombre || 'Agencia')}${verificadaBadgeHTML(b.agencias?.verificada)} · ${esc(b.agencias?.ciudad || '—')}</div>
         </div>
       </div>
       <div class="propdetail-grid">
@@ -7787,11 +7175,12 @@ async function showApp(view){
 
   // Traemos plan/estado frescos en cada navegación: si un admin aprobó un cambio de plan o
   // pausó la cuenta mientras la agencia tenía la sesión abierta, se entera sin tener que
-  // volver a loguearse (antes quedaba con los datos de plan/estado del momento del login).
+  // volver a loguearse. Corre en paralelo (sin await) para no sumar un round-trip extra
+  // a CADA cambio de pestaña — antes esto era lo que hacía sentir lento el menú.
   if (currentAgencia) {
-    try {
-      const { data: freshAgencia } = await supa.from('agencias').select('plan, estado').eq('id', currentAgencia.id).maybeSingle();
-      if (freshAgencia) {
+    supa.from('agencias').select('plan, estado').eq('id', currentAgencia.id).maybeSingle()
+      .then(({ data: freshAgencia }) => {
+        if (!freshAgencia) return;
         if (freshAgencia.estado !== 'activo') {
           toast('Tu cuenta está pausada. Comunicate con un administrador de la red.');
           logout();
@@ -7801,35 +7190,35 @@ async function showApp(view){
           currentAgencia.plan = freshAgencia.plan;
           toast('Tu plan fue actualizado a ' + freshAgencia.plan.toUpperCase());
         }
-      }
-    } catch (e) { console.error('showApp (refresco plan/estado):', e); }
+      })
+      .catch(e => console.error('showApp (refresco plan/estado):', e));
   }
 
+  // Loader diferido: si la vista carga rápido (caso normal), no se llega a mostrar nada y
+  // no hay flash de pantalla en blanco. Si tarda, a los 250ms aparece un spinner centrado
+  // en vez de dejar la pantalla vacía con solo un texto arriba a la izquierda.
+  const mainEl = document.getElementById('main-content');
+  const loaderTimeout = setTimeout(() => {
+    mainEl.innerHTML = '<div class="view-loading"><div class="spinner"></div></div>';
+  }, 250);
+
   if (view === 'dashboard') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarDashboardData();
   } else if (view === 'performance') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarMisMatches();
   } else if (view === 'comisiones') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarMisMatches();
   } else if (view === 'vehículos') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarMiStock();
     await cargarStatsInteresStock();
   } else if (view === 'explorar') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarRedStock();
     await cargarEstadisticasRed();
   } else if (view === 'asociadas') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarAgencias();
   } else if (view === 'redbusca') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarRedBusca();
   } else if (view === 'matches') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     _matchesFavoritasLoaded = false;
     const tareas = [runMatchEngine().then(cargarMisMatches), cargarNotificacionesReal()];
     if (matchesTab === 'favoritas') {
@@ -7838,28 +7227,23 @@ async function showApp(view){
     await Promise.all(tareas);
     await marcarMatchNuevoNotifsLeidas();
   } else if (view === 'exclusiva') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarMisGremio();
     await cargarRedGremio();
   } else if (view === 'proveedores') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarProveedoresReal();
   } else if (view === 'notificaciones') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarNotificacionesReal();
   } else if (view === 'busquedas' || view === 'clientes') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarMisBusquedas();
     await cargarMisClientesReal();
   } else if (view === 'soporte') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarMisTickets();
     await marcarTicketNotifsLeidas();
   } else if (view === 'leadsexternos') {
-    document.getElementById('main-content').innerHTML = '<p class="sub">Cargando...</p>';
     await cargarLeadsExternos();
   }
-  document.getElementById('main-content').innerHTML = renderers[view] ? renderers[view]() : '<p>Vista no encontrada.</p>';
+  clearTimeout(loaderTimeout);
+  mainEl.innerHTML = renderers[view] ? renderers[view]() : '<p>Vista no encontrada.</p>';
 }
 
 function fmtMoney(n,cur){ if(!n) return '—'; return (cur==='USD'?'USD ':'ARS ') + n.toLocaleString('es-AR'); }
@@ -8377,7 +7761,7 @@ redbusca: ()=>`
         const rango = (anioDesde||anioHasta) ? ` (${anioDesde||'—'}–${anioHasta||'—'})` : '';
         return `<tr>
           <td><a style="cursor:pointer;color:var(--red-dark);font-weight:600;" onclick="abrirDetalleBusquedaRed('${b.id}')"><span class="search-pulse"><span class="ring"></span><span class="ring"></span><span class="ring"></span><i class="fa-solid fa-magnifying-glass"></i></span>${esc(marca||'Cualquier marca')} ${esc(modelo||'')}${rango}</a></td>
-          <td>${esc(b.agencias?.nombre||'—')}</td>
+          <td>${esc(b.agencias?.nombre||'—')}${b.agencias?.verificada ? `<i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:11px;margin-left:4px;" title="Agencia verificada por Red de Autos"></i>` : ''}</td>
           <td class="mono">${esc(precioMax? fmtMoney(precioMax,b.moneda||'ARS') : '—')}</td>
           <td><span class="pill ${esc(c.urgencia && c.urgencia.toLowerCase().includes('alta')?'pill-red':'')}">${esc(c.urgencia||'—')}</span></td>
           <td>${b.agencias?.telefono ? `<button class="btn btn-sm btn-contact-lime" onclick="avisarPotencialCliente('${b.id}')"><i class="fa-brands fa-whatsapp"></i> Tengo potencial cliente</button>` : ''}</td>
@@ -8524,7 +7908,7 @@ asociadas: ()=>`
   <table>
     <thead><tr><th>Agencia</th><th>Ciudad</th><th></th></tr></thead>
     <tbody>
-      ${redAgencias.filter(a=>a.id!==currentAgencia?.id).length? redAgencias.filter(a=>a.id!==currentAgencia?.id).map(a=>`<tr><td><div class="agency-actions-cell"><div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="abrirPerfilAgenciaPublico('${a.id}')"><div class="stock-thumb" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;">${a.logo_url?`<img src="${a.logo_url}" alt="${esc(a.nombre)}">`:`<i class="fa-solid fa-car" style="font-size:13px;"></i>`}</div><span>${esc(a.nombre)}</span>${a.oficial?`<span class="pill pill-sage"><i class="fa-solid fa-circle-check"></i> Concesionaria oficial</span>`:''}</div>${agencyActionsHTML(a.id, a.nombre)}</div></td><td>${esc(a.ciudad||'—')}</td><td>${a.telefono?`<a class="btn btn-sm btn-contact-lime" style="text-decoration:none;" href="https://wa.me/${esc(a.telefono.replace(/\\D/g,''))}" target="_blank"><i class="fa-brands fa-whatsapp"></i> Contactar</a>`:''}</td></tr>`).join('') : `<tr><td colspan="3" class="empty-row">Todavía no hay otras agencias verificadas en la red.</td></tr>`}
+      ${redAgencias.filter(a=>a.id!==currentAgencia?.id).length? redAgencias.filter(a=>a.id!==currentAgencia?.id).map(a=>`<tr><td><div class="agency-actions-cell"><div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="abrirPerfilAgenciaPublico('${a.id}')"><div class="stock-thumb" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;">${a.logo_url?`<img src="${a.logo_url}" alt="${esc(a.nombre)}">`:`<i class="fa-solid fa-car" style="font-size:13px;"></i>`}</div><span>${esc(a.nombre)}</span>${a.oficial?`<span class="pill pill-sage"><i class="fa-solid fa-circle-check"></i> Concesionaria oficial</span>`:''}${verificadaBadgeHTML(a.verificada)}</div>${agencyActionsHTML(a.id, a.nombre)}</div></td><td>${esc(a.ciudad||'—')}</td><td>${a.telefono?`<a class="btn btn-sm btn-contact-lime" style="text-decoration:none;" href="https://wa.me/${esc(a.telefono.replace(/\\D/g,''))}" target="_blank"><i class="fa-brands fa-whatsapp"></i> Contactar</a>`:''}</td></tr>`).join('') : `<tr><td colspan="3" class="empty-row">Todavía no hay otras agencias verificadas en la red.</td></tr>`}
     </tbody>
   </table>
 `,
@@ -8748,7 +8132,6 @@ soporte: ()=>`
 };
 
 /* init */
-computeMatches();
 
 /* Restaurar sesión al cargar/refrescar la página. Antes se guardaba el id en localStorage
    al loguear, pero nunca se leía en el arranque — por eso un refresh siempre volvía a la landing
