@@ -135,6 +135,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   @keyframes view-spin{to{transform:rotate(360deg);}}
   .view-loading{display:flex;align-items:center;justify-content:center;min-height:260px;}
   .view-loading .spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--red);animation:view-spin .7s linear infinite;}
+  .import-preview-wrap{max-height:340px;overflow-y:auto;border:1px solid var(--line);border-radius:10px;margin:14px 0;}
+  .import-preview-wrap table{margin:0;}
+  .import-preview-wrap thead th{position:sticky;top:0;background:var(--paper);z-index:1;}
+  .import-preview-summary{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;font-weight:700;margin-top:4px;}
   .search-pulse{position:relative;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;margin-right:9px;vertical-align:middle;flex-shrink:0;}
   .search-pulse .ring{position:absolute;width:26px;height:26px;border-radius:50%;border:2px solid var(--red);opacity:0;animation:pulse-ring 1.8s ease-out infinite;}
   .search-pulse .ring:nth-child(2){animation-delay:.6s;}
@@ -2175,10 +2179,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <div class="field"><label>Precio</label><input id="st-precio" type="number" placeholder="18000"></div>
       <div class="field"><label>Moneda</label><select id="st-moneda"><option>USD</option><option>ARS</option></select></div>
     </div>
-    <div class="row-2">
-      <div class="field"><label>Comisión</label><select id="st-comision"><option>1%</option><option>1,5%</option><option>2%</option><option>2,5%</option><option selected>3%</option></select></div>
-      <div class="field"><label>Condición de pago de comisión</label><select id="st-com-condicion"><option>Al contado</option><option>Transferencia bancaria</option><option>A convenir</option></select></div>
-    </div>
+    <div class="field"><label>Comisión</label><select id="st-comision"><option>1%</option><option>1,5%</option><option>2%</option><option>2,5%</option><option selected>3%</option></select></div>
     <div class="field"><label>Descripción / comentarios</label><textarea id="st-desc" rows="3" placeholder="Service oficial al día, único dueño, permuta, financiación, disponibilidad para prueba de manejo..."></textarea></div>
 
     <div class="field">
@@ -2195,6 +2196,35 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="modal-close-row">
       <button class="btn" onclick="closeModal('newstock')">Cancelar</button>
       <button class="btn btn-solid" id="newstock-submit-btn" onclick="submitNewStock()">Guardar vehículo</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-importstock" class="modal-backdrop hidden">
+  <div class="modal modal-wide">
+    <h3>Importar vehículos desde Excel</h3>
+    <p class="sub">Cargá varios vehículos de una sola vez. Después vas a tener que subirles las fotos de forma individual desde Mi Stock.</p>
+
+    <div class="card" style="margin-bottom:16px;background:#FAFAF7;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <strong style="font-size:13.5px;">¿Primera vez importando?</strong>
+          <p class="sub" style="margin:2px 0 0;">Descargá la plantilla, completá una fila por vehículo y volvé a subirla acá.</p>
+        </div>
+        <button class="btn btn-sm btn-editar-violeta btn-hover-fill" onclick="descargarPlantillaStock()"><i class="fa-solid fa-download"></i> Descargar plantilla</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Archivo Excel (.xlsx)</label>
+      <input type="file" id="import-stock-file" accept=".xlsx,.xls" onchange="handleImportStockFile(event)">
+    </div>
+
+    <div id="import-stock-preview"></div>
+
+    <div class="modal-close-row">
+      <button class="btn" onclick="closeModal('importstock')">Cancelar</button>
+      <button class="btn btn-solid" id="import-stock-confirm-btn" onclick="confirmarImportStock()" disabled>Importar vehículos</button>
     </div>
   </div>
 </div>
@@ -2426,6 +2456,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 /* ---------------- esc(): blindaje contra XSS almacenado ----------------
    Todo texto que viene de la base y se inserta en HTML pasa por acá. Sin esto,
@@ -3691,7 +3722,6 @@ function openNewStockModal(){
   document.getElementById('st-precio').value = '';
   document.getElementById('st-moneda').value = currentAgencia?.moneda_default || 'USD';
   document.getElementById('st-comision').value = currentAgencia?.comision_default || '3%';
-  document.getElementById('st-com-condicion').value = 'Al contado';
   document.getElementById('st-desc').value = '';
   renderStockPhotoSlots();
   openModal('newstock');
@@ -3774,6 +3804,213 @@ async function submitNewStock(){
     toast('Error al guardar el vehículo.');
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = editingStockId ? 'Guardar cambios' : 'Guardar vehículo'; }
+  }
+}
+
+/* ---------------- Importar stock desde Excel ---------------- */
+// Mismas columnas que el formulario de "Agregar vehículo" (ver submitNewStock), salvo las fotos:
+// esas se siguen cargando a mano, una por una, después de importar.
+const IMPORT_STOCK_HEADERS = ['Marca','Modelo','Año','Kilometraje','Transmisión','Combustible','Color','Precio','Moneda','Comisión','Descripción'];
+const IMPORT_TRANSMISIONES = ['Manual','Automática'];
+const IMPORT_COMBUSTIBLES = ['Nafta','Diesel','GNC','Nafta + GNC','EV (Eléctrico 100%)','HEV (Híbrido autorrecargable)','PHEV (Híbrido enchufable)'];
+const IMPORT_MONEDAS = ['USD','ARS'];
+const IMPORT_COMISIONES = ['1%','1,5%','2%','2,5%','3%'];
+let _importStockRows = []; // filas parseadas + validadas de la última carga
+
+function openImportStockModal(){
+  _importStockRows = [];
+  document.getElementById('import-stock-file').value = '';
+  document.getElementById('import-stock-preview').innerHTML = '';
+  document.getElementById('import-stock-confirm-btn').disabled = true;
+  document.getElementById('import-stock-confirm-btn').textContent = 'Importar vehículos';
+  openModal('importstock');
+}
+
+function descargarPlantillaStock(){
+  const ejemplo = ['Toyota','Corolla',2021,45000,'Automática','Nafta','Gris',18000,'USD','3%','Único dueño, service oficial al día, impecable'];
+  const wsDatos = XLSX.utils.aoa_to_sheet([IMPORT_STOCK_HEADERS, ejemplo]);
+  wsDatos['!cols'] = IMPORT_STOCK_HEADERS.map(()=>({wch:18}));
+
+  // Segunda hoja con los valores exactos que acepta cada columna, para no adivinar.
+  const maxLen = Math.max(MARCAS_AUTOS.length, IMPORT_TRANSMISIONES.length, IMPORT_COMBUSTIBLES.length, IMPORT_MONEDAS.length, IMPORT_COMISIONES.length);
+  const filasValores = [['Marcas disponibles','Transmisión','Combustible','Moneda','Comisión']];
+  for (let i = 0; i < maxLen; i++) {
+    filasValores.push([MARCAS_AUTOS[i]||'', IMPORT_TRANSMISIONES[i]||'', IMPORT_COMBUSTIBLES[i]||'', IMPORT_MONEDAS[i]||'', IMPORT_COMISIONES[i]||'']);
+  }
+  const wsValores = XLSX.utils.aoa_to_sheet(filasValores);
+  wsValores['!cols'] = [{wch:18},{wch:14},{wch:26},{wch:10},{wch:10}];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, wsDatos, 'Vehículos');
+  XLSX.utils.book_append_sheet(wb, wsValores, 'Valores válidos');
+  XLSX.writeFile(wb, 'plantilla_stock_red_de_autos.xlsx');
+}
+
+// Compara ignorando mayúsculas/acentos, para no rechazar "automatica" o "GNC " con espacio de más.
+function _normalizarTexto(v){
+  return String(v ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+function _matchOpcion(valor, opciones){
+  const norm = _normalizarTexto(valor);
+  return opciones.find(o => _normalizarTexto(o) === norm) || null;
+}
+
+function _validarFilaImportStock(fila, i){
+  const errores = [];
+  const avisos = [];
+
+  const marca = _matchOpcion(fila['Marca'], MARCAS_AUTOS);
+  if (!fila['Marca']) errores.push('Falta la marca');
+  else if (!marca) errores.push(`Marca "${fila['Marca']}" no reconocida`);
+
+  const modelo = String(fila['Modelo'] ?? '').trim();
+  if (!modelo) errores.push('Falta el modelo');
+  else if (marca && MODELS_BY_MARCA[marca] && !MODELS_BY_MARCA[marca].some(m => _normalizarTexto(m) === _normalizarTexto(modelo))) {
+    avisos.push(`Modelo "${modelo}" no está en la lista habitual de ${marca}, se va a importar igual`);
+  }
+
+  const anio = parseInt(fila['Año'], 10);
+  if (!fila['Año']) errores.push('Falta el año');
+  else if (!Number.isFinite(anio) || anio < 1980 || anio > new Date().getFullYear() + 1) errores.push(`Año "${fila['Año']}" inválido`);
+
+  let km = null;
+  if (fila['Kilometraje'] !== undefined && fila['Kilometraje'] !== '') {
+    km = parseInt(fila['Kilometraje'], 10);
+    if (!Number.isFinite(km) || km < 0) errores.push(`Kilometraje "${fila['Kilometraje']}" inválido`);
+  }
+
+  const transmision = _matchOpcion(fila['Transmisión'], IMPORT_TRANSMISIONES);
+  if (!fila['Transmisión']) errores.push('Falta la transmisión');
+  else if (!transmision) errores.push(`Transmisión "${fila['Transmisión']}" no reconocida (usá Manual o Automática)`);
+
+  const combustible = _matchOpcion(fila['Combustible'], IMPORT_COMBUSTIBLES);
+  if (!fila['Combustible']) errores.push('Falta el combustible');
+  else if (!combustible) errores.push(`Combustible "${fila['Combustible']}" no reconocido`);
+
+  const precio = Number(fila['Precio']);
+  if (!fila['Precio']) errores.push('Falta el precio');
+  else if (!Number.isFinite(precio) || precio <= 0) errores.push(`Precio "${fila['Precio']}" inválido`);
+
+  const moneda = _matchOpcion(fila['Moneda'], IMPORT_MONEDAS);
+  if (!fila['Moneda']) errores.push('Falta la moneda');
+  else if (!moneda) errores.push(`Moneda "${fila['Moneda']}" no reconocida (usá USD o ARS)`);
+
+  let comision = String(fila['Comisión'] ?? '').trim();
+  const comisionMatch = _matchOpcion(comision, IMPORT_COMISIONES);
+  if (!comision) { comision = '3%'; avisos.push('Sin comisión indicada, se usó 3% por defecto'); }
+  else if (comisionMatch) { comision = comisionMatch; }
+  else { avisos.push(`Comisión "${comision}" no es un formato estándar, se guardó tal cual`); }
+
+  const color = String(fila['Color'] ?? '').trim();
+  const descripcion = String(fila['Descripción'] ?? '').trim();
+
+  return {
+    fila: i + 1,
+    ok: errores.length === 0,
+    errores, avisos,
+    data: {
+      marca: marca || String(fila['Marca']||'').trim(),
+      modelo, anio: Number.isFinite(anio) ? anio : null, km,
+      transmision: transmision || '', combustible: combustible || '', color,
+      precio: Number.isFinite(precio) ? precio : 0,
+      moneda: moneda || '', comision, descripcion,
+    },
+  };
+}
+
+function handleImportStockFile(event){
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const filas = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+      if (!filas.length) {
+        toast('El archivo no tiene filas para importar.');
+        _importStockRows = [];
+        document.getElementById('import-stock-preview').innerHTML = '';
+        document.getElementById('import-stock-confirm-btn').disabled = true;
+        return;
+      }
+      _importStockRows = filas.map((fila, i) => _validarFilaImportStock(fila, i));
+      renderImportStockPreview();
+    } catch (err) {
+      console.error('handleImportStockFile:', err);
+      toast('No se pudo leer el archivo. Verificá que sea un Excel válido (.xlsx).');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function renderImportStockPreview(){
+  const validas = _importStockRows.filter(r => r.ok);
+  const invalidas = _importStockRows.filter(r => !r.ok);
+  const conAvisos = validas.filter(r => r.avisos.length);
+
+  const filasHTML = _importStockRows.map(r => `
+    <tr>
+      <td class="mono">${r.fila}</td>
+      <td>${esc(r.data.marca)} ${esc(r.data.modelo)}</td>
+      <td>${r.data.anio || '—'}</td>
+      <td>${r.data.precio ? esc(fmtMoney(r.data.precio, r.data.moneda||'ARS')) : '—'}</td>
+      <td>${r.ok
+          ? (r.avisos.length ? `<span class="pill" style="background:#FEF3E2;color:#854F0B;border-color:#FAC775;" title="${esc(r.avisos.join(' · '))}"><i class="fa-solid fa-triangle-exclamation"></i> Con avisos</span>` : `<span class="pill pill-sage"><i class="fa-solid fa-check"></i> Listo</span>`)
+          : `<span class="pill" style="background:#FDEDEC;color:#A32D2D;border-color:#F7C1C1;" title="${esc(r.errores.join(' · '))}"><i class="fa-solid fa-circle-xmark"></i> ${esc(r.errores[0])}${r.errores.length>1?` (+${r.errores.length-1})`:''}</span>`}
+      </td>
+    </tr>
+  `).join('');
+
+  document.getElementById('import-stock-preview').innerHTML = `
+    <div class="import-preview-summary">
+      <span style="color:#166534;"><i class="fa-solid fa-circle-check"></i> ${validas.length} listos para importar</span>
+      ${conAvisos.length ? `<span style="color:#854F0B;"><i class="fa-solid fa-triangle-exclamation"></i> ${conAvisos.length} con avisos (se importan igual)</span>` : ''}
+      ${invalidas.length ? `<span style="color:#A32D2D;"><i class="fa-solid fa-circle-xmark"></i> ${invalidas.length} con errores (no se van a importar)</span>` : ''}
+    </div>
+    <div class="import-preview-wrap">
+      <table>
+        <thead><tr><th>Fila</th><th>Vehículo</th><th>Año</th><th>Precio</th><th>Estado</th></tr></thead>
+        <tbody>${filasHTML}</tbody>
+      </table>
+    </div>
+  `;
+
+  const btn = document.getElementById('import-stock-confirm-btn');
+  btn.disabled = validas.length === 0;
+  btn.textContent = validas.length ? `Importar ${validas.length} vehículo${validas.length===1?'':'s'}` : 'Importar vehículos';
+}
+
+async function confirmarImportStock(){
+  if (!currentAgencia) return;
+  const validas = _importStockRows.filter(r => r.ok);
+  if (!validas.length) return;
+
+  const btn = document.getElementById('import-stock-confirm-btn');
+  btn.disabled = true;
+  btn.textContent = 'Importando...';
+
+  try {
+    const payload = validas.map(r => ({
+      marca: r.data.marca, modelo: r.data.modelo, anio: r.data.anio, km: r.data.km,
+      transmision: r.data.transmision, combustible: r.data.combustible, color: r.data.color,
+      precio: r.data.precio, moneda: r.data.moneda, comision: r.data.comision,
+      descripcion: r.data.descripcion, fotos: [],
+      agencia_id: currentAgencia.id, estado: 'activo',
+    }));
+    const { error } = await supa.from('vehiculos').insert(payload);
+    if (error) throw error;
+
+    await runMatchEngine();
+    toast(`Se importaron ${payload.length} vehículo${payload.length===1?'':'s'}. Ahora podés cargarles las fotos desde Mi Stock.`);
+    closeModal('importstock');
+    _importStockRows = [];
+    await showApp('vehículos');
+  } catch (e) {
+    console.error('confirmarImportStock:', e);
+    toast('Error al importar los vehículos: ' + (e.message || ''));
+    btn.disabled = false;
+    btn.textContent = `Importar ${validas.length} vehículo${validas.length===1?'':'s'}`;
   }
 }
 
@@ -7829,7 +8066,10 @@ matches: ()=>{
 
 vehículos: ()=>`
   <div class="main-head"><div><h1>Mi Stock</h1><p class="sub">Vehículos disponibles en tu concesionaria, visibles para toda la red</p></div>
-  <button class="btn btn-solid" onclick="openNewStockModal()"><i class="fa-solid fa-plus"></i> Agregar vehículo</button></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn btn-editar-violeta btn-hover-fill" onclick="openImportStockModal()"><i class="fa-solid fa-file-import"></i> Importar</button>
+    <button class="btn btn-solid" onclick="openNewStockModal()"><i class="fa-solid fa-plus"></i> Agregar vehículo</button>
+  </div></div>
   <table>
     <thead><tr><th>Vehículo</th><th>Precio</th><th>Comisión</th><th>Antigüedad</th><th>Estado</th><th>Interés</th><th></th></tr></thead>
     <tbody>
