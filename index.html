@@ -8439,6 +8439,10 @@ manuales: ()=>{
   }
   return `
   <div class="main-head"><div><h1>Matches Manuales</h1><p class="sub">Contactos directos por WhatsApp desde Explorar la Red y Gremio — ${pendientes.length} pendiente${pendientes.length===1?'':'s'} · ${concretadas.length} concretada${concretadas.length===1?'':'s'} · ${caidas.length} caída${caidas.length===1?'':'s'}</p></div></div>
+  <div class="le-infobanner">
+    <i class="fa-solid fa-circle-info"></i>
+    <span><strong>Contactar no reserva el vehículo.</strong> Varias agencias pueden tener una consulta pendiente sobre el mismo auto al mismo tiempo, sin pisarse. La exclusividad recién se activa cuando alguna acepta la comisión: ahí se reserva el auto y las demás consultas pendientes sobre ese vehículo se marcan como caídas automáticamente. Si esa operación después no se concreta, esas agencias se reabren solas y les llega una notificación avisando que el vehículo volvió a estar disponible.</span>
+  </div>
   <div class="view-toggle">
     <button class="view-toggle-btn ${matchesManualesTab==='pipeline'?'active':''}" onclick="setMatchesManualesTab('pipeline')"><i class="fa-solid fa-timeline"></i> Pipeline</button>
     <button class="view-toggle-btn ${matchesManualesTab==='concretadas'?'active':''}" onclick="setMatchesManualesTab('concretadas')"><i class="fa-solid fa-circle-check"></i> Operaciones concretadas</button>
