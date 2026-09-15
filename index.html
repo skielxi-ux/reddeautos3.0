@@ -417,6 +417,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   /* ---- listing cards (Explorar la Red) ---- */
   .listing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .listing-grid.cols-2{grid-template-columns:repeat(2,1fr);}
   .listing-card{
     background:#FFFFFF;border-radius:14px;overflow:visible;position:relative;
     border:1px solid #EDEBF7;
@@ -2484,6 +2485,20 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </div>
 
+<div id="modal-editarportada" class="modal-backdrop hidden">
+  <div class="modal" style="position:relative;">
+    <button class="avatar-modal-close" onclick="closeModal('editarportada')"><i class="fa-solid fa-xmark"></i></button>
+    <h3>Elegir foto de portada</h3>
+    <p class="sub">Hacé clic en la foto que querés que aparezca primero en la card del marketplace.</p>
+    <div id="admin-portada-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;"></div>
+    <input type="file" id="admin-portada-file-input" accept="image/*" style="display:none;" onchange="handleAdminPortadaFileChange(event)">
+    <div class="modal-close-row">
+      <button class="btn" onclick="closeModal('editarportada')">Cancelar</button>
+      <button class="btn btn-solid" id="admin-portada-guardar-btn" onclick="guardarPortadaAdmin()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -4340,7 +4355,7 @@ async function deleteProp(id){
   });
 }
 
-function listingCardReal(v){
+function listingCardReal(v, esAdminView=false){
   const foto = (v.fotos && v.fotos.length) ? v.fotos[0] : null;
   const agName = v.agencias?.nombre || 'Agencia';
   const agCiudad = v.agencias?.ciudad || '—';
@@ -4357,6 +4372,7 @@ function listingCardReal(v){
         <span class="listing-type-pill">${esc(v.marca||'')}</span>
         <span class="listing-agency-pill"><i class="fa-solid fa-building"></i> ${esc(agName)}</span>
       </div>
+      ${esAdminView && v.fotos && v.fotos.length > 0 ? `<button type="button" class="btn btn-sm" style="width:100%;border-radius:0;" onclick="abrirEditarPortadaAdmin('${v.id}')"><i class="fa-solid fa-image"></i> Editar portada</button>` : ''}
       ${isPopular ? `<div class="listing-ribbon">${icoSpark} Popular</div>` : ''}
       <div class="listing-body">
         <div class="listing-price-row">
@@ -4704,6 +4720,7 @@ function fmtFechaCorta(d){ return d.toLocaleDateString('es-AR', { day:'2-digit',
 function fmtARS(n){ return 'ARS ' + Math.round(n).toLocaleString('es-AR'); }
 
 let ADMIN_AGENCIES = [];
+let _adminAgencyDetailProps = []; // vehículos de la agencia que el admin está viendo en "Ver detalle"
 let ADMIN_MATCHES = [];       // matches reales de toda la red, para KPIs y para contar "ops" por agencia
 let ADMIN_VEHICULOS_COUNT = 0;
 let ADMIN_BUSQUEDAS_COUNT = 0;
@@ -5390,6 +5407,91 @@ async function guardarDescuentoProveedorAdmin(){
 }
 
 let agencyDetailSwiperInstance = null;
+/* ---------------- editar foto de portada (admin) ---------------- */
+// El admin no edita el vehículo en sí, solo el orden de las fotos que ya subió la agencia —
+// puntualmente, cuál queda primera (la portada que se ve en la card del marketplace). Silencioso:
+// no se le avisa a la agencia. La política "vehiculos: admin gestiona todo" en Supabase ya permite
+// este UPDATE sobre vehículos de cualquier agencia (confirmado, no hizo falta tocar RLS).
+let _adminPortadaVehiculoId = null;
+let _adminPortadaFotos = [];
+let _adminPortadaReplaceIndex = null;
+let _adminPortadaSubiendo = false;
+function abrirEditarPortadaAdmin(vehiculoId){
+  const v = _adminAgencyDetailProps.find(x => x.id === vehiculoId);
+  if (!v || !v.fotos || v.fotos.length < 1) return;
+  _adminPortadaVehiculoId = vehiculoId;
+  _adminPortadaFotos = [...v.fotos];
+  renderAdminPortadaGrid();
+  openModal('editarportada');
+}
+function renderAdminPortadaGrid(){
+  document.getElementById('admin-portada-grid').innerHTML = _adminPortadaFotos.map((foto, i) => `
+    <div style="position:relative;border-radius:10px;overflow:hidden;border:3px solid ${i===0?'var(--red)':'transparent'};">
+      <img src="${foto}" style="width:100%;height:90px;object-fit:cover;display:block;cursor:pointer;" onclick="elegirPortadaAdmin(${i})">
+      ${i===0 ? `<span class="cover-tag">Portada</span>` : ''}
+      <button type="button" class="btn btn-sm" style="position:absolute;bottom:4px;right:4px;padding:3px 8px;font-size:11px;" onclick="iniciarReemplazoFotoAdmin(${i})" title="Reemplazar esta foto"><i class="fa-solid fa-upload"></i></button>
+    </div>
+  `).join('');
+}
+function elegirPortadaAdmin(idx){
+  if (idx === 0) return;
+  const [foto] = _adminPortadaFotos.splice(idx, 1);
+  _adminPortadaFotos.unshift(foto);
+  renderAdminPortadaGrid();
+}
+// Reemplazar una foto puntual (por ejemplo, cuando el vehículo tiene una sola foto cargada y
+// hace falta cambiarla) — sube el archivo nuevo al mismo bucket/carpeta que ya usa la agencia
+// para sus propias fotos, así queda todo en el mismo lugar de siempre.
+function iniciarReemplazoFotoAdmin(idx){
+  _adminPortadaReplaceIndex = idx;
+  document.getElementById('admin-portada-file-input').click();
+}
+async function handleAdminPortadaFileChange(event){
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file || _adminPortadaReplaceIndex === null) return;
+  const v = _adminAgencyDetailProps.find(x => x.id === _adminPortadaVehiculoId);
+  if (!v) return;
+  const idx = _adminPortadaReplaceIndex;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+    // Mostramos la previsualización al toque (antes de terminar de subir) para que se sienta ágil.
+    _adminPortadaFotos[idx] = dataUrl;
+    renderAdminPortadaGrid();
+    _adminPortadaSubiendo = true;
+    try {
+      const path = `vehiculos/${v.agencia_id}/${Date.now()}_admin_${idx}.jpg`;
+      const url = await supaUpload('red-de-autos', path, dataUrl);
+      _adminPortadaFotos[idx] = url;
+    } catch (err) {
+      console.error('handleAdminPortadaFileChange:', err);
+      toast('No se pudo subir la foto. Probá de nuevo.');
+    } finally {
+      _adminPortadaSubiendo = false;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+async function guardarPortadaAdmin(){
+  if (_adminPortadaSubiendo) { toast('Esperá a que termine de subir la foto.'); return; }
+  const btn = document.getElementById('admin-portada-guardar-btn');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  const { error } = await supa.from('vehiculos').update({ fotos: _adminPortadaFotos }).eq('id', _adminPortadaVehiculoId);
+  btn.disabled = false; btn.textContent = 'Guardar';
+  if (error) { toast('Error al guardar la portada.'); console.error('guardarPortadaAdmin:', error); return; }
+  // Actualizamos en memoria para que la card se refresque sin tener que recargar todo el detalle
+  // de la agencia (que además nos sacaría de la pestaña "Vehículos" de vuelta a "Resumen").
+  const v = _adminAgencyDetailProps.find(x => x.id === _adminPortadaVehiculoId);
+  if (v) v.fotos = _adminPortadaFotos;
+  document.getElementById('agencydetail-props-grid').innerHTML = _adminAgencyDetailProps.length
+    ? `<div class="listing-grid cols-2">${_adminAgencyDetailProps.map(x=>listingCardReal(x, true)).join('')}</div>`
+    : '';
+  closeModal('editarportada');
+  toast('Portada actualizada');
+}
+
 async function openAgencyDetail(agencyId){
   const a = ADMIN_AGENCIES.find(x=>x.id===agencyId);
   if(!a) return;
@@ -5414,6 +5516,7 @@ async function openAgencyDetail(agencyId){
   if (eRev) console.error('openAgencyDetail calificaciones:', eRev);
   const props = vehiculos || [];
   const revs = reviews || [];
+  _adminAgencyDetailProps = props;
 
   const resumenSlide = `
     <div class="swiper-slide">
@@ -5429,7 +5532,7 @@ async function openAgencyDetail(agencyId){
   `;
   const propsSlide = `
     <div class="swiper-slide">
-      ${props.length ? `<div class="listing-grid">${props.map(v=>listingCardReal(v)).join('')}</div>` : `<p style="color:var(--paper-dim);font-size:13px;">Esta agencia no tiene vehículos publicados todavía.</p>`}
+      <div id="agencydetail-props-grid">${props.length ? `<div class="listing-grid cols-2">${props.map(v=>listingCardReal(v, true)).join('')}</div>` : `<p style="color:var(--paper-dim);font-size:13px;">Esta agencia no tiene vehículos publicados todavía.</p>`}</div>
     </div>
   `;
   const reviewsSlide = `
@@ -8574,6 +8677,8 @@ faqapp: ()=>`
 
       <div class="faq-c-item faq-c-open"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Cómo funciona el sistema de matches?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>El sistema cruza tu stock y tus clientes contra las búsquedas y vehículos de toda la red. Cuando hay compatibilidad de tipo, ciudad, operación y presupuesto, se genera un match automático.</p></div></div>
 
+      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Cómo funcionan los matches manuales?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Además de los matches automáticos, podés contactar directamente a una agencia desde una card en Explorar la Red o en Oportunidades Exclusivas. Ese contacto también queda registrado — en "Matches Manuales", separado de "Mis Matches" para no mezclarlo con los automáticos — con su propio seguimiento. Si le vas a llevar un cliente, funciona igual que un match automático (con comisión de por medio); si el interés es tuyo, para comprarlo o consultarlo vos mismo, lo marcás como una consulta directa y queda sin comisión ni cliente asociado.</p></div></div>
+
       <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Solo puedo vender o también puedo comprar?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Podés hacer ambas cosas: publicar vehículos de venta o consignación que tengas en tu stock, y también cargar clientes que buscan comprar o consignar algo que no tenés, para que la red te avise si otra concesionaria lo tiene.</p></div></div>
 
       <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Cómo se fija la comisión?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Al publicar un vehículo, vos definís el porcentaje (o monto) que estás dispuesto a pagarle a la concesionaria que traiga al comprador o consignante. Ese dato queda visible al producirse el match.</p></div></div>
@@ -8587,6 +8692,8 @@ faqapp: ()=>`
       <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Qué diferencia hay entre Plan Pro y Premium?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>El Plan Pro es autogestión: vos cargás y actualizás tu stock y tus clientes. El Plan Premium incluye todo eso más un equipo que carga y mantiene tu stock al día, con soporte prioritario.</p></div></div>
 
       <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Cómo contrato el Plan Premium?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Desde Mi Perfil, en la sección "Plan actual", elegís Plan Premium y nuestro equipo se pone en contacto para coordinar el cambio y el relevamiento inicial de tu stock.</p></div></div>
+
+      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Cómo funcionan los anuncios destacados?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Es un beneficio automático del Plan Premium: tus vehículos aparecen primero en Explorar la Red (antes que los de cualquier agencia Pro, sin importar el orden que elija quien está mirando) y llevan una estrella distintiva en la card. No hay que activarlo ni elegir qué auto destacar — aplica solo a todo tu stock mientras tengas el Plan Premium.</p></div></div>
 
       <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Puedo cambiar en cualquier momento?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Sí, podés cambiar de plan cuando quieras desde Mi Perfil. El cambio se hace efectivo en el siguiente ciclo de facturación.</p></div></div>
 
