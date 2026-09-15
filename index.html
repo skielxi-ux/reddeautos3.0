@@ -2386,10 +2386,25 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 <div id="modal-contactomanual" class="modal-backdrop hidden">
   <div class="modal" style="position:relative;">
     <button class="avatar-modal-close" onclick="closeModal('contactomanual')"><i class="fa-solid fa-xmark"></i></button>
-    <h3>¿Para qué cliente es esta consulta?</h3>
-    <p class="sub">Así queda registrado en "Matches Manuales" y podés hacerle seguimiento a esta operación.</p>
-    <div class="field"><label>Nombre del cliente</label><input id="cm-cliente-nombre" placeholder="Nombre y apellido"></div>
-    <div class="field"><label>Teléfono del cliente (opcional)</label><input id="cm-cliente-telefono" placeholder="Para tu propio registro, no se comparte"></div>
+    <h3>¿Para qué es esta consulta?</h3>
+    <p class="sub">Así queda bien registrado en "Matches Manuales".</p>
+
+    <div class="row-2" style="margin-bottom:16px;">
+      <button type="button" class="client-type-btn selected" id="cm-tipo-btn-cliente" onclick="setContactoManualTipo('cliente')">
+        <div style="font-weight:700;">Tengo un cliente interesado</div>
+        <div style="font-size:11.5px;color:var(--paper-dim);margin-top:2px;">Vas a cobrar la comisión del vehículo</div>
+      </button>
+      <button type="button" class="client-type-btn" id="cm-tipo-btn-directa" onclick="setContactoManualTipo('directa')">
+        <div style="font-weight:700;">Es para mí</div>
+        <div style="font-size:11.5px;color:var(--paper-dim);margin-top:2px;">Quiero comprarlo/consultarlo yo, sin comisión</div>
+      </button>
+    </div>
+
+    <div id="cm-campos-cliente">
+      <div class="field"><label>Nombre del cliente</label><input id="cm-cliente-nombre" placeholder="Nombre y apellido"></div>
+      <div class="field"><label>Teléfono del cliente (opcional)</label><input id="cm-cliente-telefono" placeholder="Para tu propio registro, no se comparte"></div>
+    </div>
+
     <div class="modal-close-row">
       <button class="btn" onclick="closeModal('contactomanual')">Cancelar</button>
       <button class="btn btn-solid btn-contact-lime" id="contactomanual-confirm-btn" onclick="confirmarContactoManual()"><i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp</button>
@@ -5918,12 +5933,13 @@ async function cargarMisMatches(){
     const otraAgenciaContacto = soyVendedor ? (m.comp?.contacto || '') : (m.vend?.contacto || '');
     // Etapa del pipeline, derivada de datos reales y compartida entre ambas agencias.
     // 'propuesta' es el primer touchpoint: la compradora tiene que aceptar la comisión que ya
-    // viene cargada en el vehículo antes de poder pasar a coordinar por WhatsApp.
+    // viene cargada en el vehículo antes de poder pasar a coordinar por WhatsApp. La compra
+    // directa (sin cliente ni comisión) no pasa por ese paso — arranca directo en 'contactado'.
     let etapa = 'propuesta';
     if (m.estado === 'concretada') etapa = 'concretada';
     else if (m.estado === 'cancelada') etapa = 'cancelada';
     else if (m.visita_agendada_at) etapa = 'visita';
-    else if (m.comision_aceptada_at) etapa = 'contactado';
+    else if (m.comision_aceptada_at || (m.es_compra_directa && m.contactado_at)) etapa = 'contactado';
     return {
       id: m.id,
       vehiculoId: m.vehiculo_id,
@@ -5938,9 +5954,11 @@ async function cargarMisMatches(){
       // Si soy el vendedor, el cliente es de la otra agencia — nombre protegido, como en el diseño de Exe.
       // El teléfono del cliente solo lo tenemos (y solo lo usamos) cuando el match es nuestro como compradores.
       // Los matches manuales no vienen de una búsqueda (bus vacío), así que el dato sale directo del match.
-      clienteNombre: soyVendedor ? `Cliente de ${otraAgencia}` : (bus.cliente_nombre || m.cliente_nombre || '—'),
+      // La compra directa no tiene cliente: es la propia agencia comprando/consultando para sí misma.
+      clienteNombre: m.es_compra_directa ? 'Compra directa' : (soyVendedor ? `Cliente de ${otraAgencia}` : (bus.cliente_nombre || m.cliente_nombre || '—')),
       clienteTelefono: soyVendedor ? '' : (bus.cliente_telefono || m.cliente_telefono || ''),
-      clienteProtegido: soyVendedor,
+      clienteProtegido: soyVendedor && !m.es_compra_directa,
+      esCompraDirecta: !!m.es_compra_directa,
       origen: m.origen || 'automatico',
       estado: m.estado || 'pendiente',
       etapa,
@@ -6138,7 +6156,14 @@ function matchCardHTML(m){
   let primaryActions = '';
   let primaryNote = '';
   if (m.estado === 'concretada') {
-    if (!m.soyVendedor) {
+    if (m.esCompraDirecta) {
+      primaryNote = `<div class="match-done-note"><i class="fa-solid fa-circle-check"></i> Operación finalizada · Compra directa, sin comisión</div>`;
+      if (!m.soyVendedor) {
+        primaryActions = m.yaCalifique
+          ? `<div class="waiting-note"><i class="fa-solid fa-star"></i> Ya calificaste esta operación</div>`
+          : `<button class="btn btn-sm" onclick="openRatingModal('${m.otraAgenciaId}','${m.otraAgencia}','${m.id}')"><i class="fa-solid fa-star"></i> Calificar a ${esc(m.otraAgencia)}</button>`;
+      }
+    } else if (!m.soyVendedor) {
       // Soy el comprador (traje al cliente): la comisión ya se calculó sola al cerrarse la operación
       const estadoPagoTxt = { pendiente: 'pendiente de pago', pagada: 'pagada', parcial: 'con pago parcial' }[m.comisionEstado] || '';
       const calificarBtn = m.yaCalifique
@@ -6169,7 +6194,13 @@ function matchCardHTML(m){
   } else if (m.etapa === 'contactado') {
     // Touchpoint 2: ya se aceptó la comisión. El contacto por WhatsApp lo inicia siempre la
     // compradora (paso 1); la vendedora solo espera, sin botón de contacto propio.
-    if (m.soyVendedor) {
+    // En una compra directa no hay cliente al que informar: la vendedora puede finalizar
+    // directo apenas se pongan de acuerdo, sin el paso intermedio de "informar al cliente".
+    if (m.esCompraDirecta) {
+      primaryActions = m.soyVendedor
+        ? `<button class="btn btn-sm whatsapp-btn" onclick="abrirCerrarMatch('${m.id}', false)"><i class="fa-solid fa-flag-checkered"></i> Finalizar operación</button>`
+        : `<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} confirme la venta</div>`;
+    } else if (m.soyVendedor) {
       primaryActions = `<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} informe al cliente</div>`;
     } else if (!m.contactadoAt) {
       // Paso 1: contactar a la agencia que tiene el vehículo
@@ -6193,14 +6224,14 @@ function matchCardHTML(m){
   const puedeMarcarCaida = m.estado === 'pendiente' && !(m.etapa === 'propuesta' && !m.soyVendedor);
   const cerrarCaidaBtn = puedeMarcarCaida ? `<button class="btn btn-sm btn-eliminar-pastel" onclick="abrirCerrarMatch('${m.id}', true)"><i class="fa-solid fa-trash"></i> Marcar como caída</button>` : '';
   // Volver un paso atrás: solo para quien busca el vehículo (el vendedor espera, no retrocede su propio match)
-  const volverBtn = (!m.soyVendedor && m.estado === 'pendiente' && (m.etapa === 'contactado' || m.etapa === 'visita'))
+  const volverBtn = (!m.soyVendedor && !m.esCompraDirecta && m.estado === 'pendiente' && (m.etapa === 'contactado' || m.etapa === 'visita'))
     ? `<button class="btn btn-sm" onclick="retrocederMatch('${m.id}')"><i class="fa-solid fa-rotate-left"></i> Volver un paso atrás</button>` : '';
   // Reabrir una operación ya finalizada (concretada o caída): solo la agencia vendedora, que fue
   // quien la finalizó originalmente.
   const reabrirBtn = (m.soyVendedor && (m.estado === 'concretada' || m.estado === 'cancelada'))
     ? `<button class="btn btn-sm" onclick="abrirReabrirMatch('${m.id}')"><i class="fa-solid fa-rotate-left"></i> Reabrir operación</button>` : '';
 
-  const clienteClickable = !m.clienteProtegido;
+  const clienteClickable = !m.clienteProtegido && !m.esCompraDirecta;
   const clienteNombreHTML = clienteClickable
     ? `<strong style="cursor:pointer;" onclick="openMatchClientDetail('${m.id}')">${m.clienteNombre}</strong>`
     : `<strong>${m.clienteNombre}</strong>`;
@@ -6234,7 +6265,7 @@ function matchCardHTML(m){
         <div class="flow-connector"></div>
         <div class="flow-node">
           <span class="dot-icon"><i class="fa-solid fa-user"></i></span>
-          <div class="text">${clienteNombreHTML}${m.clienteProtegido ? '<span>Nombre protegido</span>' : ''}</div>
+          <div class="text">${clienteNombreHTML}${m.clienteProtegido ? '<span>Nombre protegido</span>' : (m.esCompraDirecta ? '<span>Sin cliente ni comisión</span>' : '')}</div>
         </div>
       </div>
       ${renderMatchPipelineStepper(m.etapa)}
@@ -6295,8 +6326,9 @@ async function confirmarCerrarMatch(){
     if (!motivo) { toast('Elegí un motivo.'); return; }
     const detalle = document.getElementById('cerrarmatch-detalle').value.trim();
     payload.motivo_cancelacion = motivo + (detalle ? ': ' + detalle : '');
-  } else if (_cerrarMatchResultado === 'concretada') {
+  } else if (_cerrarMatchResultado === 'concretada' && !mCerrado?.esCompraDirecta) {
     // La comisión se calcula sola (precio × % del vehículo) — nadie tiene que cargarla a mano.
+    // La compra directa no tiene comisión: se salta este cálculo por completo.
     const { monto, moneda } = calcularComisionAutomatica(mCerrado);
     payload.comision_monto = monto;
     payload.comision_moneda = moneda;
@@ -6531,10 +6563,18 @@ function _buscarVehiculoParaContacto(vehiculoId){
   return redStock.find(x=>x.id===vehiculoId) || redGremioReal.find(x=>x.id===vehiculoId) || null;
 }
 let _contactoManualVehiculoId = null;
+let _contactoManualTipo = 'cliente';
+function setContactoManualTipo(tipo){
+  _contactoManualTipo = tipo;
+  document.getElementById('cm-tipo-btn-cliente').classList.toggle('selected', tipo==='cliente');
+  document.getElementById('cm-tipo-btn-directa').classList.toggle('selected', tipo==='directa');
+  document.getElementById('cm-campos-cliente').classList.toggle('hidden', tipo==='directa');
+}
 function abrirContactoManual(vehiculoId){
   _contactoManualVehiculoId = vehiculoId;
   document.getElementById('cm-cliente-nombre').value = '';
   document.getElementById('cm-cliente-telefono').value = '';
+  setContactoManualTipo('cliente');
   openModal('contactomanual');
 }
 // A diferencia de un match automático, el contacto manual no reserva el vehículo ni bloquea a
@@ -6547,9 +6587,14 @@ async function confirmarContactoManual(){
   if (!currentAgencia) return;
   const v = _buscarVehiculoParaContacto(_contactoManualVehiculoId);
   if (!v || !v.agencia_id) { toast('No se pudo encontrar el vehículo.'); return; }
-  const nombreCliente = document.getElementById('cm-cliente-nombre').value.trim();
-  if (!nombreCliente) { toast('Ingresá el nombre del cliente antes de continuar.'); return; }
-  const telefonoCliente = document.getElementById('cm-cliente-telefono').value.trim();
+
+  const esDirecta = _contactoManualTipo === 'directa';
+  let nombreCliente = '', telefonoCliente = '';
+  if (!esDirecta) {
+    nombreCliente = document.getElementById('cm-cliente-nombre').value.trim();
+    if (!nombreCliente) { toast('Ingresá el nombre del cliente antes de continuar.'); return; }
+    telefonoCliente = document.getElementById('cm-cliente-telefono').value.trim();
+  }
 
   const waHref = v.agencias?.telefono
     ? `https://wa.me/${v.agencias.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(construirMensajeWhatsappVehiculo(v.agencias?.nombre, [v.marca,v.modelo].filter(Boolean).join(' ')))}`
@@ -6560,15 +6605,21 @@ async function confirmarContactoManual(){
   btn.disabled = true; btn.textContent = 'Contactando...';
 
   try {
-    const { error: errIns } = await supa.from('matches').insert({
+    const payload = {
       vehiculo_id: v.id,
       agencia_vendedora: v.agencia_id,
       agencia_compradora: currentAgencia.id,
       estado: 'pendiente',
       origen: 'manual',
-      cliente_nombre: nombreCliente,
-      cliente_telefono: telefonoCliente || null,
-    });
+      es_compra_directa: esDirecta,
+      cliente_nombre: esDirecta ? null : nombreCliente,
+      cliente_telefono: esDirecta ? null : (telefonoCliente || null),
+    };
+    // La compra directa no tiene cliente ni comisión de por medio, así que no pasa por el paso
+    // de "aceptar comisión" — queda directamente marcada como contactada, como un registro simple.
+    if (esDirecta) payload.contactado_at = new Date().toISOString();
+
+    const { error: errIns } = await supa.from('matches').insert(payload);
     if (errIns) throw errIns;
 
     registrarClicReal('vehiculo', v.id, 'whatsapp');
@@ -6577,7 +6628,9 @@ async function confirmarContactoManual(){
 
     closeModal('contactomanual');
     window.open(waHref, '_blank');
-    toast('Contacto registrado en Matches Manuales. Si el cliente sigue interesado, aceptá la comisión desde ahí para reservar el vehículo.');
+    toast(esDirecta
+      ? 'Contacto registrado en Matches Manuales.'
+      : 'Contacto registrado en Matches Manuales. Si el cliente sigue interesado, aceptá la comisión desde ahí para reservar el vehículo.');
     await cargarMisMatches();
   } catch (e) {
     console.error('confirmarContactoManual:', e);
