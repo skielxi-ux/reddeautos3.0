@@ -6375,6 +6375,30 @@ async function confirmarCerrarMatch(){
     );
   } else if (mCerrado) {
     crearNotificacion(mCerrado.otraAgenciaId, 'match_cerrado', 'Operación caída', `El match de ${mCerrado.vehiculo} se marcó como caído.`, mCerrado.id);
+
+    // Si este match había ganado la reserva del vehículo (le habían aceptado la comisión) y ahora
+    // se cae sin concretarse, reabrimos a las agencias rivales que habían quedado afuera por su
+    // culpa — antes quedaban canceladas para siempre aunque el auto siguiera disponible en la red.
+    if (mCerrado.comisionAceptadaAt) {
+      const { data: rivalesReabiertos, error: errRivales } = await supa.from('matches')
+        .update({ estado: 'pendiente', motivo_cancelacion: null, cerrado_at: null, comision_aceptada_at: null, cancelado_por_match_id: null })
+        .eq('cancelado_por_match_id', mCerrado.id)
+        .eq('estado', 'cancelada')
+        .select('id, agencia_compradora, origen');
+      if (errRivales) {
+        console.warn('confirmarCerrarMatch (reabrir rivales):', errRivales);
+      } else if (rivalesReabiertos && rivalesReabiertos.length) {
+        rivalesReabiertos.forEach(r => {
+          crearNotificacion(
+            r.agencia_compradora,
+            'match_etapa',
+            '¡El vehículo volvió a estar disponible!',
+            `La operación de otra agencia por el ${mCerrado.vehiculo} no se concretó. Tu match volvió a quedar activo — entrá a ${r.origen === 'manual' ? 'Matches Manuales' : 'Mis Matches'} para retomarlo.`,
+            r.id
+          );
+        });
+      }
+    }
   }
 
   closeModal('cerrarmatch');
