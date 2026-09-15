@@ -6780,7 +6780,7 @@ async function cargarNotificacionesReal(){
 }
 function actualizarNotifDotReal(){
   const dot = document.getElementById('notifdot');
-  if (dot) dot.style.display = notificacionesReal.some(n=>!n.leido) ? 'block' : 'none';
+  if (dot) dot.style.display = (notificacionesReal.some(n=>!n.leido) || dashDemandaCaliente.length) ? 'block' : 'none';
   actualizarSoporteDotReal();
 }
 function actualizarSoporteDotReal(){
@@ -7317,6 +7317,59 @@ async function cargarDashboardData(){
   const estrellas = (califRes.data || []).map(c => c.estrellas).filter(n => typeof n === 'number');
   dashCalificacionProm = estrellas.length ? (estrellas.reduce((a,b)=>a+b,0) / estrellas.length) : null;
   dashCalificacionCant = estrellas.length;
+  await calcularDemandaCaliente();
+  actualizarNotifDotReal();
+}
+
+// --- Demanda caliente por zona ---------------------------------------------
+// Cruza búsquedas activas de TODA la red vs. stock publicado de TODA la red,
+// agrupado por marca + ciudad. Si en tu ciudad hay muchas búsquedas activas
+// de una marca y poco stock publicado, es una señal de demanda insatisfecha.
+// No usa datos externos (scraping): es 100% dato propio de la plataforma.
+let dashDemandaCaliente = [];
+const DEMANDA_CALIENTE_MIN_DEMANDA = 3; // mínimo de búsquedas activas para considerarlo señal
+const DEMANDA_CALIENTE_MIN_RATIO = 3;   // demanda / oferta mínimo para marcarlo "caliente"
+
+function capitalizarPalabra(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+
+async function calcularDemandaCaliente(){
+  dashDemandaCaliente = [];
+  if (!currentAgencia || !currentAgencia.ciudad) return;
+  const [busquedasRes, stockRes] = await Promise.all([
+    supa.from('busquedas').select('marca, agencias:agencia_id(ciudad)').eq('estado', 'activa'),
+    supa.from('vehiculos').select('marca, agencias:agencia_id(ciudad)').eq('estado', 'activo').eq('es_gremio', false)
+  ]);
+  if (busquedasRes.error || stockRes.error) { console.warn('calcularDemandaCaliente:', busquedasRes.error || stockRes.error); return; }
+
+  const contarPorMarcaCiudad = (rows) => {
+    const map = {};
+    (rows || []).forEach(r => {
+      const marca = (r.marca || '').trim();
+      const ciudad = (r.agencias?.ciudad || '').trim();
+      if (!marca || !ciudad) return;
+      const key = marca.toLowerCase() + '||' + ciudad.toLowerCase();
+      map[key] = (map[key] || 0) + 1;
+    });
+    return map;
+  };
+
+  const demandaMap = contarPorMarcaCiudad(busquedasRes.data);
+  const ofertaMap = contarPorMarcaCiudad(stockRes.data);
+  const miCiudad = currentAgencia.ciudad.trim().toLowerCase();
+
+  const hotspots = [];
+  Object.keys(demandaMap).forEach(key => {
+    const [marca, ciudad] = key.split('||');
+    if (ciudad !== miCiudad) return;
+    const demanda = demandaMap[key];
+    const oferta = ofertaMap[key] || 0;
+    if (demanda < DEMANDA_CALIENTE_MIN_DEMANDA) return;
+    const ratio = oferta === 0 ? demanda : demanda / oferta;
+    if (ratio < DEMANDA_CALIENTE_MIN_RATIO) return;
+    hotspots.push({ marca: capitalizarPalabra(marca), ciudad: currentAgencia.ciudad, demanda, oferta, ratio });
+  });
+  hotspots.sort((a,b) => b.ratio - a.ratio);
+  dashDemandaCaliente = hotspots;
 }
 
 async function cargarMiStock(){
@@ -8094,22 +8147,36 @@ notificaciones: ()=>{
     ticket_respondido: { icon: 'fa-solid fa-headset', color: '#5B3FBF' },
     calificacion_recibida: { icon: 'fa-solid fa-star', color: '#FBBC04' },
     comision_pagada: { icon: 'fa-solid fa-sack-dollar', color: '#3F7A46' },
+    demanda_caliente: { icon: 'fa-solid fa-fire', color: '#C0392B' },
   };
+  // Los hotspots de demanda caliente se calculan en vivo (no son filas en la tabla notificaciones),
+  // así que se generan acá como notificaciones "virtuales" y se mezclan con las reales para
+  // mostrarlas juntas. Al no tener referencia_id no admiten "eliminar" ni "marcar leída" individual.
+  const notifsDemandaCaliente = dashDemandaCaliente.map(h => ({
+    id: 'demanda-' + h.marca + '-' + h.ciudad,
+    tipo: 'demanda_caliente',
+    titulo: `Demanda caliente: ${h.marca} en ${h.ciudad}`,
+    texto: `${h.demanda} búsqueda${h.demanda===1?'':'s'} activa${h.demanda===1?'':'s'} vs. ${h.oferta} publicada${h.oferta===1?'':'s'} en la red`,
+    created_at: new Date().toISOString(),
+    leido: false,
+    virtual: true,
+  }));
+  const listaNotificaciones = [...notifsDemandaCaliente, ...notificacionesReal];
   return `
   <div class="main-head"><div><h1>Notificaciones</h1><p class="sub">Todo lo que pasó en tu actividad dentro de la red</p></div>
   <div style="display:flex;gap:10px;"><button class="btn" onclick="marcarTodasNotifLeidasReal()"><i class="fa-solid fa-check-double"></i> Marcar todas como leídas</button><button class="btn" onclick="limpiarNotificacionesReal()"><i class="fa-solid fa-trash"></i> Limpiar notificaciones</button></div></div>
-  ${notificacionesReal.length ? notificacionesReal.map(n=>{
+  ${listaNotificaciones.length ? listaNotificaciones.map(n=>{
     const esCaida = n.tipo === 'match_cerrado' && (n.titulo||'').toLowerCase().includes('caída');
 const meta = esCaida ? { icon: 'fa-solid fa-xmark', color: '#C0392B' } : (iconMap[n.tipo] || { icon: 'fa-solid fa-bell', color: 'var(--red)' });
     return `
-    <div class="notif-item ${n.leido?'':'notif-unread'}" onclick="abrirNotificacion('${n.id}')" style="cursor:pointer;">
+    <div class="notif-item ${n.leido?'':'notif-unread'}" ${n.virtual?`onclick="showApp('vehículos')" style="cursor:pointer;"`:`onclick="abrirNotificacion('${n.id}')" style="cursor:pointer;"`}>
       <div class="notif-icon" style="color:${esc(meta.color)};background:${esc(meta.color)}1a;"><i class="${esc(meta.icon)}"></i></div>
             <div class="notif-body">
         <div class="notif-title">${esc(n.titulo)}${!n.leido?'<span class="notif-dot"></span>':''}</div>
         <div class="notif-text">${esc(n.texto||'')}</div>
-        <div class="notif-date">${formatDateTime(n.created_at)}</div>
+        <div class="notif-date">${n.virtual?'Ahora':formatDateTime(n.created_at)}</div>
       </div>
-      <button class="btn btn-sm" onclick="eliminarNotificacionUna(event, '${n.id}')" style="margin-left:auto;flex-shrink:0;" title="Eliminar esta notificación"><i class="fa-solid fa-trash"></i></button>
+      ${n.virtual?'':`<button class="btn btn-sm" onclick="eliminarNotificacionUna(event, '${n.id}')" style="margin-left:auto;flex-shrink:0;" title="Eliminar esta notificación"><i class="fa-solid fa-trash"></i></button>`}
     </div>
   `;}).join('') : `<div class="card"><p style="color:var(--paper-dim);margin:0;">No tenés notificaciones todavía. Van a ir apareciendo acá a medida que uses la red: matches nuevos, contactos por WhatsApp, "me interesa" en tu stock y cierres de operaciones.</p></div>`}
   `;},
@@ -8117,6 +8184,7 @@ const meta = esCaida ? { icon: 'fa-solid fa-xmark', color: '#C0392B' } : (iconMa
 dashboard: ()=>`
   <div class="main-head"><div><h1>Dashboard</h1><p class="sub">Resumen de tu actividad en la red</p></div></div>
   ${dashMatches.filter(m=>m.estado==='pendiente').length? (()=>{const n=dashMatches.filter(m=>m.estado==='pendiente').length; return `<div class="banner"><div class="banner-left"><svg class="banner-bell" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1C2B36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="txt"><strong>¡Tenés ${n} match${n>1?'es':''} nuevo${n>1?'s':''}!</strong><span>Se encontraron coincidencias para tu stock o tus clientes.</span></div></div><button class="btn btn-solid btn-sm" onclick="showApp('matches')">Ver matches</button></div>`;})() : ''}
+  ${dashDemandaCaliente.length? (()=>{const h=dashDemandaCaliente[0]; return `<div class="banner" style="border-left:3px solid #C0392B;"><div class="banner-left"><i class="fa-solid fa-fire" style="font-size:24px;color:#C0392B;flex-shrink:0;"></i><div class="txt"><strong>Demanda caliente: ${esc(h.marca)} en ${esc(h.ciudad)}</strong><span>${h.demanda} búsqueda${h.demanda===1?'':'s'} activa${h.demanda===1?'':'s'} vs. ${h.oferta} publicada${h.oferta===1?'':'s'} en la red</span></div></div><button class="btn btn-sm" style="border-color:#C0392B;color:#C0392B;" onclick="showApp('vehículos')">Ver mi stock</button></div>`;})() : ''}
   <div class="kpi-grid">
     <div class="kpi"><div class="lbl">Vehículos en stock</div><div class="val">${dashStock.length}</div></div>
     <div class="kpi"><div class="lbl">Búsquedas activas</div><div class="val">${dashBusquedas.filter(b=>b.estado==='activa').length}</div></div>
