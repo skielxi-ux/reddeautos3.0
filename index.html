@@ -2413,6 +2413,19 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </div>
 
+<div id="modal-matchconfirmado" class="modal-backdrop hidden">
+  <div class="modal" style="position:relative;text-align:center;">
+    <button class="avatar-modal-close" onclick="closeModal('matchconfirmado')"><i class="fa-solid fa-xmark"></i></button>
+    <div style="font-size:40px;color:var(--red);margin-bottom:6px;"><i class="fa-solid fa-handshake"></i></div>
+    <h3>¡Hiciste match!</h3>
+    <p class="sub">Hiciste match con la agencia propietaria del vehículo. Ahora continuá la operación en la pestaña "Matches Manuales".</p>
+    <div class="modal-close-row" style="justify-content:center;">
+      <button class="btn" onclick="closeModal('matchconfirmado')">Cerrar</button>
+      <button class="btn btn-solid" onclick="closeModal('matchconfirmado'); showApp('manuales');">Ir a Matches Manuales</button>
+    </div>
+  </div>
+</div>
+
 <div id="modal-calificar" class="modal-backdrop hidden">
   <div class="modal" style="position:relative;">
     <button class="avatar-modal-close" onclick="closeModal('calificar')"><i class="fa-solid fa-xmark"></i></button>
@@ -4719,6 +4732,44 @@ function estadoPagoAgencia(a){
 function fmtFechaCorta(d){ return d.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' }); }
 function fmtARS(n){ return 'ARS ' + Math.round(n).toLocaleString('es-AR'); }
 
+// --- Selector de mes para los paneles admin (Pagos, Operaciones, Matches, Ingresos) -----
+// null = "todos los períodos". Si tiene valor: { anio, mes } con mes en 0-11.
+let adminMesFiltro = { pagos: null, operaciones: null, matches: null, ingresos: null };
+
+function mesNombreCorto(anio, mes){
+  const nombre = new Date(anio, mes, 1).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+  return nombre.charAt(0).toUpperCase() + nombre.slice(1);
+}
+function cambiarMesAdmin(vista, delta){
+  const hoy = new Date();
+  const actual = adminMesFiltro[vista] || { anio: hoy.getFullYear(), mes: hoy.getMonth() };
+  let mes = actual.mes + delta, anio = actual.anio;
+  if (mes < 0) { mes = 11; anio--; } else if (mes > 11) { mes = 0; anio++; }
+  adminMesFiltro[vista] = { anio, mes };
+  showAdmin(vista);
+}
+function verTodosMesAdmin(vista){
+  adminMesFiltro[vista] = null;
+  showAdmin(vista);
+}
+function estaEnMesAdmin(fecha, filtro){
+  if (!filtro || !fecha) return !filtro ? true : false;
+  const d = fecha instanceof Date ? fecha : new Date(fecha);
+  if (isNaN(d)) return false;
+  return d.getFullYear() === filtro.anio && d.getMonth() === filtro.mes;
+}
+function renderSelectorMesAdmin(vista){
+  const f = adminMesFiltro[vista];
+  const label = f ? mesNombreCorto(f.anio, f.mes) : 'Todos los períodos';
+  return `
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+    <button class="btn btn-sm" onclick="cambiarMesAdmin('${vista}', -1)" title="Mes anterior"><i class="fa-solid fa-chevron-left"></i></button>
+    <span style="font-weight:600;min-width:170px;text-align:center;"><i class="fa-solid fa-calendar-days" style="color:var(--red);margin-right:6px;"></i>${esc(label)}</span>
+    <button class="btn btn-sm" onclick="cambiarMesAdmin('${vista}', 1)" title="Mes siguiente"><i class="fa-solid fa-chevron-right"></i></button>
+    ${f ? `<button class="btn btn-sm" onclick="verTodosMesAdmin('${vista}')">Ver todos los períodos</button>` : ''}
+  </div>`;
+}
+
 let ADMIN_AGENCIES = [];
 let _adminAgencyDetailProps = []; // vehículos de la agencia que el admin está viendo en "Ver detalle"
 let ADMIN_MATCHES = [];       // matches reales de toda la red, para KPIs y para contar "ops" por agencia
@@ -5739,8 +5790,9 @@ const adminRenderers = {
     </table>
   `,
   operaciones: ()=>{
-    const ops = ADMIN_MATCHES.filter(m => m.estado === 'concretada' || m.estado === 'cancelada')
+    const opsTodas = ADMIN_MATCHES.filter(m => m.estado === 'concretada' || m.estado === 'cancelada')
       .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+    const ops = opsTodas.filter(o => estaEnMesAdmin(o.created_at, adminMesFiltro.operaciones));
     const concretadas = ops.filter(o => o.estado === 'concretada');
     const canceladas = ops.filter(o => o.estado === 'cancelada');
     // Antes esto recalculaba la comisión desde el % del vehículo × precio, ignorando por
@@ -5752,6 +5804,7 @@ const adminRenderers = {
     const comisionesTxt = [comisionesArs ? fmtARS(comisionesArs) : null, comisionesUsd ? 'USD ' + Math.round(comisionesUsd).toLocaleString('es-AR') : null].filter(Boolean).join(' + ') || fmtARS(0);
     return `
     <div class="main-head"><div><h1>Operaciones</h1><p class="sub">Historial de todas las operaciones cerradas en la red — para tener registro ante cualquier disputa</p></div></div>
+    ${renderSelectorMesAdmin('operaciones')}
     <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px;">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Concretadas</div><div class="val kpi-green">${concretadas.length}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-xmark"></i>Caídas</div><div class="val kpi-red">${canceladas.length}</div></div>
@@ -5774,7 +5827,7 @@ const adminRenderers = {
             <td>${adminStatusPill(o.estado==='concretada'?'Resuelta':'Desestimada', o.estado==='concretada'?'Concretada':'Caída')}${o.estado==='cancelada' && o.motivo_cancelacion ? `<div style="font-size:11px;color:var(--paper-dim);margin-top:3px;">${esc(o.motivo_cancelacion)}</div>` : ''}</td>
             <td>${o.created_at ? new Date(o.created_at).toLocaleDateString('es-AR') : '—'}</td>
           </tr>`;
-        }).join('') : `<tr><td colspan="7" class="empty-row">Todavía no hay operaciones cerradas en la red.</td></tr>`}
+        }).join('') : `<tr><td colspan="7" class="empty-row">${adminMesFiltro.operaciones ? 'No hay operaciones cerradas en este período.' : 'Todavía no hay operaciones cerradas en la red.'}</td></tr>`}
       </tbody>
     </table>
   `;
@@ -5784,7 +5837,7 @@ const adminRenderers = {
     // a Supabase) con nombres de campo que no existían en el esquema real (.status, .claimedAt,
     // matchFlowData(), AGENCY.name). Por eso siempre aparecía vacía. La reescribo sobre
     // ADMIN_MATCHES, que es la misma fuente de datos que ya usa correctamente "Operaciones".
-    const conEtapa = ADMIN_MATCHES.map(m => {
+    const conEtapaTodas = ADMIN_MATCHES.map(m => {
       let etapa = 'propuesta';
       if (m.estado === 'concretada') etapa = 'concretada';
       else if (m.estado === 'cancelada') etapa = 'cancelada';
@@ -5792,6 +5845,7 @@ const adminRenderers = {
       else if (m.comision_aceptada_at) etapa = 'contactado';
       return { ...m, etapa };
     });
+    const conEtapa = conEtapaTodas.filter(m => estaEnMesAdmin(m.created_at, adminMesFiltro.matches));
     const total = conEtapa.length;
     const enSeguimiento = conEtapa.filter(m => m.etapa === 'contactado' || m.etapa === 'visita').length;
     const concretadas = conEtapa.filter(m => m.etapa === 'concretada').length;
@@ -5800,6 +5854,7 @@ const adminRenderers = {
     const ETAPA_LABELS = { propuesta: 'Comisión propuesta', contactado: 'Agencia contactada', visita: 'Visita agendada', concretada: 'Concretada', cancelada: 'Caída' };
     return `
     <div class="main-head"><div><h1>Matches</h1><p class="sub">Todos los cruces detectados en la red, en cualquier etapa del pipeline</p></div></div>
+    ${renderSelectorMesAdmin('matches')}
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-link"></i>Matches totales</div><div class="val">${total}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-brands fa-whatsapp"></i>En seguimiento</div><div class="val">${enSeguimiento}</div></div>
@@ -5815,29 +5870,33 @@ const adminRenderers = {
         ${total ? conEtapa.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).map(m=>{
           const vehTxt = [m.veh?.marca, m.veh?.modelo, m.veh?.anio].filter(Boolean).join(' ') || '—';
           return `<tr><td>${esc(vehTxt)}</td><td>${esc(m.vend?.nombre || '—')}</td><td>${esc(m.comp?.nombre || '—')}</td><td>${esc(m.bus?.cliente_nombre || '—')}</td><td>${adminStatusPill(m.etapa==='cancelada'?'Suspendida':m.etapa==='concretada'?'Verificada':'Pendiente', ETAPA_LABELS[m.etapa])}</td><td>${m.created_at ? new Date(m.created_at).toLocaleDateString('es-AR') : '—'}</td></tr>`;
-        }).join('') : `<tr><td colspan="6" class="empty-row">Todavía no hay matches en la red.</td></tr>`}
+        }).join('') : `<tr><td colspan="6" class="empty-row">${adminMesFiltro.matches ? 'No hay matches en este período.' : 'Todavía no hay matches en la red.'}</td></tr>`}
       </tbody>
     </table>
   `;
   },
   ingresos: ()=>{
-    const verified = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
+    const verifiedTodas = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
+    const f = adminMesFiltro.ingresos;
+    const verified = f ? verifiedTodas.filter(a => estaEnMesAdmin(a.registeredAt, f)) : verifiedTodas;
     const proCount = verified.filter(a=>a.plan==='Pro').length;
     const premiumCount = verified.filter(a=>a.plan==='Premium').length;
     const mrrReal = proCount*190000 + premiumCount*390000;
     return `
     <div class="main-head"><div><h1>Ingresos</h1><p class="sub">Facturación por suscripciones de la red</p></div></div>
+    ${renderSelectorMesAdmin('ingresos')}
+    ${f ? `<p style="font-size:12.5px;color:var(--ink);margin-bottom:16px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-circle-info" style="margin-top:2px;color:var(--red);"></i><span>Mostrando agencias dadas de alta en ${esc(mesNombreCorto(f.anio,f.mes))}. El prototipo no lleva un historial de pagos mes a mes, así que este filtro usa la fecha de alta de cada agencia (MRR incorporado ese período), no lo efectivamente cobrado ese mes.</span></p>` : ''}
     <div class="kpi-grid">
-      <div class="kpi"><div class="lbl"><i class="fa-solid fa-arrows-rotate"></i>MRR</div><div class="val mono">${fmtARS(mrrReal)}</div></div>
-      <div class="kpi"><div class="lbl"><i class="fa-solid fa-sack-dollar"></i>Ingresos totales</div><div class="val mono">${fmtARS(mrrReal*6)}</div></div>
-      <div class="kpi"><div class="lbl"><i class="fa-solid fa-users"></i>Suscripciones activas</div><div class="val">${verified.length}</div></div>
+      <div class="kpi"><div class="lbl"><i class="fa-solid fa-arrows-rotate"></i>${f?'MRR incorporado':'MRR'}</div><div class="val mono">${fmtARS(mrrReal)}</div></div>
+      ${f ? '' : `<div class="kpi"><div class="lbl"><i class="fa-solid fa-sack-dollar"></i>Ingresos totales</div><div class="val mono">${fmtARS(mrrReal*6)}</div></div>`}
+      <div class="kpi"><div class="lbl"><i class="fa-solid fa-users"></i>${f?'Agencias nuevas':'Suscripciones activas'}</div><div class="val">${verified.length}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-star"></i>Plan Pro</div><div class="val">${proCount}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-crown"></i>Plan Premium</div><div class="val">${premiumCount}</div></div>
     </div>
     <table>
       <thead><tr><th>Concesionaria</th><th>Plan</th><th>Ingreso mensual</th></tr></thead>
       <tbody>
-        ${verified.map(a=>`<tr><td>${a.name}</td><td>${a.plan}</td><td class="mono">${fmtARS(a.plan==='Pro'?190000:390000)}</td></tr>`).join('')}
+        ${verified.length ? verified.map(a=>`<tr><td>${a.name}</td><td>${a.plan}</td><td class="mono">${fmtARS(a.plan==='Pro'?190000:390000)}</td></tr>`).join('') : `<tr><td colspan="3" class="empty-row">Ninguna agencia se dio de alta en este período.</td></tr>`}
       </tbody>
     </table>
     <p style="font-size:12.5px;color:var(--ink);margin-top:14px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-bell" style="margin-top:2px;color:var(--red);"></i><span>MRR y el desglose por concesionaria se calculan en base a los planes reales asignados. "Ingresos totales" es un acumulado ilustrativo (6 meses de MRR), ya que el prototipo no lleva un historial de facturación real.</span></p>
@@ -5845,12 +5904,14 @@ const adminRenderers = {
   },
   pagos: ()=>{
     const activas = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
-    const filas = activas.map(a => ({ a, ...estadoPagoAgencia(a) })).sort((x,y)=>x.vencimiento - y.vencimiento);
+    const filasTodas = activas.map(a => ({ a, ...estadoPagoAgencia(a) })).sort((x,y)=>x.vencimiento - y.vencimiento);
+    const filas = filasTodas.filter(f => estaEnMesAdmin(f.vencimiento, adminMesFiltro.pagos));
     const vencidas = filas.filter(f=>f.estado==='Vencido').length;
     const pendientes = filas.filter(f=>f.estado==='Pendiente').length;
     const pagadas = filas.filter(f=>f.estado==='Pagado').length;
     return `
     <div class="main-head"><div><h1>Pagos</h1><p class="sub">Vencimiento mensual de cada agencia y estado de pago de la suscripción</p></div></div>
+    ${renderSelectorMesAdmin('pagos')}
     <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px;">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Pagadas este período</div><div class="val kpi-green">${pagadas}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-clock"></i>Pendientes</div><div class="val">${pendientes}</div></div>
@@ -5870,7 +5931,7 @@ const adminRenderers = {
               : `<button class="btn btn-sm whatsapp-btn" onclick="marcarPagoAgencia('${f.a.id}')"><i class="fa-solid fa-check"></i> Marcar pagado</button>`
             }
           </td>
-        </tr>`).join('') : `<tr><td colspan="5" class="empty-row">No hay agencias activas.</td></tr>`}
+        </tr>`).join('') : `<tr><td colspan="5" class="empty-row">${adminMesFiltro.pagos ? 'Ninguna agencia vence en este período.' : 'No hay agencias activas.'}</td></tr>`}
       </tbody>
     </table>
     <p style="font-size:12.5px;color:var(--ink);margin-top:14px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-bell" style="margin-top:2px;color:var(--red);"></i><span>El vencimiento se calcula solo, siempre el mismo día del mes en que se dio de alta cada agencia (ej. alta el 11/09 → vence el 11/10, luego el 11/11, y así cada mes). Al marcar "Pagado" queda cubierto el período vigente; al llegar el próximo vencimiento vuelve a aparecer como Pendiente automáticamente.</span></p>
@@ -6755,9 +6816,7 @@ async function confirmarContactoManual(){
 
     closeModal('contactomanual');
     window.open(waHref, '_blank');
-    toast(esDirecta
-      ? 'Contacto registrado en Matches Manuales.'
-      : 'Contacto registrado en Matches Manuales. Si el cliente sigue interesado, aceptá la comisión desde ahí para reservar el vehículo.');
+    openModal('matchconfirmado');
     await cargarMisMatches();
   } catch (e) {
     console.error('confirmarContactoManual:', e);
@@ -7252,7 +7311,7 @@ function renderDetailModalReal(v){
       ${mapHTML}
       <div class="propdetail-agency">Publicada por <strong>${esc(v.agencias?.nombre || 'Agencia')}</strong>${verificadaBadgeHTML(v.agencias?.verificada)}</div>
       <div class="propdetail-actions">
-        ${waHref ? `<button class="btn btn-solid btn-contact-lime" onclick="abrirContactoManual('${v.id}')"><i class="fa-brands fa-whatsapp"></i> Contactar Agencia</button>` : ''}
+        ${waHref ? `<button class="btn btn-solid btn-contact-lime" onclick="abrirContactoManual('${v.id}')"><i class="fa-brands fa-whatsapp"></i> Hacer Match</button>` : ''}
         <button class="btn" onclick="closeModal('propdetail')">Cerrar</button>
       </div>
     </div>
@@ -7336,8 +7395,8 @@ async function calcularDemandaCaliente(){
   dashDemandaCaliente = [];
   if (!currentAgencia || !currentAgencia.ciudad) return;
   const [busquedasRes, stockRes] = await Promise.all([
-    supa.from('busquedas').select('marca, agencias:agencia_id(ciudad)').eq('estado', 'activa'),
-    supa.from('vehiculos').select('marca, agencias:agencia_id(ciudad)').eq('estado', 'activo').eq('es_gremio', false)
+    supa.from('busquedas').select('marca, agencias!left(ciudad)').eq('estado', 'activa'),
+    supa.from('vehiculos').select('marca, agencias!left(ciudad)').eq('estado', 'activo').eq('es_gremio', false)
   ]);
   if (busquedasRes.error || stockRes.error) { console.warn('calcularDemandaCaliente:', busquedasRes.error || stockRes.error); return; }
 
