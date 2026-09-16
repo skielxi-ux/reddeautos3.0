@@ -6377,10 +6377,15 @@ function matchCardHTML(m){
     }
   } else if (m.etapa === 'visita') {
     // Touchpoint 3 (parte "exitosa"): cerrar la operación como concretada queda reservado a la
-    // agencia vendedora, que es quien tiene el poder de decisión de vender o no el vehículo.
+    // agencia vendedora, que es quien tiene el poder de decisión de vender o no el vehículo. La
+    // compradora ya avisó al cliente (botón "Informar al cliente"), así que a la vendedora le
+    // mostramos un aviso de que el cliente va a visitarla, además del botón para cuando cierre.
     primaryActions = m.soyVendedor
       ? `<button class="btn btn-sm whatsapp-btn" onclick="abrirCerrarMatch('${m.id}', false)"><i class="fa-solid fa-flag-checkered"></i> Finalizar operación</button>`
       : `<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que el cliente visite a ${esc(m.otraAgencia)}.</div>`;
+    if (m.soyVendedor) {
+      primaryNote = `<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que el cliente te visite</div>`;
+    }
   }
   // Touchpoint 3 (parte "caída"): marcar la operación como caída queda disponible para cualquiera
   // de las dos agencias en cualquier etapa activa. En 'propuesta' la compradora ya tiene su propio
@@ -7745,7 +7750,7 @@ function avisarPotencialCliente(busquedaId){
   const c = b.clientes || {};
   const marca = b.marca || c.marca || '';
   const modelo = b.modelo || c.modelo || '';
-  const msg = encodeURIComponent(`Hola ${b.agencias.nombre||''}, vi en Red de Autos que están buscando un ${marca} ${modelo}. Tengo un cliente potencial para eso, ¿hablamos?`);
+  const msg = encodeURIComponent(`Hola ${b.agencias.nombre||''}, vi en Red de Autos que están buscando un ${marca} ${modelo}. Tengo ese vehículo en stock, ¿hablamos?`);
   registrarClicReal('busqueda', b.id, 'potencial_cliente');
   window.open(`https://wa.me/${b.agencias.telefono.replace(/\D/g,'')}?text=${msg}`, '_blank');
 }
@@ -8485,7 +8490,7 @@ redbusca: ()=>`
           <td>${esc(b.agencias?.nombre||'—')}${b.agencias?.verificada ? `<i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:11px;margin-left:4px;" title="Agencia verificada por Red de Autos"></i>` : ''}</td>
           <td class="mono">${esc(precioMax? fmtMoney(precioMax,b.moneda||'ARS') : '—')}</td>
           <td><span class="pill ${esc(c.urgencia && c.urgencia.toLowerCase().includes('alta')?'pill-red':'')}">${esc(c.urgencia||'—')}</span></td>
-          <td>${b.agencias?.telefono ? `<button class="btn btn-sm btn-contact-lime" onclick="avisarPotencialCliente('${b.id}')"><i class="fa-brands fa-whatsapp"></i> Tengo potencial cliente</button>` : ''}</td>
+          <td>${b.agencias?.telefono ? `<button class="btn btn-sm btn-contact-lime" onclick="avisarPotencialCliente('${b.id}')"><i class="fa-brands fa-whatsapp"></i> Tengo el vehículo</button>` : ''}</td>
         </tr>`;
       }).join('') : `<tr><td colspan="5" class="empty-row">Ninguna agencia de la red tiene búsquedas activas por ahora.</td></tr>`}
     </tbody>
