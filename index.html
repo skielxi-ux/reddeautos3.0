@@ -2403,7 +2403,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
     <div id="cm-campos-cliente">
       <div class="field"><label>Nombre del cliente</label><input id="cm-cliente-nombre" placeholder="Nombre y apellido"></div>
-      <div class="field"><label>Teléfono del cliente (opcional)</label><input id="cm-cliente-telefono" placeholder="Para tu propio registro, no se comparte"></div>
+      <div class="field"><label>Teléfono del cliente</label><input id="cm-cliente-telefono" placeholder="Ej: 3815551234 — lo vas a necesitar para avisarle por WhatsApp que encontraste el auto"></div>
     </div>
 
     <div class="modal-close-row">
@@ -6271,14 +6271,27 @@ async function informarClienteMatch(matchId){
   if (!m) return;
   if (!m.comisionAceptadaAt) { toast('Todavía no se aceptó la comisión propuesta.'); return; }
   if (!m.soyVendedor && !m.contactadoAt) { toast('Primero contactá a la agencia que tiene el vehículo.'); return; }
+
+  // Matches manuales creados antes de que el teléfono del cliente fuera obligatorio pueden haber
+  // quedado sin ese dato — antes esto hacía que el botón simplemente no abriera WhatsApp, sin
+  // avisar por qué. Ahora, si falta, se lo pedimos acá mismo y lo guardamos antes de continuar.
+  let telefonoCliente = m.clienteTelefono;
+  if (!m.soyVendedor && !telefonoCliente) {
+    const ingresado = (window.prompt(`Este match no tiene cargado el teléfono de ${m.clienteNombre || 'tu cliente'}. Ingresalo para poder avisarle por WhatsApp:`) || '').trim();
+    if (!ingresado) { toast('Sin el teléfono del cliente no se puede armar el mensaje de WhatsApp.'); return; }
+    const { error: errTel } = await supa.from('matches').update({ cliente_telefono: ingresado }).eq('id', matchId);
+    if (errTel) { toast('Error al guardar el teléfono del cliente.'); console.error('informarClienteMatch (guardar teléfono):', errTel); return; }
+    telefonoCliente = ingresado;
+  }
+
   const { error } = await supa.from('matches').update({ visita_agendada_at: new Date().toISOString() }).eq('id', matchId);
   if (error) { toast('Error al actualizar el match.'); console.error('informarClienteMatch:', error); return; }
   crearNotificacion(m.otraAgenciaId, 'match_etapa', 'Avance en un match', `${currentAgencia?.nombre || 'La agencia compradora'} ya informó a su cliente sobre ${m.vehiculo}.`, m.id);
 
-  if (!m.soyVendedor && m.clienteTelefono) {
+  if (!m.soyVendedor && telefonoCliente) {
     const primerNombre = (m.clienteNombre || '').trim().split(/\s+/)[0] || m.clienteNombre;
     const mensaje = `¡Hola ${primerNombre}! Te tengo excelentes noticias: encontramos el ${m.vehiculoMarcaModelo} en las condiciones exactas que buscabas dentro de nuestra red de aliados. Ya validé que la unidad está disponible y reservada para que la veamos. Decime qué día y horario te queda cómodo así coordinamos la visita y te acompaño a revisarlo en detalle.`;
-    window.open(`https://wa.me/${m.clienteTelefono.replace(/\D/g,'')}?text=${encodeURIComponent(mensaje)}`, '_blank');
+    window.open(`https://wa.me/${telefonoCliente.replace(/\D/g,'')}?text=${encodeURIComponent(mensaje)}`, '_blank');
     toast('Cliente informado y mensaje armado');
   } else {
     toast('Match actualizado');
@@ -6787,10 +6800,17 @@ async function confirmarContactoManual(){
     nombreCliente = document.getElementById('cm-cliente-nombre').value.trim();
     if (!nombreCliente) { toast('Ingresá el nombre del cliente antes de continuar.'); return; }
     telefonoCliente = document.getElementById('cm-cliente-telefono').value.trim();
+    // El teléfono ya no es opcional: sin esto, más adelante "Informar al cliente" (en Matches
+    // Manuales) no tiene a quién mandarle el WhatsApp automático y el botón queda mudo.
+    if (!telefonoCliente) { toast('Ingresá el teléfono del cliente — lo vas a necesitar para avisarle cuando encuentres el auto.'); return; }
   }
 
+  const vehTxt = [v.marca, v.modelo, v.anio].filter(Boolean).join(' ') || 'vehículo';
+  const mensaje = esDirecta
+    ? construirMensajeWhatsappVehiculo(v.agencias?.nombre, [v.marca,v.modelo].filter(Boolean).join(' '))
+    : `¡Hola ${v.agencias?.nombre||''}! Te escribo desde ${currentAgencia.nombre||'mi agencia'} por la plataforma Red de Autos. Tengo un cliente con interés real y listo para avanzar por tu ${vehTxt}. ¿Sigue disponible la unidad? Si está disponible, confirmamelo y coordinamos para mostrarlo. ¡Gracias!`;
   const waHref = v.agencias?.telefono
-    ? `https://wa.me/${v.agencias.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(construirMensajeWhatsappVehiculo(v.agencias?.nombre, [v.marca,v.modelo].filter(Boolean).join(' ')))}`
+    ? `https://wa.me/${v.agencias.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(mensaje)}`
     : null;
   if (!waHref) { toast('Esta agencia todavía no cargó un teléfono de contacto.'); return; }
 
@@ -6807,10 +6827,13 @@ async function confirmarContactoManual(){
       es_compra_directa: esDirecta,
       cliente_nombre: esDirecta ? null : nombreCliente,
       cliente_telefono: esDirecta ? null : (telefonoCliente || null),
+      // El mensaje de WhatsApp con toda la info ya se manda en este mismo paso (tanto para
+      // "tengo un cliente" como para compra directa), así que el contacto queda registrado acá
+      // directamente. Antes solo se marcaba en la compra directa, y en el caso "tengo un cliente"
+      // el flujo de Matches Manuales volvía a pedir "Contactar agencia" con un segundo mensaje
+      // redundante — este ajuste elimina ese paso de más.
+      contactado_at: new Date().toISOString(),
     };
-    // La compra directa no tiene cliente ni comisión de por medio, así que no pasa por el paso
-    // de "aceptar comisión" — queda directamente marcada como contactada, como un registro simple.
-    if (esDirecta) payload.contactado_at = new Date().toISOString();
 
     const { error: errIns } = await supa.from('matches').insert(payload);
     if (errIns) throw errIns;
