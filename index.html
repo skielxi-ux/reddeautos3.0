@@ -659,7 +659,84 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .faq-c-item.faq-c-open .faq-c-a{display:block;}
   .faq-c-a p{margin:0;color:var(--paper-dim);font-size:13.5px;line-height:1.65;}
 
-  /* ---- hero Explorar la Red ---- */
+  /* ---- slider de fotos a pantalla completa (Multiplicá tu stock / No esperás siempre el match) ---- */
+  .lp-photo-swiper{width:100%;--swiper-theme-color:var(--red);}
+  .lp-photo-slide{position:relative;height:440px;background-size:cover;background-position:center;
+    display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;}
+  .lp-photo-slide-overlay{position:absolute;inset:0;background:linear-gradient(0deg, rgba(10,14,18,.55), rgba(10,14,18,.3));}
+  .lp-photo-slide-inner{position:relative;z-index:1;max-width:820px;width:100%;min-width:0;padding:0 24px;}
+  .lp-photo-slide-title{font-family:var(--font-display);font-weight:800;font-size:38px;line-height:1.28;
+    color:#FFFFFF;margin:0;min-height:2.6em;}
+  .lp-photo-slide-title em{font-style:normal;color:var(--red);}
+  .lp-photo-swiper .swiper-pagination-bullet{background:rgba(255,255,255,.5);opacity:1;}
+  .lp-photo-swiper .swiper-pagination-bullet-active{background:var(--red);}
+  .lp-photo-swiper .swiper-button-prev, .lp-photo-swiper .swiper-button-next{color:#FFFFFF;}
+  .lp-photo-swiper .swiper-button-prev:after, .lp-photo-swiper .swiper-button-next:after{font-size:20px;}
+  @media (max-width:640px){
+    .lp-photo-slide{height:320px;}
+    .lp-photo-slide-title{font-size:25px;}
+  }
+
+
+  .lp-photo-banner{width:100%;height:380px;overflow:hidden;}
+  .lp-photo-banner img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;}
+  @media (max-width:780px){
+    .lp-photo-banner{height:220px;}
+  }
+
+
+  .hero-dark{
+    position:relative;
+    background:radial-gradient(ellipse 120% 100% at 30% -10%, #26363f 0%, var(--ink) 45%, #0E161C 100%);
+    padding:100px 24px 130px;text-align:center;
+  }
+  .hero-dark-bgfx{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+  .hero-dark-bgfx::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size:64px 64px;
+    -webkit-mask-image:linear-gradient(to bottom, black, transparent 78%);
+    mask-image:linear-gradient(to bottom, black, transparent 78%);
+  }
+  .hero-dark-bgfx::after{
+    content:"";position:absolute;right:-12%;bottom:-35%;width:75%;height:170%;
+    background:linear-gradient(115deg, transparent 46%, rgba(248,58,58,.5) 49%, rgba(248,58,58,.85) 50%, rgba(248,58,58,.5) 51%, transparent 54%);
+    filter:blur(2px);opacity:.5;
+  }
+  .hero-dark-spark{position:absolute;color:rgba(255,255,255,.55);font-size:12px;pointer-events:none;z-index:1;}
+  .hero-dark-inner{position:relative;z-index:1;max-width:720px;margin:0 auto;}
+  .hero-dark-badge{
+    display:inline-flex;align-items:center;gap:10px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:999px;
+    padding:7px 18px 7px 8px;font-family:var(--font-mono);font-size:12px;font-weight:700;
+    letter-spacing:.03em;color:#C7CDD3;margin-bottom:28px;
+  }
+  .hero-dark-badge .tag{background:var(--red);color:#FFFFFF;border-radius:999px;padding:4px 12px;font-weight:800;}
+  .hero-dark-title{
+    font-family:var(--font-display);font-weight:800;font-size:46px;line-height:1.1;
+    letter-spacing:-.01em;color:#FFFFFF;margin:0 0 22px;min-height:2.2em;
+  }
+  .hero-dark-title em{font-style:italic;color:var(--red);}
+  .typewriter-cursor{display:inline-block;width:3px;background:var(--red);margin-left:3px;transform:translateY(2px);animation:blinkCursor .8s steps(2) infinite;}
+  @keyframes blinkCursor{50%{opacity:0;}}
+  .hero-dark-lead{font-size:17px;line-height:1.65;color:#AEB6BE;max-width:600px;margin:0 auto 36px;}
+  .hero-dark-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+  .btn-on-dark{background:rgba(255,255,255,.07);color:#FFFFFF;border-color:rgba(255,255,255,.24);}
+  .btn-on-dark:hover{background:rgba(255,255,255,.14);color:#FFFFFF;border-color:rgba(255,255,255,.4);}
+  .hero-dark-car{position:absolute;right:3%;bottom:-56px;width:40%;max-width:480px;min-width:260px;z-index:1;pointer-events:none;}
+  .hero-dark-car img{width:100%;height:auto;display:block;filter:drop-shadow(0 26px 22px rgba(0,0,0,.4));animation:heroCarFloat 5.5s ease-in-out infinite;}
+  @keyframes heroCarFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+  @media (max-width:780px){
+    .hero-dark-car{display:none;}
+  }
+  @media (max-width:640px){
+    .hero-dark{padding:64px 20px 56px;}
+    .hero-dark-title{font-size:32px;}
+  }
+
+
   .explorar-hero{
     position:relative;border-radius:16px;overflow:hidden;min-height:170px;
     background-size:cover;background-position:center;
@@ -855,15 +932,36 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lp-steps-eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--red-dark);margin:0 0 10px;}
   .lp-steps-title{font-family:var(--font-display);font-size:32px;font-weight:700;line-height:1.2;color:var(--ink);margin:0 0 14px;}
   .lp-steps-sub{font-size:15px;line-height:1.6;color:#6B7280;max-width:760px;margin:0 0 40px;}
-  .lp-steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
-  .lp-steps-card{background:#FFFFFF;border:1px solid var(--line);border-radius:10px;padding:28px 26px;}
-  .lp-steps-num{font-family:var(--font-mono);font-size:12.5px;font-weight:700;letter-spacing:.02em;color:var(--red-dark);margin:0 0 12px;}
+  .lp-steps-swiper{padding:6px 6px 46px;overflow:visible;--swiper-theme-color:var(--red);}
+  .lp-steps-swiper .swiper-slide{height:auto;}
+  .lp-steps-card{
+    background:#FFFFFF;border:1px solid var(--line);border-radius:14px;padding:30px 26px;height:100%;
+    border-top:4px solid var(--step-color, var(--red));
+    box-shadow:0 8px 22px -14px rgba(28,43,54,.22);
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .swiper-slide-active .lp-steps-card{transform:translateY(-4px);box-shadow:0 16px 30px -14px rgba(28,43,54,.3);}
+  .lp-steps-card.step-1{--step-color:var(--red);}
+  .lp-steps-card.step-2{--step-color:var(--sage);}
+  .lp-steps-card.step-3{--step-color:var(--ink);}
+  .lp-steps-badge{
+    width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:var(--step-color, var(--red));color:#FFFFFF;font-family:var(--font-mono);font-weight:800;font-size:14px;
+    margin-bottom:14px;
+  }
+  .lp-steps-swiper .swiper-button-prev, .lp-steps-swiper .swiper-button-next{
+    background:#FFFFFF;width:38px;height:38px;border-radius:50%;box-shadow:0 4px 14px rgba(28,43,54,.18);top:40%;
+  }
+  .lp-steps-swiper .swiper-button-prev:after, .lp-steps-swiper .swiper-button-next:after{font-size:13px;font-weight:900;color:var(--ink);}
+  .lp-steps-swiper .swiper-pagination-bullet{background:var(--line-strong);opacity:1;}
+  .lp-steps-swiper .swiper-pagination-bullet-active{background:var(--red);}
+  .lp-steps-num{font-family:var(--font-mono);font-size:12.5px;font-weight:700;letter-spacing:.02em;color:var(--step-color, var(--red-dark));text-transform:uppercase;margin:0 0 10px;}
   .lp-steps-card h3{font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--ink);margin:0 0 10px;}
   .lp-steps-card p{font-size:14px;line-height:1.6;color:#6B7280;margin:0;}
   @media(max-width:900px){
     .lp-steps{padding:48px 24px;}
-    .lp-steps-grid{grid-template-columns:1fr;}
   }
+
 
   .lp-feature{
     max-width:1180px;margin:0 auto;padding:76px 48px;
@@ -1117,33 +1215,22 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     </div>
   </div>
 
-  <div class="relative overflow-hidden">
-    <div class="relative max-w-7xl mx-auto px-6 md:px-12 pt-16 md:pt-20 pb-16 grid lg:grid-cols-2 gap-14 items-center">
-      <div>
-        <div class="font-mono text-[12px] font-bold tracking-[.14em] uppercase text-red-dark">Plataforma B2B · Tucumán y el Norte</div>
-        <h1 class="font-display font-semibold text-[38px] sm:text-[46px] lg:text-[54px] leading-[1.07] tracking-tight mt-3.5 text-ink">
-          La red de concesionarias que <span class="text-red-dark italic">cruza stock</span> y cierra operaciones.
-        </h1>
-        <p class="text-[17px] leading-relaxed text-slate-500 max-w-lg mt-6">Conectamos concesionarias del NOA para que ningún vehículo ni ningún cliente se quede sin encontrar su match — y para que la comisión por colaborar quede clara desde el primer día.</p>
-        <div class="flex flex-wrap gap-3.5 mt-8">
-          <button class="btn btn-solid" onclick="openModal('activate')">Solicitar acceso →</button>
-          <button class="btn" onclick="scrollToSection('como-funciona')">Cómo funciona</button>
-        </div>
-        <div class="flex gap-9 mt-12" id="hero-stats">
-          <div><span class="block font-mono font-bold text-[27px] text-red-dark" data-count="24">0</span><span class="text-[11px] text-slate-400 font-semibold">Concesionarias activas</span></div>
-          <div><span class="block font-mono font-bold text-[27px] text-red-dark" data-count="96">0</span><span class="text-[11px] text-slate-400 font-semibold">Operaciones cerradas</span></div>
-          <div><span class="flex items-baseline gap-1 font-mono font-bold text-[27px] text-red-dark"><span data-count="4.7" data-decimal="1">0</span><span class="text-[18px]">★</span></span><span class="text-[11px] text-slate-400 font-semibold">Calificación promedio</span></div>
-        </div>
-      </div>
-
-      <!-- auto: flota suavemente + tilt 3D interactivo al mover el mouse -->
-      <div class="relative h-[300px] sm:h-[400px] lg:h-[480px] flex items-center justify-center" id="hero-car-wrap" style="perspective:1300px;">
-        <div class="absolute bottom-2 sm:bottom-6 w-[62%] h-8 sm:h-11 bg-black/20 blur-2xl rounded-full car-shadow"></div>
-        <div id="hero-car-tilt" class="relative w-full transition-transform duration-300 ease-out will-change-transform" style="transform-style:preserve-3d;">
-          <img src="assets/img02.webp" alt="Vista superior de un vehículo de la red" class="car-float w-full max-w-[640px] mx-auto h-auto select-none" draggable="false">
-        </div>
+  <div class="hero-dark">
+    <div class="hero-dark-bgfx"></div>
+    <span class="hero-dark-spark" style="top:18%;left:14%;">✦</span>
+    <span class="hero-dark-spark" style="top:32%;left:38%;font-size:9px;">✦</span>
+    <span class="hero-dark-spark" style="top:22%;right:16%;">✦</span>
+    <span class="hero-dark-spark" style="top:44%;right:8%;font-size:9px;">✦</span>
+    <div class="hero-dark-inner">
+      <div class="hero-dark-badge"><span class="tag">Plataforma B2B</span> Tucumán y el Norte</div>
+      <h1 class="hero-dark-title" id="hero-dark-title" data-plain="La red de concesionarias que " data-em="cruza stock" data-suffix=" y cierra operaciones."></h1>
+      <p class="hero-dark-lead">Conectamos concesionarias del NOA para que ningún vehículo ni ningún cliente se quede sin encontrar su match — y para que la comisión por colaborar quede clara desde el primer día.</p>
+      <div class="hero-dark-actions">
+        <button class="btn btn-solid" onclick="openModal('activate')">Solicitar acceso →</button>
+        <button class="btn btn-on-dark" onclick="scrollToSection('como-funciona')">Cómo funciona</button>
       </div>
     </div>
+    <div class="hero-dark-car"><img src="assets/img-hero-car.png" alt="Vehículo de la red" loading="lazy"></div>
   </div>
 
   <!-- ============ 1. Cómo funciona — tres pasos ============ -->
@@ -1152,62 +1239,46 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <div class="lp-steps-eyebrow">Cómo funciona</div>
       <h2 class="lp-steps-title">Tres pasos, un vehículo vendido</h2>
       <p class="lp-steps-sub">La lógica es simple: publicás tu stock, el sistema cruza contra toda la red, y avanzás la operación con la otra concesionaria de forma directa.</p>
-      <div class="lp-steps-grid">
-        <div class="lp-steps-card">
-          <div class="lp-steps-num">01 · Stock</div>
-          <h3>Publicá tu stock y tus búsquedas</h3>
-          <p>Cargá los vehículos que tenés en tu lote y las búsquedas activas de tus clientes cuando no tenés lo que piden.</p>
+      <div class="swiper lp-steps-swiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide">
+            <div class="lp-steps-card step-1">
+              <div class="lp-steps-badge">01</div>
+              <div class="lp-steps-num">Stock</div>
+              <h3>Publicá tu stock y tus búsquedas</h3>
+              <p>Cargá los vehículos que tenés en tu lote y las búsquedas activas de tus clientes cuando no tenés lo que piden.</p>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="lp-steps-card step-2">
+              <div class="lp-steps-badge">02</div>
+              <div class="lp-steps-num">Match</div>
+              <h3>Encontramos tu match</h3>
+              <p>El sistema cruza automáticamente tu stock y tus búsquedas contra toda la red y te avisa apenas hay compatibilidad.</p>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="lp-steps-card step-3">
+              <div class="lp-steps-badge">03</div>
+              <div class="lp-steps-num">Cierre</div>
+              <h3>Cerrá y cobrá tu comisión</h3>
+              <p>Contacto directo con la otra concesionaria, seguimiento de la operación y comisión acordada de antemano.</p>
+            </div>
+          </div>
         </div>
-        <div class="lp-steps-card">
-          <div class="lp-steps-num">02 · Match</div>
-          <h3>Encontramos tu match</h3>
-          <p>El sistema cruza automáticamente tu stock y tus búsquedas contra toda la red y te avisa apenas hay compatibilidad.</p>
-        </div>
-        <div class="lp-steps-card">
-          <div class="lp-steps-num">03 · Cierre</div>
-          <h3>Cerrá y cobrá tu comisión</h3>
-          <p>Contacto directo con la otra concesionaria, seguimiento de la operación y comisión acordada de antemano.</p>
-        </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
       </div>
     </div>
   </div>
 
-  <!-- ============ 2. Multiplicá tu stock (texto izq / imagen der) ============ -->
-  <div class="lp-feature reveal">
-    <div class="lp-feature-text">
-      <div class="eyebrow">Red de Autos</div>
-      <h2>Multiplicá tu stock y vendé más rápido colaborando con otras agencias.</h2>
-      <p>Cada día que un auto no se vende no es por falta de interesados. Es porque el comprador está en el otro lado de la ciudad —o en otra provincia— hablando con una agencia que no tiene ese vehículo, pero tiene el cliente exacto que vos necesitás. Conectá tu inventario y no pierdas ninguna venta más.</p>
-      <div class="lp-feature-actions">
-        <button class="btn btn-solid" onclick="openModal('activate')">Unirme a la Red</button>
-        <button class="btn" onclick="scrollToSection('precios')">Consultar Planes</button>
-      </div>
-    </div>
-    <div class="lp-feature-media">
-      <img src="assets/img03.jpg" alt="Entrega de llaves entre concesionarias" loading="lazy">
-    </div>
+  <!-- ============ 1.5. Banner de foto full-width ============ -->
+  <div class="lp-photo-banner reveal">
+    <img src="assets/img-team-banner.jpg" alt="Equipo de Red de Autos trabajando" loading="lazy">
   </div>
 
-  <!-- ============ 3. Logos de marcas ============ -->
-  <div class="lp-logos-wrap reveal">
-    <div class="lp-logos-track-wrap">
-      <div class="lp-logos-track" id="lp-logos-track"></div>
-    </div>
-  </div>
-
-  <!-- ============ 4. No esperás siempre el match (texto izq / imagen der) ============ -->
-  <div class="lp-feature reveal" style="border-top:1px solid var(--line);">
-    <div class="lp-feature-text">
-      <div class="eyebrow">Red de Autos</div>
-      <h2>No esperás siempre el match. También podés salir a buscarlo.</h2>
-      <p>Red de Autos no es solo un cruce automático en segundo plano. Es un marketplace activo: podés entrar cuando quieras a ver qué hay y qué se busca en toda la red, además de recibir el aviso cuando el sistema encuentra la coincidencia por vos.</p>
-    </div>
-    <div class="lp-feature-media">
-      <img src="assets/img04.jpg" alt="Vehículo disponible en la red para vender sin esperar el match" loading="lazy">
-    </div>
-  </div>
-
-  <!-- ============ 5. Dos formas más (mockup izq / texto der) ============ -->
+  <!-- ============ 2. Dos formas más (mockup izq / texto der) ============ -->
   <div class="lp-feature reverse reveal">
     <div class="lp-feature-media" style="height:auto;background:#FFFFFF;border:1px solid var(--line);">
       <div style="display:flex;align-items:center;gap:6px;padding:12px 16px;border-bottom:1px solid var(--line);">
@@ -1229,6 +1300,38 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <button class="btn btn-solid" onclick="openModal('activate')">Unirme a la Red</button>
         <button class="btn" onclick="scrollToSection('precios')">Consultar planes</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ============ 3. Multiplicá tu stock / No esperás siempre el match (slider de fotos) ============ -->
+  <div class="swiper lp-photo-swiper reveal">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide">
+        <div class="lp-photo-slide" style="background-image:url('assets/img-slide-wheel.jpg');">
+          <div class="lp-photo-slide-overlay"></div>
+          <div class="lp-photo-slide-inner">
+            <h2 class="lp-photo-slide-title">Multiplicá tu stock y vendé <em>más rápido</em> colaborando con otras <em>agencias.</em></h2>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-slide">
+        <div class="lp-photo-slide" style="background-image:url('assets/img-slide-night-car.jpg');">
+          <div class="lp-photo-slide-overlay"></div>
+          <div class="lp-photo-slide-inner">
+            <h2 class="lp-photo-slide-title">No esperás siempre <em>el match</em>, podés salir a buscarlo.</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+  </div>
+
+  <!-- ============ 4. Logos de marcas ============ -->
+  <div class="lp-logos-wrap reveal">
+    <div class="lp-logos-track-wrap">
+      <div class="lp-logos-track" id="lp-logos-track"></div>
     </div>
   </div>
 
@@ -2403,25 +2506,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
     <div id="cm-campos-cliente">
       <div class="field"><label>Nombre del cliente</label><input id="cm-cliente-nombre" placeholder="Nombre y apellido"></div>
-      <div class="field"><label>Teléfono del cliente</label><input id="cm-cliente-telefono" placeholder="Ej: 3815551234 — lo vas a necesitar para avisarle por WhatsApp que encontraste el auto"></div>
+      <div class="field"><label>Teléfono del cliente (opcional)</label><input id="cm-cliente-telefono" placeholder="Para tu propio registro, no se comparte"></div>
     </div>
 
     <div class="modal-close-row">
       <button class="btn" onclick="closeModal('contactomanual')">Cancelar</button>
       <button class="btn btn-solid btn-contact-lime" id="contactomanual-confirm-btn" onclick="confirmarContactoManual()"><i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp</button>
-    </div>
-  </div>
-</div>
-
-<div id="modal-matchconfirmado" class="modal-backdrop hidden">
-  <div class="modal" style="position:relative;text-align:center;">
-    <button class="avatar-modal-close" onclick="closeModal('matchconfirmado')"><i class="fa-solid fa-xmark"></i></button>
-    <div style="font-size:40px;color:var(--red);margin-bottom:6px;"><i class="fa-solid fa-handshake"></i></div>
-    <h3>¡Hiciste match!</h3>
-    <p class="sub">Hiciste match con la agencia propietaria del vehículo. Ahora continuá la operación en la pestaña "Matches Manuales".</p>
-    <div class="modal-close-row" style="justify-content:center;">
-      <button class="btn" onclick="closeModal('matchconfirmado')">Cerrar</button>
-      <button class="btn btn-solid" onclick="closeModal('matchconfirmado'); showApp('manuales');">Ir a Matches Manuales</button>
     </div>
   </div>
 </div>
@@ -4732,44 +4822,6 @@ function estadoPagoAgencia(a){
 function fmtFechaCorta(d){ return d.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' }); }
 function fmtARS(n){ return 'ARS ' + Math.round(n).toLocaleString('es-AR'); }
 
-// --- Selector de mes para los paneles admin (Pagos, Operaciones, Matches, Ingresos) -----
-// null = "todos los períodos". Si tiene valor: { anio, mes } con mes en 0-11.
-let adminMesFiltro = { pagos: null, operaciones: null, matches: null, ingresos: null };
-
-function mesNombreCorto(anio, mes){
-  const nombre = new Date(anio, mes, 1).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
-  return nombre.charAt(0).toUpperCase() + nombre.slice(1);
-}
-function cambiarMesAdmin(vista, delta){
-  const hoy = new Date();
-  const actual = adminMesFiltro[vista] || { anio: hoy.getFullYear(), mes: hoy.getMonth() };
-  let mes = actual.mes + delta, anio = actual.anio;
-  if (mes < 0) { mes = 11; anio--; } else if (mes > 11) { mes = 0; anio++; }
-  adminMesFiltro[vista] = { anio, mes };
-  showAdmin(vista);
-}
-function verTodosMesAdmin(vista){
-  adminMesFiltro[vista] = null;
-  showAdmin(vista);
-}
-function estaEnMesAdmin(fecha, filtro){
-  if (!filtro || !fecha) return !filtro ? true : false;
-  const d = fecha instanceof Date ? fecha : new Date(fecha);
-  if (isNaN(d)) return false;
-  return d.getFullYear() === filtro.anio && d.getMonth() === filtro.mes;
-}
-function renderSelectorMesAdmin(vista){
-  const f = adminMesFiltro[vista];
-  const label = f ? mesNombreCorto(f.anio, f.mes) : 'Todos los períodos';
-  return `
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
-    <button class="btn btn-sm" onclick="cambiarMesAdmin('${vista}', -1)" title="Mes anterior"><i class="fa-solid fa-chevron-left"></i></button>
-    <span style="font-weight:600;min-width:170px;text-align:center;"><i class="fa-solid fa-calendar-days" style="color:var(--red);margin-right:6px;"></i>${esc(label)}</span>
-    <button class="btn btn-sm" onclick="cambiarMesAdmin('${vista}', 1)" title="Mes siguiente"><i class="fa-solid fa-chevron-right"></i></button>
-    ${f ? `<button class="btn btn-sm" onclick="verTodosMesAdmin('${vista}')">Ver todos los períodos</button>` : ''}
-  </div>`;
-}
-
 let ADMIN_AGENCIES = [];
 let _adminAgencyDetailProps = []; // vehículos de la agencia que el admin está viendo en "Ver detalle"
 let ADMIN_MATCHES = [];       // matches reales de toda la red, para KPIs y para contar "ops" por agencia
@@ -5790,9 +5842,8 @@ const adminRenderers = {
     </table>
   `,
   operaciones: ()=>{
-    const opsTodas = ADMIN_MATCHES.filter(m => m.estado === 'concretada' || m.estado === 'cancelada')
+    const ops = ADMIN_MATCHES.filter(m => m.estado === 'concretada' || m.estado === 'cancelada')
       .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-    const ops = opsTodas.filter(o => estaEnMesAdmin(o.created_at, adminMesFiltro.operaciones));
     const concretadas = ops.filter(o => o.estado === 'concretada');
     const canceladas = ops.filter(o => o.estado === 'cancelada');
     // Antes esto recalculaba la comisión desde el % del vehículo × precio, ignorando por
@@ -5804,7 +5855,6 @@ const adminRenderers = {
     const comisionesTxt = [comisionesArs ? fmtARS(comisionesArs) : null, comisionesUsd ? 'USD ' + Math.round(comisionesUsd).toLocaleString('es-AR') : null].filter(Boolean).join(' + ') || fmtARS(0);
     return `
     <div class="main-head"><div><h1>Operaciones</h1><p class="sub">Historial de todas las operaciones cerradas en la red — para tener registro ante cualquier disputa</p></div></div>
-    ${renderSelectorMesAdmin('operaciones')}
     <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px;">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Concretadas</div><div class="val kpi-green">${concretadas.length}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-xmark"></i>Caídas</div><div class="val kpi-red">${canceladas.length}</div></div>
@@ -5827,7 +5877,7 @@ const adminRenderers = {
             <td>${adminStatusPill(o.estado==='concretada'?'Resuelta':'Desestimada', o.estado==='concretada'?'Concretada':'Caída')}${o.estado==='cancelada' && o.motivo_cancelacion ? `<div style="font-size:11px;color:var(--paper-dim);margin-top:3px;">${esc(o.motivo_cancelacion)}</div>` : ''}</td>
             <td>${o.created_at ? new Date(o.created_at).toLocaleDateString('es-AR') : '—'}</td>
           </tr>`;
-        }).join('') : `<tr><td colspan="7" class="empty-row">${adminMesFiltro.operaciones ? 'No hay operaciones cerradas en este período.' : 'Todavía no hay operaciones cerradas en la red.'}</td></tr>`}
+        }).join('') : `<tr><td colspan="7" class="empty-row">Todavía no hay operaciones cerradas en la red.</td></tr>`}
       </tbody>
     </table>
   `;
@@ -5837,7 +5887,7 @@ const adminRenderers = {
     // a Supabase) con nombres de campo que no existían en el esquema real (.status, .claimedAt,
     // matchFlowData(), AGENCY.name). Por eso siempre aparecía vacía. La reescribo sobre
     // ADMIN_MATCHES, que es la misma fuente de datos que ya usa correctamente "Operaciones".
-    const conEtapaTodas = ADMIN_MATCHES.map(m => {
+    const conEtapa = ADMIN_MATCHES.map(m => {
       let etapa = 'propuesta';
       if (m.estado === 'concretada') etapa = 'concretada';
       else if (m.estado === 'cancelada') etapa = 'cancelada';
@@ -5845,7 +5895,6 @@ const adminRenderers = {
       else if (m.comision_aceptada_at) etapa = 'contactado';
       return { ...m, etapa };
     });
-    const conEtapa = conEtapaTodas.filter(m => estaEnMesAdmin(m.created_at, adminMesFiltro.matches));
     const total = conEtapa.length;
     const enSeguimiento = conEtapa.filter(m => m.etapa === 'contactado' || m.etapa === 'visita').length;
     const concretadas = conEtapa.filter(m => m.etapa === 'concretada').length;
@@ -5854,7 +5903,6 @@ const adminRenderers = {
     const ETAPA_LABELS = { propuesta: 'Comisión propuesta', contactado: 'Agencia contactada', visita: 'Visita agendada', concretada: 'Concretada', cancelada: 'Caída' };
     return `
     <div class="main-head"><div><h1>Matches</h1><p class="sub">Todos los cruces detectados en la red, en cualquier etapa del pipeline</p></div></div>
-    ${renderSelectorMesAdmin('matches')}
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-link"></i>Matches totales</div><div class="val">${total}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-brands fa-whatsapp"></i>En seguimiento</div><div class="val">${enSeguimiento}</div></div>
@@ -5870,33 +5918,29 @@ const adminRenderers = {
         ${total ? conEtapa.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).map(m=>{
           const vehTxt = [m.veh?.marca, m.veh?.modelo, m.veh?.anio].filter(Boolean).join(' ') || '—';
           return `<tr><td>${esc(vehTxt)}</td><td>${esc(m.vend?.nombre || '—')}</td><td>${esc(m.comp?.nombre || '—')}</td><td>${esc(m.bus?.cliente_nombre || '—')}</td><td>${adminStatusPill(m.etapa==='cancelada'?'Suspendida':m.etapa==='concretada'?'Verificada':'Pendiente', ETAPA_LABELS[m.etapa])}</td><td>${m.created_at ? new Date(m.created_at).toLocaleDateString('es-AR') : '—'}</td></tr>`;
-        }).join('') : `<tr><td colspan="6" class="empty-row">${adminMesFiltro.matches ? 'No hay matches en este período.' : 'Todavía no hay matches en la red.'}</td></tr>`}
+        }).join('') : `<tr><td colspan="6" class="empty-row">Todavía no hay matches en la red.</td></tr>`}
       </tbody>
     </table>
   `;
   },
   ingresos: ()=>{
-    const verifiedTodas = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
-    const f = adminMesFiltro.ingresos;
-    const verified = f ? verifiedTodas.filter(a => estaEnMesAdmin(a.registeredAt, f)) : verifiedTodas;
+    const verified = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
     const proCount = verified.filter(a=>a.plan==='Pro').length;
     const premiumCount = verified.filter(a=>a.plan==='Premium').length;
     const mrrReal = proCount*190000 + premiumCount*390000;
     return `
     <div class="main-head"><div><h1>Ingresos</h1><p class="sub">Facturación por suscripciones de la red</p></div></div>
-    ${renderSelectorMesAdmin('ingresos')}
-    ${f ? `<p style="font-size:12.5px;color:var(--ink);margin-bottom:16px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-circle-info" style="margin-top:2px;color:var(--red);"></i><span>Mostrando agencias dadas de alta en ${esc(mesNombreCorto(f.anio,f.mes))}. El prototipo no lleva un historial de pagos mes a mes, así que este filtro usa la fecha de alta de cada agencia (MRR incorporado ese período), no lo efectivamente cobrado ese mes.</span></p>` : ''}
     <div class="kpi-grid">
-      <div class="kpi"><div class="lbl"><i class="fa-solid fa-arrows-rotate"></i>${f?'MRR incorporado':'MRR'}</div><div class="val mono">${fmtARS(mrrReal)}</div></div>
-      ${f ? '' : `<div class="kpi"><div class="lbl"><i class="fa-solid fa-sack-dollar"></i>Ingresos totales</div><div class="val mono">${fmtARS(mrrReal*6)}</div></div>`}
-      <div class="kpi"><div class="lbl"><i class="fa-solid fa-users"></i>${f?'Agencias nuevas':'Suscripciones activas'}</div><div class="val">${verified.length}</div></div>
+      <div class="kpi"><div class="lbl"><i class="fa-solid fa-arrows-rotate"></i>MRR</div><div class="val mono">${fmtARS(mrrReal)}</div></div>
+      <div class="kpi"><div class="lbl"><i class="fa-solid fa-sack-dollar"></i>Ingresos totales</div><div class="val mono">${fmtARS(mrrReal*6)}</div></div>
+      <div class="kpi"><div class="lbl"><i class="fa-solid fa-users"></i>Suscripciones activas</div><div class="val">${verified.length}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-star"></i>Plan Pro</div><div class="val">${proCount}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-crown"></i>Plan Premium</div><div class="val">${premiumCount}</div></div>
     </div>
     <table>
       <thead><tr><th>Concesionaria</th><th>Plan</th><th>Ingreso mensual</th></tr></thead>
       <tbody>
-        ${verified.length ? verified.map(a=>`<tr><td>${a.name}</td><td>${a.plan}</td><td class="mono">${fmtARS(a.plan==='Pro'?190000:390000)}</td></tr>`).join('') : `<tr><td colspan="3" class="empty-row">Ninguna agencia se dio de alta en este período.</td></tr>`}
+        ${verified.map(a=>`<tr><td>${a.name}</td><td>${a.plan}</td><td class="mono">${fmtARS(a.plan==='Pro'?190000:390000)}</td></tr>`).join('')}
       </tbody>
     </table>
     <p style="font-size:12.5px;color:var(--ink);margin-top:14px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-bell" style="margin-top:2px;color:var(--red);"></i><span>MRR y el desglose por concesionaria se calculan en base a los planes reales asignados. "Ingresos totales" es un acumulado ilustrativo (6 meses de MRR), ya que el prototipo no lleva un historial de facturación real.</span></p>
@@ -5904,14 +5948,12 @@ const adminRenderers = {
   },
   pagos: ()=>{
     const activas = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
-    const filasTodas = activas.map(a => ({ a, ...estadoPagoAgencia(a) })).sort((x,y)=>x.vencimiento - y.vencimiento);
-    const filas = filasTodas.filter(f => estaEnMesAdmin(f.vencimiento, adminMesFiltro.pagos));
+    const filas = activas.map(a => ({ a, ...estadoPagoAgencia(a) })).sort((x,y)=>x.vencimiento - y.vencimiento);
     const vencidas = filas.filter(f=>f.estado==='Vencido').length;
     const pendientes = filas.filter(f=>f.estado==='Pendiente').length;
     const pagadas = filas.filter(f=>f.estado==='Pagado').length;
     return `
     <div class="main-head"><div><h1>Pagos</h1><p class="sub">Vencimiento mensual de cada agencia y estado de pago de la suscripción</p></div></div>
-    ${renderSelectorMesAdmin('pagos')}
     <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px;">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Pagadas este período</div><div class="val kpi-green">${pagadas}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-clock"></i>Pendientes</div><div class="val">${pendientes}</div></div>
@@ -5931,7 +5973,7 @@ const adminRenderers = {
               : `<button class="btn btn-sm whatsapp-btn" onclick="marcarPagoAgencia('${f.a.id}')"><i class="fa-solid fa-check"></i> Marcar pagado</button>`
             }
           </td>
-        </tr>`).join('') : `<tr><td colspan="5" class="empty-row">${adminMesFiltro.pagos ? 'Ninguna agencia vence en este período.' : 'No hay agencias activas.'}</td></tr>`}
+        </tr>`).join('') : `<tr><td colspan="5" class="empty-row">No hay agencias activas.</td></tr>`}
       </tbody>
     </table>
     <p style="font-size:12.5px;color:var(--ink);margin-top:14px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-bell" style="margin-top:2px;color:var(--red);"></i><span>El vencimiento se calcula solo, siempre el mismo día del mes en que se dio de alta cada agencia (ej. alta el 11/09 → vence el 11/10, luego el 11/11, y así cada mes). Al marcar "Pagado" queda cubierto el período vigente; al llegar el próximo vencimiento vuelve a aparecer como Pendiente automáticamente.</span></p>
@@ -6271,27 +6313,14 @@ async function informarClienteMatch(matchId){
   if (!m) return;
   if (!m.comisionAceptadaAt) { toast('Todavía no se aceptó la comisión propuesta.'); return; }
   if (!m.soyVendedor && !m.contactadoAt) { toast('Primero contactá a la agencia que tiene el vehículo.'); return; }
-
-  // Matches manuales creados antes de que el teléfono del cliente fuera obligatorio pueden haber
-  // quedado sin ese dato — antes esto hacía que el botón simplemente no abriera WhatsApp, sin
-  // avisar por qué. Ahora, si falta, se lo pedimos acá mismo y lo guardamos antes de continuar.
-  let telefonoCliente = m.clienteTelefono;
-  if (!m.soyVendedor && !telefonoCliente) {
-    const ingresado = (window.prompt(`Este match no tiene cargado el teléfono de ${m.clienteNombre || 'tu cliente'}. Ingresalo para poder avisarle por WhatsApp:`) || '').trim();
-    if (!ingresado) { toast('Sin el teléfono del cliente no se puede armar el mensaje de WhatsApp.'); return; }
-    const { error: errTel } = await supa.from('matches').update({ cliente_telefono: ingresado }).eq('id', matchId);
-    if (errTel) { toast('Error al guardar el teléfono del cliente.'); console.error('informarClienteMatch (guardar teléfono):', errTel); return; }
-    telefonoCliente = ingresado;
-  }
-
   const { error } = await supa.from('matches').update({ visita_agendada_at: new Date().toISOString() }).eq('id', matchId);
   if (error) { toast('Error al actualizar el match.'); console.error('informarClienteMatch:', error); return; }
   crearNotificacion(m.otraAgenciaId, 'match_etapa', 'Avance en un match', `${currentAgencia?.nombre || 'La agencia compradora'} ya informó a su cliente sobre ${m.vehiculo}.`, m.id);
 
-  if (!m.soyVendedor && telefonoCliente) {
+  if (!m.soyVendedor && m.clienteTelefono) {
     const primerNombre = (m.clienteNombre || '').trim().split(/\s+/)[0] || m.clienteNombre;
     const mensaje = `¡Hola ${primerNombre}! Te tengo excelentes noticias: encontramos el ${m.vehiculoMarcaModelo} en las condiciones exactas que buscabas dentro de nuestra red de aliados. Ya validé que la unidad está disponible y reservada para que la veamos. Decime qué día y horario te queda cómodo así coordinamos la visita y te acompaño a revisarlo en detalle.`;
-    window.open(`https://wa.me/${telefonoCliente.replace(/\D/g,'')}?text=${encodeURIComponent(mensaje)}`, '_blank');
+    window.open(`https://wa.me/${m.clienteTelefono.replace(/\D/g,'')}?text=${encodeURIComponent(mensaje)}`, '_blank');
     toast('Cliente informado y mensaje armado');
   } else {
     toast('Match actualizado');
@@ -6390,15 +6419,10 @@ function matchCardHTML(m){
     }
   } else if (m.etapa === 'visita') {
     // Touchpoint 3 (parte "exitosa"): cerrar la operación como concretada queda reservado a la
-    // agencia vendedora, que es quien tiene el poder de decisión de vender o no el vehículo. La
-    // compradora ya avisó al cliente (botón "Informar al cliente"), así que a la vendedora le
-    // mostramos un aviso de que el cliente va a visitarla, además del botón para cuando cierre.
+    // agencia vendedora, que es quien tiene el poder de decisión de vender o no el vehículo.
     primaryActions = m.soyVendedor
       ? `<button class="btn btn-sm whatsapp-btn" onclick="abrirCerrarMatch('${m.id}', false)"><i class="fa-solid fa-flag-checkered"></i> Finalizar operación</button>`
       : `<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que el cliente visite a ${esc(m.otraAgencia)}.</div>`;
-    if (m.soyVendedor) {
-      primaryNote = `<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que el cliente te visite</div>`;
-    }
   }
   // Touchpoint 3 (parte "caída"): marcar la operación como caída queda disponible para cualquiera
   // de las dos agencias en cualquier etapa activa. En 'propuesta' la compradora ya tiene su propio
@@ -6800,17 +6824,10 @@ async function confirmarContactoManual(){
     nombreCliente = document.getElementById('cm-cliente-nombre').value.trim();
     if (!nombreCliente) { toast('Ingresá el nombre del cliente antes de continuar.'); return; }
     telefonoCliente = document.getElementById('cm-cliente-telefono').value.trim();
-    // El teléfono ya no es opcional: sin esto, más adelante "Informar al cliente" (en Matches
-    // Manuales) no tiene a quién mandarle el WhatsApp automático y el botón queda mudo.
-    if (!telefonoCliente) { toast('Ingresá el teléfono del cliente — lo vas a necesitar para avisarle cuando encuentres el auto.'); return; }
   }
 
-  const vehTxt = [v.marca, v.modelo, v.anio].filter(Boolean).join(' ') || 'vehículo';
-  const mensaje = esDirecta
-    ? construirMensajeWhatsappVehiculo(v.agencias?.nombre, [v.marca,v.modelo].filter(Boolean).join(' '))
-    : `¡Hola ${v.agencias?.nombre||''}! Te escribo desde ${currentAgencia.nombre||'mi agencia'} por la plataforma Red de Autos. Tengo un cliente con interés real y listo para avanzar por tu ${vehTxt}. ¿Sigue disponible la unidad? Si está disponible, confirmamelo y coordinamos para mostrarlo. ¡Gracias!`;
   const waHref = v.agencias?.telefono
-    ? `https://wa.me/${v.agencias.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(mensaje)}`
+    ? `https://wa.me/${v.agencias.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(construirMensajeWhatsappVehiculo(v.agencias?.nombre, [v.marca,v.modelo].filter(Boolean).join(' ')))}`
     : null;
   if (!waHref) { toast('Esta agencia todavía no cargó un teléfono de contacto.'); return; }
 
@@ -6827,13 +6844,10 @@ async function confirmarContactoManual(){
       es_compra_directa: esDirecta,
       cliente_nombre: esDirecta ? null : nombreCliente,
       cliente_telefono: esDirecta ? null : (telefonoCliente || null),
-      // El mensaje de WhatsApp con toda la info ya se manda en este mismo paso (tanto para
-      // "tengo un cliente" como para compra directa), así que el contacto queda registrado acá
-      // directamente. Antes solo se marcaba en la compra directa, y en el caso "tengo un cliente"
-      // el flujo de Matches Manuales volvía a pedir "Contactar agencia" con un segundo mensaje
-      // redundante — este ajuste elimina ese paso de más.
-      contactado_at: new Date().toISOString(),
     };
+    // La compra directa no tiene cliente ni comisión de por medio, así que no pasa por el paso
+    // de "aceptar comisión" — queda directamente marcada como contactada, como un registro simple.
+    if (esDirecta) payload.contactado_at = new Date().toISOString();
 
     const { error: errIns } = await supa.from('matches').insert(payload);
     if (errIns) throw errIns;
@@ -6844,7 +6858,9 @@ async function confirmarContactoManual(){
 
     closeModal('contactomanual');
     window.open(waHref, '_blank');
-    openModal('matchconfirmado');
+    toast(esDirecta
+      ? 'Contacto registrado en Matches Manuales.'
+      : 'Contacto registrado en Matches Manuales. Si el cliente sigue interesado, aceptá la comisión desde ahí para reservar el vehículo.');
     await cargarMisMatches();
   } catch (e) {
     console.error('confirmarContactoManual:', e);
@@ -6867,7 +6883,7 @@ async function cargarNotificacionesReal(){
 }
 function actualizarNotifDotReal(){
   const dot = document.getElementById('notifdot');
-  if (dot) dot.style.display = (notificacionesReal.some(n=>!n.leido) || dashDemandaCaliente.length) ? 'block' : 'none';
+  if (dot) dot.style.display = notificacionesReal.some(n=>!n.leido) ? 'block' : 'none';
   actualizarSoporteDotReal();
 }
 function actualizarSoporteDotReal(){
@@ -7339,7 +7355,7 @@ function renderDetailModalReal(v){
       ${mapHTML}
       <div class="propdetail-agency">Publicada por <strong>${esc(v.agencias?.nombre || 'Agencia')}</strong>${verificadaBadgeHTML(v.agencias?.verificada)}</div>
       <div class="propdetail-actions">
-        ${waHref ? `<button class="btn btn-solid btn-contact-lime" onclick="abrirContactoManual('${v.id}')"><i class="fa-brands fa-whatsapp"></i> Hacer Match</button>` : ''}
+        ${waHref ? `<button class="btn btn-solid btn-contact-lime" onclick="abrirContactoManual('${v.id}')"><i class="fa-brands fa-whatsapp"></i> Contactar Agencia</button>` : ''}
         <button class="btn" onclick="closeModal('propdetail')">Cerrar</button>
       </div>
     </div>
@@ -7404,59 +7420,6 @@ async function cargarDashboardData(){
   const estrellas = (califRes.data || []).map(c => c.estrellas).filter(n => typeof n === 'number');
   dashCalificacionProm = estrellas.length ? (estrellas.reduce((a,b)=>a+b,0) / estrellas.length) : null;
   dashCalificacionCant = estrellas.length;
-  await calcularDemandaCaliente();
-  actualizarNotifDotReal();
-}
-
-// --- Demanda caliente por zona ---------------------------------------------
-// Cruza búsquedas activas de TODA la red vs. stock publicado de TODA la red,
-// agrupado por marca + ciudad. Si en tu ciudad hay muchas búsquedas activas
-// de una marca y poco stock publicado, es una señal de demanda insatisfecha.
-// No usa datos externos (scraping): es 100% dato propio de la plataforma.
-let dashDemandaCaliente = [];
-const DEMANDA_CALIENTE_MIN_DEMANDA = 3; // mínimo de búsquedas activas para considerarlo señal
-const DEMANDA_CALIENTE_MIN_RATIO = 3;   // demanda / oferta mínimo para marcarlo "caliente"
-
-function capitalizarPalabra(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
-
-async function calcularDemandaCaliente(){
-  dashDemandaCaliente = [];
-  if (!currentAgencia || !currentAgencia.ciudad) return;
-  const [busquedasRes, stockRes] = await Promise.all([
-    supa.from('busquedas').select('marca, agencias!left(ciudad)').eq('estado', 'activa'),
-    supa.from('vehiculos').select('marca, agencias!left(ciudad)').eq('estado', 'activo').eq('es_gremio', false)
-  ]);
-  if (busquedasRes.error || stockRes.error) { console.warn('calcularDemandaCaliente:', busquedasRes.error || stockRes.error); return; }
-
-  const contarPorMarcaCiudad = (rows) => {
-    const map = {};
-    (rows || []).forEach(r => {
-      const marca = (r.marca || '').trim();
-      const ciudad = (r.agencias?.ciudad || '').trim();
-      if (!marca || !ciudad) return;
-      const key = marca.toLowerCase() + '||' + ciudad.toLowerCase();
-      map[key] = (map[key] || 0) + 1;
-    });
-    return map;
-  };
-
-  const demandaMap = contarPorMarcaCiudad(busquedasRes.data);
-  const ofertaMap = contarPorMarcaCiudad(stockRes.data);
-  const miCiudad = currentAgencia.ciudad.trim().toLowerCase();
-
-  const hotspots = [];
-  Object.keys(demandaMap).forEach(key => {
-    const [marca, ciudad] = key.split('||');
-    if (ciudad !== miCiudad) return;
-    const demanda = demandaMap[key];
-    const oferta = ofertaMap[key] || 0;
-    if (demanda < DEMANDA_CALIENTE_MIN_DEMANDA) return;
-    const ratio = oferta === 0 ? demanda : demanda / oferta;
-    if (ratio < DEMANDA_CALIENTE_MIN_RATIO) return;
-    hotspots.push({ marca: capitalizarPalabra(marca), ciudad: currentAgencia.ciudad, demanda, oferta, ratio });
-  });
-  hotspots.sort((a,b) => b.ratio - a.ratio);
-  dashDemandaCaliente = hotspots;
 }
 
 async function cargarMiStock(){
@@ -7773,7 +7736,7 @@ function avisarPotencialCliente(busquedaId){
   const c = b.clientes || {};
   const marca = b.marca || c.marca || '';
   const modelo = b.modelo || c.modelo || '';
-  const msg = encodeURIComponent(`Hola ${b.agencias.nombre||''}, vi en Red de Autos que están buscando un ${marca} ${modelo}. Tengo ese vehículo en stock, ¿hablamos?`);
+  const msg = encodeURIComponent(`Hola ${b.agencias.nombre||''}, vi en Red de Autos que están buscando un ${marca} ${modelo}. Tengo un cliente potencial para eso, ¿hablamos?`);
   registrarClicReal('busqueda', b.id, 'potencial_cliente');
   window.open(`https://wa.me/${b.agencias.telefono.replace(/\D/g,'')}?text=${msg}`, '_blank');
 }
@@ -8234,36 +8197,22 @@ notificaciones: ()=>{
     ticket_respondido: { icon: 'fa-solid fa-headset', color: '#5B3FBF' },
     calificacion_recibida: { icon: 'fa-solid fa-star', color: '#FBBC04' },
     comision_pagada: { icon: 'fa-solid fa-sack-dollar', color: '#3F7A46' },
-    demanda_caliente: { icon: 'fa-solid fa-fire', color: '#C0392B' },
   };
-  // Los hotspots de demanda caliente se calculan en vivo (no son filas en la tabla notificaciones),
-  // así que se generan acá como notificaciones "virtuales" y se mezclan con las reales para
-  // mostrarlas juntas. Al no tener referencia_id no admiten "eliminar" ni "marcar leída" individual.
-  const notifsDemandaCaliente = dashDemandaCaliente.map(h => ({
-    id: 'demanda-' + h.marca + '-' + h.ciudad,
-    tipo: 'demanda_caliente',
-    titulo: `Demanda caliente: ${h.marca} en ${h.ciudad}`,
-    texto: `${h.demanda} búsqueda${h.demanda===1?'':'s'} activa${h.demanda===1?'':'s'} vs. ${h.oferta} publicada${h.oferta===1?'':'s'} en la red`,
-    created_at: new Date().toISOString(),
-    leido: false,
-    virtual: true,
-  }));
-  const listaNotificaciones = [...notifsDemandaCaliente, ...notificacionesReal];
   return `
   <div class="main-head"><div><h1>Notificaciones</h1><p class="sub">Todo lo que pasó en tu actividad dentro de la red</p></div>
   <div style="display:flex;gap:10px;"><button class="btn" onclick="marcarTodasNotifLeidasReal()"><i class="fa-solid fa-check-double"></i> Marcar todas como leídas</button><button class="btn" onclick="limpiarNotificacionesReal()"><i class="fa-solid fa-trash"></i> Limpiar notificaciones</button></div></div>
-  ${listaNotificaciones.length ? listaNotificaciones.map(n=>{
+  ${notificacionesReal.length ? notificacionesReal.map(n=>{
     const esCaida = n.tipo === 'match_cerrado' && (n.titulo||'').toLowerCase().includes('caída');
 const meta = esCaida ? { icon: 'fa-solid fa-xmark', color: '#C0392B' } : (iconMap[n.tipo] || { icon: 'fa-solid fa-bell', color: 'var(--red)' });
     return `
-    <div class="notif-item ${n.leido?'':'notif-unread'}" ${n.virtual?`onclick="showApp('vehículos')" style="cursor:pointer;"`:`onclick="abrirNotificacion('${n.id}')" style="cursor:pointer;"`}>
+    <div class="notif-item ${n.leido?'':'notif-unread'}" onclick="abrirNotificacion('${n.id}')" style="cursor:pointer;">
       <div class="notif-icon" style="color:${esc(meta.color)};background:${esc(meta.color)}1a;"><i class="${esc(meta.icon)}"></i></div>
             <div class="notif-body">
         <div class="notif-title">${esc(n.titulo)}${!n.leido?'<span class="notif-dot"></span>':''}</div>
         <div class="notif-text">${esc(n.texto||'')}</div>
-        <div class="notif-date">${n.virtual?'Ahora':formatDateTime(n.created_at)}</div>
+        <div class="notif-date">${formatDateTime(n.created_at)}</div>
       </div>
-      ${n.virtual?'':`<button class="btn btn-sm" onclick="eliminarNotificacionUna(event, '${n.id}')" style="margin-left:auto;flex-shrink:0;" title="Eliminar esta notificación"><i class="fa-solid fa-trash"></i></button>`}
+      <button class="btn btn-sm" onclick="eliminarNotificacionUna(event, '${n.id}')" style="margin-left:auto;flex-shrink:0;" title="Eliminar esta notificación"><i class="fa-solid fa-trash"></i></button>
     </div>
   `;}).join('') : `<div class="card"><p style="color:var(--paper-dim);margin:0;">No tenés notificaciones todavía. Van a ir apareciendo acá a medida que uses la red: matches nuevos, contactos por WhatsApp, "me interesa" en tu stock y cierres de operaciones.</p></div>`}
   `;},
@@ -8271,7 +8220,6 @@ const meta = esCaida ? { icon: 'fa-solid fa-xmark', color: '#C0392B' } : (iconMa
 dashboard: ()=>`
   <div class="main-head"><div><h1>Dashboard</h1><p class="sub">Resumen de tu actividad en la red</p></div></div>
   ${dashMatches.filter(m=>m.estado==='pendiente').length? (()=>{const n=dashMatches.filter(m=>m.estado==='pendiente').length; return `<div class="banner"><div class="banner-left"><svg class="banner-bell" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1C2B36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="txt"><strong>¡Tenés ${n} match${n>1?'es':''} nuevo${n>1?'s':''}!</strong><span>Se encontraron coincidencias para tu stock o tus clientes.</span></div></div><button class="btn btn-solid btn-sm" onclick="showApp('matches')">Ver matches</button></div>`;})() : ''}
-  ${dashDemandaCaliente.length? (()=>{const h=dashDemandaCaliente[0]; return `<div class="banner" style="border-left:3px solid #C0392B;"><div class="banner-left"><i class="fa-solid fa-fire" style="font-size:24px;color:#C0392B;flex-shrink:0;"></i><div class="txt"><strong>Demanda caliente: ${esc(h.marca)} en ${esc(h.ciudad)}</strong><span>${h.demanda} búsqueda${h.demanda===1?'':'s'} activa${h.demanda===1?'':'s'} vs. ${h.oferta} publicada${h.oferta===1?'':'s'} en la red</span></div></div><button class="btn btn-sm" style="border-color:#C0392B;color:#C0392B;" onclick="showApp('vehículos')">Ver mi stock</button></div>`;})() : ''}
   <div class="kpi-grid">
     <div class="kpi"><div class="lbl">Vehículos en stock</div><div class="val">${dashStock.length}</div></div>
     <div class="kpi"><div class="lbl">Búsquedas activas</div><div class="val">${dashBusquedas.filter(b=>b.estado==='activa').length}</div></div>
@@ -8513,7 +8461,7 @@ redbusca: ()=>`
           <td>${esc(b.agencias?.nombre||'—')}${b.agencias?.verificada ? `<i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:11px;margin-left:4px;" title="Agencia verificada por Red de Autos"></i>` : ''}</td>
           <td class="mono">${esc(precioMax? fmtMoney(precioMax,b.moneda||'ARS') : '—')}</td>
           <td><span class="pill ${esc(c.urgencia && c.urgencia.toLowerCase().includes('alta')?'pill-red':'')}">${esc(c.urgencia||'—')}</span></td>
-          <td>${b.agencias?.telefono ? `<button class="btn btn-sm btn-contact-lime" onclick="avisarPotencialCliente('${b.id}')"><i class="fa-brands fa-whatsapp"></i> Tengo el vehículo</button>` : ''}</td>
+          <td>${b.agencias?.telefono ? `<button class="btn btn-sm btn-contact-lime" onclick="avisarPotencialCliente('${b.id}')"><i class="fa-brands fa-whatsapp"></i> Tengo potencial cliente</button>` : ''}</td>
         </tr>`;
       }).join('') : `<tr><td colspan="5" class="empty-row">Ninguna agencia de la red tiene búsquedas activas por ahora.</td></tr>`}
     </tbody>
@@ -8986,6 +8934,52 @@ function animateCount(el){
   requestAnimationFrame(step);
 }
 (function initLandingInteractivity(){
+  // Tipeo genérico para los títulos del slider de fotos: soporta cualquier cantidad de tramos
+  // en <em> dentro del texto (a diferencia del tipeo del header, que solo tiene un tramo resaltado).
+  // Declarado primero para que ya exista cuando el callback on.init de Swiper lo llame más abajo.
+  const _photoTitleCache = new WeakMap();
+  function typePhotoSlideTitle(slideEl){
+    if(!slideEl) return;
+    const titleEl = slideEl.querySelector('.lp-photo-slide-title');
+    if(!titleEl) return;
+    let targetHtml = _photoTitleCache.get(titleEl);
+    if(targetHtml === undefined){ targetHtml = titleEl.innerHTML.trim(); _photoTitleCache.set(titleEl, targetHtml); }
+    runTypewriterHTML(titleEl, targetHtml, 22);
+  }
+  function runTypewriterHTML(el, html, speed){
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    const chars = [];
+    (function walk(node, em){
+      node.childNodes.forEach(n=>{
+        if(n.nodeType === 3){ for(const ch of n.textContent) chars.push({ch, em}); }
+        else if(n.nodeType === 1){ walk(n, em || n.tagName === 'EM'); }
+      });
+    })(temp, false);
+    if(el._typeTimer) clearInterval(el._typeTimer);
+    let i = 0;
+    el.innerHTML = '<span class="typewriter-cursor">&nbsp;</span>';
+    function render(){
+      let out = '', curEm = null, buf = '';
+      for(let j=0; j<i && j<chars.length; j++){
+        const c = chars[j];
+        if(curEm === null){ curEm = c.em; buf = c.ch; }
+        else if(c.em === curEm){ buf += c.ch; }
+        else { out += curEm ? `<em>${buf}</em>` : buf; curEm = c.em; buf = c.ch; }
+      }
+      if(buf) out += curEm ? `<em>${buf}</em>` : buf;
+      el.innerHTML = out + '<span class="typewriter-cursor">&nbsp;</span>';
+    }
+    el._typeTimer = setInterval(()=>{
+      i++;
+      render();
+      if(i >= chars.length){
+        clearInterval(el._typeTimer);
+        setTimeout(()=>{ const c = el.querySelector('.typewriter-cursor'); if(c) c.remove(); }, 700);
+      }
+    }, speed);
+  }
+
   const heroStats = document.getElementById('hero-stats');
   if(heroStats){
     const counters = heroStats.querySelectorAll('[data-count]');
@@ -9039,6 +9033,65 @@ function animateCount(el){
         },
       });
     }
+    if(document.querySelector('.lp-photo-swiper')){
+      new Swiper('.lp-photo-swiper', {
+        effect:'fade',
+        fadeEffect:{crossFade:true},
+        loop:false,
+        rewind:true,
+        speed:700,
+        autoplay:{delay:5500, disableOnInteraction:false},
+        pagination:{el:'.lp-photo-swiper .swiper-pagination', clickable:true},
+        navigation:{nextEl:'.lp-photo-swiper .swiper-button-next', prevEl:'.lp-photo-swiper .swiper-button-prev'},
+        on:{
+          init(sw){ typePhotoSlideTitle(sw.slides[sw.activeIndex]); },
+          slideChangeTransitionStart(sw){ typePhotoSlideTitle(sw.slides[sw.activeIndex]); },
+        },
+      });
+    }
+    if(document.querySelector('.lp-steps-swiper')){
+      new Swiper('.lp-steps-swiper', {
+        slidesPerView:1.05,
+        centeredSlides:false,
+        spaceBetween:22,
+        loop:true,
+        watchOverflow:true,
+        autoplay:{delay:4200, disableOnInteraction:false},
+        pagination:{el:'.lp-steps-swiper .swiper-pagination', clickable:true},
+        navigation:{nextEl:'.lp-steps-swiper .swiper-button-next', prevEl:'.lp-steps-swiper .swiper-button-prev'},
+        breakpoints:{
+          640:{slidesPerView:1.3, spaceBetween:22, centeredSlides:true},
+          1024:{slidesPerView:3, spaceBetween:24, centeredSlides:false},
+        },
+      });
+    }
+  }
+
+  // Título del hero: efecto de tipeo, respeta el tramo en rojo/cursiva definido en los data-* del H1.
+  const heroTitleEl = document.getElementById('hero-dark-title');
+  if(heroTitleEl){
+    const segments = [
+      {text: heroTitleEl.dataset.plain || '', em:false},
+      {text: heroTitleEl.dataset.em || '', em:true},
+      {text: heroTitleEl.dataset.suffix || '', em:false},
+    ].filter(s=>s.text);
+    let segIdx = 0, charIdx = 0;
+    function typeTick(){
+      if(segIdx >= segments.length){
+        setTimeout(()=>{ const cur = heroTitleEl.querySelector('.typewriter-cursor'); if(cur) cur.remove(); }, 900);
+        return;
+      }
+      let html = '';
+      for(let i=0;i<segIdx;i++){ html += segments[i].em ? `<em>${segments[i].text}</em>` : segments[i].text; }
+      const cur = segments[segIdx];
+      const partial = cur.text.slice(0, charIdx+1);
+      html += cur.em ? `<em>${partial}</em>` : partial;
+      heroTitleEl.innerHTML = html + '<span class="typewriter-cursor">&nbsp;</span>';
+      charIdx++;
+      if(charIdx >= cur.text.length){ segIdx++; charIdx = 0; }
+      setTimeout(typeTick, 26);
+    }
+    typeTick();
   }
 })();
 </script>
