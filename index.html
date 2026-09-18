@@ -1337,85 +1337,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   <!-- ============ 6. Preview "Explorar la Red" ============ -->
   <div class="section reveal" style="border-top:none;padding-top:0;">
-    <div class="lp-explorar">
-      <div class="lp-explorar-shell">
-        <div class="lp-explorar-side">
-          <div class="lbl">Principal</div>
-          <div class="lp-explorar-item"><i class="fa-solid fa-gauge"></i> Dashboard</div>
-          <div class="lp-explorar-item active"><i class="fa-solid fa-magnifying-glass"></i> Explorar la Red</div>
-          <div class="lp-explorar-item"><i class="fa-solid fa-bullhorn"></i> La Red está buscando</div>
-          <div class="lp-explorar-item"><i class="fa-solid fa-list-check"></i> Mis Búsquedas</div>
-          <div class="lp-explorar-item"><i class="fa-solid fa-link"></i> Mis Matches</div>
-          <div class="lp-explorar-item"><i class="fa-solid fa-bell"></i> Notificaciones</div>
-          <div class="lbl">Mi concesionaria</div>
-          <div class="lp-explorar-item"><i class="fa-solid fa-car"></i> Mi Stock</div>
-          <div class="lp-explorar-item"><i class="fa-solid fa-users"></i> Mis Clientes</div>
-          <div class="lp-explorar-item"><i class="fa-solid fa-gem"></i> Oportunidad Exclusiva</div>
-          <div class="lbl">Gremio</div>
-          <div class="lp-explorar-item"><i class="fa-solid fa-handshake"></i> Concesionarias Asociadas</div>
-          <div class="lbl">Cuentas</div>
-          <div class="lp-explorar-item"><i class="fa-solid fa-user-gear"></i> Mi Perfil</div>
-          <div class="lp-explorar-item"><i class="fa-solid fa-circle-question"></i> FAQs</div>
-        </div>
-        <div class="lp-explorar-main">
-          <div class="lp-explorar-filters">
-            <div class="lp-explorar-filters-left">
-              <span class="lp-fake-select">Marca: Todas <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:6px;"></i></span>
-              <span class="lp-fake-select">Modelo: Todos los modelos <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:6px;"></i></span>
-              <span class="lp-fake-select">Ciudad: Todas las ciudades <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:6px;"></i></span>
-              <span class="lp-fake-select"><i class="fa-solid fa-sliders"></i> Más</span>
-            </div>
-            <span class="lp-explorar-results"><i class="fa-solid fa-magnifying-glass"></i> 3 resultados</span>
-          </div>
-          <div class="lp-mini-grid">
-            <div class="lp-mini-card">
-              <div class="lp-mini-photo">
-                <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=500&q=80" alt="Changan CS55 Plus 2026" loading="lazy">
-                <span class="lp-mini-badge">Changan</span>
-                <span class="lp-mini-pop"><i class="fa-solid fa-star"></i> Popular</span>
-              </div>
-              <div class="lp-mini-body">
-                <div class="lp-mini-price">USD 32.000</div>
-                <div class="lp-mini-title">Changan CS55 Plus 2026</div>
-                <div class="lp-mini-agency">Hernán Cars · Tucumán</div>
-                <div class="lp-mini-commission"><i class="fa-solid fa-handshake"></i> Comisión: 1,5% sobre precio de venta</div>
-                <div class="lp-mini-specs"><span>— km</span><span>Automático</span><span>Blanco</span></div>
-                <div class="lp-mini-btn"><i class="fa-solid fa-eye"></i> Ver detalle</div>
-              </div>
-            </div>
-            <div class="lp-mini-card">
-              <div class="lp-mini-photo">
-                <img src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=500&q=80" alt="Volkswagen Saveiro 2025" loading="lazy">
-                <span class="lp-mini-badge">Volkswagen</span>
-                <span class="lp-mini-pop"><i class="fa-solid fa-star"></i> Popular</span>
-              </div>
-              <div class="lp-mini-body">
-                <div class="lp-mini-price">ARS 27.000.000</div>
-                <div class="lp-mini-title">Volkswagen Saveiro 2025</div>
-                <div class="lp-mini-agency">Motorshow Tucumán · Tucumán</div>
-                <div class="lp-mini-commission"><i class="fa-solid fa-handshake"></i> Comisión: 1% sobre precio de venta</div>
-                <div class="lp-mini-specs"><span>1.000 km</span><span>Manual</span><span>Blanca</span></div>
-                <div class="lp-mini-btn"><i class="fa-solid fa-eye"></i> Ver detalle</div>
-              </div>
-            </div>
-            <div class="lp-mini-card">
-              <div class="lp-mini-photo">
-                <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=500&q=80" alt="Ford Ka 2025" loading="lazy">
-                <span class="lp-mini-badge">Ford</span>
-                <span class="lp-mini-pop"><i class="fa-solid fa-star"></i> Popular</span>
-              </div>
-              <div class="lp-mini-body">
-                <div class="lp-mini-price">ARS 37.000.000</div>
-                <div class="lp-mini-title">Ford Ka 2025</div>
-                <div class="lp-mini-agency">Exe Cars · Salta</div>
-                <div class="lp-mini-commission"><i class="fa-solid fa-handshake"></i> Comisión: 3% sobre precio de venta</div>
-                <div class="lp-mini-specs"><span>10.000 km</span><span>Automático</span><span>Marrón</span></div>
-                <div class="lp-mini-btn"><i class="fa-solid fa-eye"></i> Ver detalle</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="lp-explorar" style="max-width:1180px;margin:0 auto;">
+      <img src="assets/img-explorar-screenshot.jpg" alt="Vista real de Explorar la Red dentro del sistema" loading="lazy" style="width:100%;height:auto;display:block;">
     </div>
   </div>
 
