@@ -193,6 +193,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     font-size:13.5px;
     width:100%;
   }
+  /* Los <select> de filtro de mes/año viven dentro de contenedores flex sin ancho propio —
+     el width:100% de arriba dejaba que se achicaran hasta cortar el texto (ej. "Septieml"). */
+  .select-fecha{width:auto;flex-shrink:0;min-width:132px;}
+  .select-fecha[onchange*="Anio"]{min-width:88px;}
   textarea{resize:vertical;}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--red);}
   label{font-size:11.5px;color:var(--paper-dim);display:block;margin-bottom:5px;font-family:var(--font-mono);letter-spacing:.02em;}
@@ -4829,6 +4833,35 @@ function cicloPagoAgencia(registeredAtIso, ultimoPagoStr){
   return { inicioPeriodo, vencimiento };
 }
 // Estado de pago vigente de una agencia (a = objeto de ADMIN_AGENCIES, con registeredAt y ultimoPago)
+// Filtro de mes/año reutilizable para las secciones del admin con calendario (Pagos, Operaciones,
+// Matches, Ingresos) — un solo mecanismo compartido en vez de repetirlo 4 veces.
+const adminFiltroFechaMes = { pagos:'todos', operaciones:'todos', matches:'todos', ingresos:'todos' };
+const adminFiltroFechaAnio = { pagos:new Date().getFullYear(), operaciones:new Date().getFullYear(), matches:new Date().getFullYear(), ingresos:new Date().getFullYear() };
+function cambiarAdminFiltroMes(seccion, v){ adminFiltroFechaMes[seccion] = v; showAdmin(seccion); }
+function cambiarAdminFiltroAnio(seccion, v){ adminFiltroFechaAnio[seccion] = Number(v); showAdmin(seccion); }
+function enMesFiltroAdmin(seccion, fecha){
+  const mes = adminFiltroFechaMes[seccion];
+  if (mes === 'todos') return true;
+  if (!fecha) return false;
+  const d = new Date(fecha);
+  return (d.getMonth() + 1) === Number(mes) && d.getFullYear() === adminFiltroFechaAnio[seccion];
+}
+function adminFiltroBarHTML(seccion){
+  const anioActual = new Date().getFullYear();
+  const anios = [anioActual - 1, anioActual, anioActual + 1];
+  const mes = adminFiltroFechaMes[seccion];
+  return `
+  <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:16px;">
+    <select class="select-fecha" onchange="cambiarAdminFiltroMes('${seccion}', this.value)">
+      <option value="todos" ${mes==='todos'?'selected':''}>Todos los meses</option>
+      ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${mes===String(i+1)?'selected':''}>${m}</option>`).join('')}
+    </select>
+    <select class="select-fecha" onchange="cambiarAdminFiltroAnio('${seccion}', this.value)" ${mes==='todos'?'disabled':''}>
+      ${anios.map(a=>`<option value="${a}" ${adminFiltroFechaAnio[seccion]===a?'selected':''}>${a}</option>`).join('')}
+    </select>
+  </div>`;
+}
+
 function estadoPagoAgencia(a){
   const { inicioPeriodo, vencimiento } = cicloPagoAgencia(a.registeredAt, a.ultimoPago);
   const hoy = new Date(); hoy.setHours(0,0,0,0);
@@ -5311,8 +5344,11 @@ function ticketThreadHTML(t, side){
       ${cajaRespuesta}
     </div>`;
 }
-function verificadaBadgeHTML(verificada){
-  return verificada ? ` <span class="pill pill-verificada" title="Agencia verificada por Red de Autos"><i class="fa-solid fa-circle-check"></i> Verificada</span>` : '';
+function verificadaBadgeHTML(verificada, compact){
+  if (!verificada) return '';
+  return compact
+    ? ` <span class="pill pill-verificada" style="padding:3px 7px;" title="Agencia verificada por Red de Autos"><i class="fa-solid fa-circle-check"></i></span>`
+    : ` <span class="pill pill-verificada" title="Agencia verificada por Red de Autos"><i class="fa-solid fa-circle-check"></i> Verificada</span>`;
 }
 function adminStatusPill(status, label){
   const map = {
@@ -5347,12 +5383,19 @@ function reportWhatsappBtn(r){
   return `<a href="${url}" target="_blank" class="btn btn-sm whatsapp-btn" style="text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp</a>`;
 }
 function adminAgencyRowsHTML(list){
-  return list.length ? list.map(a=>`<tr><td style="color:var(--red);font-weight:700;">${a.name}${verificadaBadgeHTML(a.verificada)}</td><td>${a.city||'—'}</td><td>${a.tipo}</td><td>${a.plan}</td><td>${a.ops}</td><td>${adminStatusPill(a.status)}</td><td style="display:flex;gap:8px;flex-wrap:wrap;">
-    <button class="btn btn-sm btn-editar-violeta btn-hover-fill" onclick="openAgencyDetail('${a.id}')"><i class="fa-solid fa-eye"></i> Ver detalle</button>
-    <button class="btn btn-sm ${esc(a.verificada?'btn-eliminar-pastel':'whatsapp-btn')}" onclick="toggleVerificarAgencia('${a.id}', ${a.verificada})"><i class="fa-solid ${a.verificada?'fa-circle-minus':'fa-circle-check'}"></i> ${a.verificada?'Quitar verificación':'Verificar agencia'}</button>
-    <button class="btn btn-sm ${esc(a.status==='Pausado'?'whatsapp-btn':'btn-eliminar-pastel')}" onclick="toggleSuspenderAgencia('${a.id}', ${a.status==='Pausado'})"><i class="fa-solid ${a.status==='Pausado'?'fa-rotate-left':'fa-ban'}"></i> ${a.status==='Pausado'?'Reactivar':'Suspender'}</button>
-    <button class="btn btn-sm btn-eliminar-pastel" onclick="eliminarAgenciaAdmin('${a.id}','${(a.name||'').replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i> Eliminar</button>
-  </td></tr>`).join('') : `<tr><td colspan="7" class="empty-row">No se encontraron agencias con ese nombre.</td></tr>`;
+  const btnStyle = 'padding:5px 10px;font-size:11.5px;white-space:nowrap;';
+  return list.length ? list.map(a=>`<tr>
+    <td style="color:var(--red);font-weight:700;">${a.name}${verificadaBadgeHTML(a.verificada, true)}</td>
+    <td>${a.city||'—'}</td>
+    <td>${a.tipo}</td>
+    <td>${a.plan}</td>
+    <td>${a.ops}</td>
+    <td>${adminStatusPill(a.status)}</td>
+    <td><button class="btn btn-sm btn-editar-violeta btn-hover-fill" style="${btnStyle}" onclick="openAgencyDetail('${a.id}')"><i class="fa-solid fa-eye"></i> Ver detalle</button></td>
+    <td><button class="btn btn-sm ${esc(a.verificada?'btn-eliminar-pastel':'whatsapp-btn')}" style="${btnStyle}" onclick="toggleVerificarAgencia('${a.id}', ${a.verificada})"><i class="fa-solid ${a.verificada?'fa-circle-minus':'fa-circle-check'}"></i> ${a.verificada?'Quitar verificación':'Verificar agencia'}</button></td>
+    <td><button class="btn btn-sm ${esc(a.status==='Pausado'?'whatsapp-btn':'btn-eliminar-pastel')}" style="${btnStyle}" onclick="toggleSuspenderAgencia('${a.id}', ${a.status==='Pausado'})"><i class="fa-solid ${a.status==='Pausado'?'fa-rotate-left':'fa-ban'}"></i> ${a.status==='Pausado'?'Reactivar':'Suspender'}</button></td>
+    <td><button class="btn btn-sm btn-eliminar-pastel" style="${btnStyle}" onclick="eliminarAgenciaAdmin('${a.id}','${(a.name||'').replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i> Eliminar</button></td>
+  </tr>`).join('') : `<tr><td colspan="10" class="empty-row">No se encontraron agencias con ese nombre.</td></tr>`;
 }
 function filterAgencyTable(query){
   const q = query.trim().toLowerCase();
@@ -5775,7 +5818,7 @@ const adminRenderers = {
       </div>
     </div>
     <table>
-      <thead><tr><th>Agencia</th><th>Ciudad</th><th>Tipo</th><th>Plan</th><th>Operaciones</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr><th>Agencia</th><th>Ciudad</th><th>Tipo</th><th>Plan</th><th>Operaciones</th><th>Estado</th><th></th><th></th><th></th><th></th></tr></thead>
       <tbody id="agency-table-body">
         ${adminAgencyRowsHTML(ADMIN_AGENCIES)}
       </tbody>
@@ -5867,7 +5910,7 @@ const adminRenderers = {
     </table>
   `,
   operaciones: ()=>{
-    const ops = ADMIN_MATCHES.filter(m => m.estado === 'concretada' || m.estado === 'cancelada')
+    const ops = ADMIN_MATCHES.filter(m => (m.estado === 'concretada' || m.estado === 'cancelada') && enMesFiltroAdmin('operaciones', m.created_at))
       .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
     const concretadas = ops.filter(o => o.estado === 'concretada');
     const canceladas = ops.filter(o => o.estado === 'cancelada');
@@ -5880,6 +5923,7 @@ const adminRenderers = {
     const comisionesTxt = [comisionesArs ? fmtARS(comisionesArs) : null, comisionesUsd ? 'USD ' + Math.round(comisionesUsd).toLocaleString('es-AR') : null].filter(Boolean).join(' + ') || fmtARS(0);
     return `
     <div class="main-head"><div><h1>Operaciones</h1><p class="sub">Historial de todas las operaciones cerradas en la red — para tener registro ante cualquier disputa</p></div></div>
+    ${adminFiltroBarHTML('operaciones')}
     <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px;">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Concretadas</div><div class="val kpi-green">${concretadas.length}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-xmark"></i>Caídas</div><div class="val kpi-red">${canceladas.length}</div></div>
@@ -5912,7 +5956,7 @@ const adminRenderers = {
     // a Supabase) con nombres de campo que no existían en el esquema real (.status, .claimedAt,
     // matchFlowData(), AGENCY.name). Por eso siempre aparecía vacía. La reescribo sobre
     // ADMIN_MATCHES, que es la misma fuente de datos que ya usa correctamente "Operaciones".
-    const conEtapa = ADMIN_MATCHES.map(m => {
+    const conEtapa = ADMIN_MATCHES.filter(m => enMesFiltroAdmin('matches', m.created_at)).map(m => {
       let etapa = 'propuesta';
       if (m.estado === 'concretada') etapa = 'concretada';
       else if (m.estado === 'cancelada') etapa = 'cancelada';
@@ -5928,6 +5972,7 @@ const adminRenderers = {
     const ETAPA_LABELS = { propuesta: 'Comisión propuesta', contactado: 'Agencia contactada', visita: 'Visita agendada', concretada: 'Concretada', cancelada: 'Caída' };
     return `
     <div class="main-head"><div><h1>Matches</h1><p class="sub">Todos los cruces detectados en la red, en cualquier etapa del pipeline</p></div></div>
+    ${adminFiltroBarHTML('matches')}
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-link"></i>Matches totales</div><div class="val">${total}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-brands fa-whatsapp"></i>En seguimiento</div><div class="val">${enSeguimiento}</div></div>
@@ -5949,12 +5994,13 @@ const adminRenderers = {
   `;
   },
   ingresos: ()=>{
-    const verified = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
+    const verified = ADMIN_AGENCIES.filter(a=>a.status==='Activo' && enMesFiltroAdmin('ingresos', a.registeredAt));
     const proCount = verified.filter(a=>a.plan==='Pro').length;
     const premiumCount = verified.filter(a=>a.plan==='Premium').length;
     const mrrReal = proCount*190000 + premiumCount*390000;
     return `
     <div class="main-head"><div><h1>Ingresos</h1><p class="sub">Facturación por suscripciones de la red</p></div></div>
+    ${adminFiltroBarHTML('ingresos')}
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-arrows-rotate"></i>MRR</div><div class="val mono">${fmtARS(mrrReal)}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-sack-dollar"></i>Ingresos totales</div><div class="val mono">${fmtARS(mrrReal*6)}</div></div>
@@ -5968,17 +6014,18 @@ const adminRenderers = {
         ${verified.map(a=>`<tr><td>${a.name}</td><td>${a.plan}</td><td class="mono">${fmtARS(a.plan==='Pro'?190000:390000)}</td></tr>`).join('')}
       </tbody>
     </table>
-    <p style="font-size:12.5px;color:var(--ink);margin-top:14px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-bell" style="margin-top:2px;color:var(--red);"></i><span>MRR y el desglose por concesionaria se calculan en base a los planes reales asignados. "Ingresos totales" es un acumulado ilustrativo (6 meses de MRR), ya que el prototipo no lleva un historial de facturación real.</span></p>
+    <p style="font-size:12.5px;color:var(--ink);margin-top:14px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-bell" style="margin-top:2px;color:var(--red);"></i><span>MRR y el desglose por concesionaria se calculan en base a los planes reales asignados. "Ingresos totales" es un acumulado ilustrativo (6 meses de MRR), ya que el prototipo no lleva un historial de facturación real. El filtro de mes/año de arriba muestra las agencias dadas de alta en ese período — no una vista histórica real de lo facturado mes a mes, ya que eso todavía no se registra.</span></p>
   `;
   },
   pagos: ()=>{
     const activas = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
-    const filas = activas.map(a => ({ a, ...estadoPagoAgencia(a) })).sort((x,y)=>x.vencimiento - y.vencimiento);
+    const filas = activas.map(a => ({ a, ...estadoPagoAgencia(a) })).filter(f => enMesFiltroAdmin('pagos', f.vencimiento)).sort((x,y)=>x.vencimiento - y.vencimiento);
     const vencidas = filas.filter(f=>f.estado==='Vencido').length;
     const pendientes = filas.filter(f=>f.estado==='Pendiente').length;
     const pagadas = filas.filter(f=>f.estado==='Pagado').length;
     return `
     <div class="main-head"><div><h1>Pagos</h1><p class="sub">Vencimiento mensual de cada agencia y estado de pago de la suscripción</p></div></div>
+    ${adminFiltroBarHTML('pagos')}
     <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px;">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Pagadas este período</div><div class="val kpi-green">${pagadas}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-clock"></i>Pendientes</div><div class="val">${pendientes}</div></div>
@@ -6137,7 +6184,7 @@ async function cargarMisMatches(){
   if (!currentAgencia) { actualizarMatchPendienteBadge(); actualizarMatchDot(); return; }
   const { data, error } = await supa
     .from('matches')
-    .select('*, veh:vehiculo_id(marca,modelo,anio,precio,moneda,km,transmision,comision,agencia_id,fotos), bus:busqueda_id(marca,modelo,anio_desde,anio_hasta,precio_max,cliente_nombre,cliente_telefono), vend:agencia_vendedora(nombre,telefono,direccion,horarios,contacto,verificada), comp:agencia_compradora(nombre,telefono,direccion,horarios,contacto,verificada)')
+    .select('*, veh:vehiculo_id(marca,modelo,anio,precio,moneda,km,transmision,comision,agencia_id,fotos,color,combustible,es_gremio,precio_gremio), bus:busqueda_id(marca,modelo,anio_desde,anio_hasta,precio_max,cliente_nombre,cliente_telefono), vend:agencia_vendedora(nombre,telefono,direccion,horarios,contacto,verificada), comp:agencia_compradora(nombre,telefono,direccion,horarios,contacto,verificada)')
     .or(`agencia_vendedora.eq.${currentAgencia.id},agencia_compradora.eq.${currentAgencia.id}`)
     .order('created_at', { ascending: false });
   if (error) { console.error('cargarMisMatches:', error); toast('Error al cargar matches: ' + error.message); actualizarMatchPendienteBadge(); actualizarMatchDot(); return; }
@@ -6174,6 +6221,7 @@ async function cargarMisMatches(){
     return {
       id: m.id,
       vehiculoId: m.vehiculo_id,
+      vehiculoFull: veh,
       busquedaId: m.busqueda_id,
       vehiculo: [veh.marca, veh.modelo, veh.anio].filter(Boolean).join(' ') || '—',
       vehiculoMarcaModelo: [veh.marca, veh.modelo].filter(Boolean).join(' ') || '—',
@@ -6381,7 +6429,7 @@ function renderMatchSections(list, emptyMsg){
 }
 
 function matchCardHTML(m){
-  const verBtn = m.vehiculoId ? `<button class="btn btn-sm" onclick="openPropertyDetailReal('${m.vehiculoId}')"><i class="fa-solid fa-eye"></i> Ver vehículo</button>` : '';
+  const verBtn = m.vehiculoId ? `<button class="btn btn-sm" onclick="abrirVehiculoDeMatch('${m.id}')"><i class="fa-solid fa-eye"></i> Ver vehículo</button>` : '';
   const motivoHTML = m.estado === 'cancelada' && m.motivoCancelacion ? `<div style="font-size:12px;color:var(--paper-dim);">Motivo: ${m.motivoCancelacion}</div>` : '';
 
   let primaryActions = '';
@@ -7339,6 +7387,16 @@ function propertyCoords(p){
   const jitter = (hash/1000 - 0.5) * 0.05;
   return [base[0]+jitter, base[1]+jitter*1.3];
 }
+// A diferencia de Explorar la Red, acá no dependemos de que redStock esté cargado (no lo está al
+// mirar Mis Matches) — usamos el vehículo que el propio match ya trae consigo desde el join.
+function abrirVehiculoDeMatch(matchId){
+  const m = misMatchesReal.find(x => x.id === matchId);
+  if (!m || !m.vehiculoFull || !Object.keys(m.vehiculoFull).length) { toast('No se pudo cargar el detalle de este vehículo.'); return; }
+  const agenciaInfo = m.soyVendedor
+    ? currentAgencia
+    : { nombre: m.otraAgencia, telefono: m.otraAgenciaTel };
+  renderDetailModalReal({ ...m.vehiculoFull, id: m.vehiculoId, agencias: agenciaInfo });
+}
 function openPropertyDetailReal(vehiculoId){
   const v = redStock.find(x=>x.id===vehiculoId);
   if(!v) return;
@@ -7958,11 +8016,11 @@ function matchesFiltroBarHTML(){
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
     <button class="btn btn-solid" onclick="toggleMatchesLista()"><i class="fa-solid ${matchesListaOculta?'fa-eye':'fa-eye-slash'}"></i> ${matchesListaOculta?'Mostrar lista':'Ocultar lista'}</button>
     <div style="display:flex;gap:10px;">
-      <select onchange="cambiarMatchesFiltroMes(this.value)">
+      <select class="select-fecha" onchange="cambiarMatchesFiltroMes(this.value)">
         <option value="todos" ${matchesFiltroMes==='todos'?'selected':''}>Todos los meses</option>
         ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${matchesFiltroMes===String(i+1)?'selected':''}>${m}</option>`).join('')}
       </select>
-      <select onchange="cambiarMatchesFiltroAnio(this.value)" ${matchesFiltroMes==='todos'?'disabled':''}>
+      <select class="select-fecha" onchange="cambiarMatchesFiltroAnio(this.value)" ${matchesFiltroMes==='todos'?'disabled':''}>
         ${anios.map(a=>`<option value="${a}" ${matchesFiltroAnio===a?'selected':''}>${a}</option>`).join('')}
       </select>
     </div>
@@ -8000,11 +8058,11 @@ function comisionesFiltroBarHTML(){
   const anios = [anioActual - 1, anioActual, anioActual + 1];
   return `
   <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:6px;">
-    <select onchange="cambiarComisionesFiltroMes(this.value)">
+    <select class="select-fecha" onchange="cambiarComisionesFiltroMes(this.value)">
       <option value="todos" ${comisionesFiltroMes==='todos'?'selected':''}>Todos los meses</option>
       ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${comisionesFiltroMes===String(i+1)?'selected':''}>${m}</option>`).join('')}
     </select>
-    <select onchange="cambiarComisionesFiltroAnio(this.value)" ${comisionesFiltroMes==='todos'?'disabled':''}>
+    <select class="select-fecha" onchange="cambiarComisionesFiltroAnio(this.value)" ${comisionesFiltroMes==='todos'?'disabled':''}>
       ${anios.map(a=>`<option value="${a}" ${comisionesFiltroAnio===a?'selected':''}>${a}</option>`).join('')}
     </select>
   </div>`;
@@ -8017,11 +8075,11 @@ function matchesManualesFiltroBarHTML(){
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
     <button class="btn btn-solid" onclick="toggleMatchesManualesLista()"><i class="fa-solid ${matchesManualesListaOculta?'fa-eye':'fa-eye-slash'}"></i> ${matchesManualesListaOculta?'Mostrar lista':'Ocultar lista'}</button>
     <div style="display:flex;gap:10px;">
-      <select onchange="cambiarMatchesManualesFiltroMes(this.value)">
+      <select class="select-fecha" onchange="cambiarMatchesManualesFiltroMes(this.value)">
         <option value="todos" ${matchesManualesFiltroMes==='todos'?'selected':''}>Todos los meses</option>
         ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${matchesManualesFiltroMes===String(i+1)?'selected':''}>${m}</option>`).join('')}
       </select>
-      <select onchange="cambiarMatchesManualesFiltroAnio(this.value)" ${matchesManualesFiltroMes==='todos'?'disabled':''}>
+      <select class="select-fecha" onchange="cambiarMatchesManualesFiltroAnio(this.value)" ${matchesManualesFiltroMes==='todos'?'disabled':''}>
         ${anios.map(a=>`<option value="${a}" ${matchesManualesFiltroAnio===a?'selected':''}>${a}</option>`).join('')}
       </select>
     </div>
@@ -8146,10 +8204,10 @@ performance: ()=>{
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
       <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Resumen mensual</strong>
       <div style="display:flex;gap:10px;">
-        <select onchange="cambiarPerfMes(this.value)">
+        <select class="select-fecha" onchange="cambiarPerfMes(this.value)">
           ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${perfMes===i+1?'selected':''}>${m}</option>`).join('')}
         </select>
-        <select onchange="cambiarPerfAnio(this.value)">
+        <select class="select-fecha" onchange="cambiarPerfAnio(this.value)">
           ${aniosDisponibles.map(a=>`<option value="${a}" ${perfAnio===a?'selected':''}>${a}</option>`).join('')}
         </select>
       </div>
@@ -8215,7 +8273,7 @@ comisiones: ()=>{
       <td>${esc(m.comisionVehiculo || '—')}<br><span class="mono" style="color:var(--paper-dim);font-size:12px;">${esc(fmtMoney(m.comisionMonto, m.comisionMoneda))}</span></td>
       <td>
         ${m.comisionEstado === 'pagada'
-          ? `<span class="pill pill-sage">Pagada${m.comisionPagadaAt ? ' el ' + esc(fmtFechaHora(m.comisionPagadaAt)) : ''}</span>`
+          ? `<span class="pill pill-sage" style="white-space:nowrap;">Pagada${m.comisionPagadaAt ? ' el ' + esc(fmtFechaHora(m.comisionPagadaAt)) : ''}</span>`
           : (m.soyVendedor
               ? `<span class="pill">Pendiente</span> <button class="btn btn-sm btn-solid" onclick="registrarPagoComision('${m.id}')" style="margin-left:8px;">Registrar pago</button>`
               : `<span class="pill">Pendiente</span>`)
@@ -8229,7 +8287,8 @@ comisiones: ()=>{
       <strong>${esc(titulo)}</strong>
     </div>
     ${items.length ? `
-    <table>
+    <table class="comisiones-table" style="table-layout:fixed;">
+      <colgroup><col style="width:22%;"><col style="width:22%;"><col style="width:18%;"><col style="width:38%;"></colgroup>
       <thead><tr><th>Agencia</th><th>Vehículo</th><th>Comisión</th><th>Estado de cobro</th></tr></thead>
       <tbody>${items.map(filaHTML).join('')}</tbody>
     </table>` : `<div class="card"><p style="color:var(--paper-dim);margin:0;">No tenés comisiones ${titulo.toLowerCase()} por ahora.</p></div>`}
