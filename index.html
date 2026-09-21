@@ -1274,6 +1274,19 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .usr-quota-full-msg{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;line-height:1.6;color:#C62828;background:#fdf1f1;border:1px solid #f3caca;border-radius:10px;padding:12px 16px;margin-bottom:18px;}
   .usr-quota-full-msg i{margin-top:2px;flex-shrink:0;}
 
+  /* ---------------- Proveedores (grilla) ---------------- */
+  .prov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:28px;}
+  .prov-card{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s ease;}
+  .prov-card:hover{border-color:var(--line-strong);}
+  .prov-card-logo{width:46px;height:46px;border-radius:var(--radius);background:var(--ink-3);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--paper-dim);font-size:18px;flex-shrink:0;}
+  .prov-card-logo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .prov-card-name{font-weight:700;font-size:14.5px;color:var(--ink);line-height:1.3;}
+  .prov-card-rubro{font-size:11.5px;color:var(--paper-dim);margin-top:2px;}
+  .prov-card-desc{font-size:12px;color:var(--paper-dim);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .prov-card-badge{display:inline-flex;align-items:center;gap:5px;align-self:flex-start;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;}
+  .prov-card-actions{display:flex;flex-direction:column;gap:6px;margin-top:auto;padding-top:2px;}
+  .prov-card-actions .btn{width:100%;justify-content:center;display:inline-flex;align-items:center;gap:6px;}
+
 </style>
 </head>
 <body>
@@ -1749,11 +1762,39 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <h3>Bienvenido de vuelta</h3>
     <p class="sub">Ingresá con los datos de tu concesionaria para continuar.</p>
     <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="vos@concesionaria.com"></div>
-    <div class="field"><label>Contraseña</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="loginPassword" placeholder="••••••••">
+      <div style="text-align:right;margin-top:6px;"><a onclick="abrirRecuperarClave()" style="cursor:pointer;color:var(--paper-dim);text-decoration:underline;font-size:12px;">¿Olvidaste tu contraseña? Recuperar</a></div>
+    </div>
     <div id="loginError" class="hidden" style="color:#E2726B;font-size:12.5px;margin:-6px 0 14px;"></div>
     <button class="btn btn-solid" id="loginBtn" style="width:100%;" onclick="enterApp()">Ingresar al sistema</button>
     <div class="switch-link">¿Ya tenés un código? <a onclick="switchModal('activate')">Activalo acá</a></div>
     <div class="switch-link" style="margin-top:6px;">¿Todavía no sos parte de la red? <a onclick="pedirAccesoWhatsapp('codigo')">Pedí tu acceso por WhatsApp</a></div>
+  </div>
+</div>
+
+<div id="modal-recuperarclave" class="modal-backdrop hidden">
+  <div class="modal" style="position:relative;">
+    <button class="avatar-modal-close" onclick="closeModal('recuperarclave')"><i class="fa-solid fa-xmark"></i></button>
+    <h3>Recuperar contraseña</h3>
+    <p class="sub">Ingresá el email de tu concesionaria y te mandamos un enlace para elegir una nueva contraseña.</p>
+    <div class="field"><label>Email</label><input type="email" id="recuperarEmail" placeholder="vos@concesionaria.com"></div>
+    <div id="recuperarError" class="hidden" style="color:#E2726B;font-size:12.5px;margin:-6px 0 14px;"></div>
+    <div id="recuperarOk" class="hidden" style="color:#166534;font-size:12.5px;margin:-6px 0 14px;"></div>
+    <button class="btn btn-solid" id="recuperarBtn" style="width:100%;" onclick="enviarRecuperacionClave()">Enviar enlace</button>
+    <div class="switch-link">¿Te acordaste? <a onclick="switchModal('login')">Volver a ingresar</a></div>
+  </div>
+</div>
+
+<div id="modal-nuevaclave" class="modal-backdrop hidden">
+  <div class="modal" style="position:relative;">
+    <h3>Elegí tu nueva contraseña</h3>
+    <p class="sub">Este es el último paso para recuperar el acceso a tu cuenta.</p>
+    <div class="field"><label>Nueva contraseña</label><input type="password" id="nuevaClavePass" placeholder="••••••••"></div>
+    <div class="field"><label>Confirmar nueva contraseña</label><input type="password" id="nuevaClaveConfirm" placeholder="••••••••"></div>
+    <div id="nuevaClaveError" class="hidden" style="color:#E2726B;font-size:12.5px;margin:-6px 0 14px;"></div>
+    <button class="btn btn-solid" id="nuevaClaveBtn" style="width:100%;" onclick="confirmarNuevaClave()">Guardar contraseña</button>
   </div>
 </div>
 
@@ -1804,6 +1845,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   <div class="modal modal-wide">
     <h3 id="prov-modal-title">Agregar proveedor</h3>
     <input type="hidden" id="prov-id">
+    <div class="field">
+      <label>Logo</label>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div id="prov-logo-preview" style="width:52px;height:52px;border-radius:var(--radius);background:var(--ink-3);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--paper-dim);"><i class="fa-solid fa-shop"></i></div>
+        <input type="file" id="prov-logo-input" accept="image/*" onchange="handleProveedorLogoChange(event)">
+      </div>
+    </div>
     <div class="row-2">
       <div class="field"><label>Nombre</label><input id="prov-nombre" placeholder="Gomería Central"></div>
       <div class="field"><label>Rubro</label><input id="prov-rubro" list="prov-rubro-list" placeholder="Gomería"></div>
@@ -4990,6 +5038,75 @@ async function logout(){
   document.getElementById('view-landing').style.display='block';
 }
 
+/* ---------------- recuperar contraseña ---------------- */
+function abrirRecuperarClave(){
+  const emailActual = document.getElementById('loginEmail')?.value.trim();
+  switchModal('recuperarclave');
+  const emailInput = document.getElementById('recuperarEmail');
+  if (emailInput && emailActual) emailInput.value = emailActual;
+  document.getElementById('recuperarError')?.classList.add('hidden');
+  document.getElementById('recuperarOk')?.classList.add('hidden');
+}
+
+async function enviarRecuperacionClave(){
+  const email = document.getElementById('recuperarEmail')?.value.trim();
+  const errEl = document.getElementById('recuperarError');
+  const okEl = document.getElementById('recuperarOk');
+  const btn = document.getElementById('recuperarBtn');
+  errEl?.classList.add('hidden');
+  okEl?.classList.add('hidden');
+
+  if (!email) { if (errEl) { errEl.textContent = 'Ingresá tu email.'; errEl.classList.remove('hidden'); } return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+
+  // El link vuelve a esta misma página; supabase-js agrega el token de recuperación
+  // en la URL y dispara el evento PASSWORD_RECOVERY que abre el modal de nueva clave.
+  await supa.auth.resetPasswordForEmail(email.toLowerCase(), {
+    redirectTo: window.location.origin + window.location.pathname,
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Enviar enlace'; }
+  // Mensaje genérico a propósito, igual que en el login: no confirmamos ni negamos
+  // si ese email está registrado, para no filtrar qué concesionarias son clientes.
+  if (okEl) { okEl.textContent = 'Si ese email está registrado, te enviamos un enlace para recuperar tu contraseña. Revisá tu bandeja de entrada (y spam).'; okEl.classList.remove('hidden'); }
+}
+
+async function confirmarNuevaClave(){
+  const nueva = document.getElementById('nuevaClavePass')?.value;
+  const confirmar = document.getElementById('nuevaClaveConfirm')?.value;
+  const errEl = document.getElementById('nuevaClaveError');
+  const btn = document.getElementById('nuevaClaveBtn');
+  errEl?.classList.add('hidden');
+
+  if (!nueva || !confirmar) { if (errEl) { errEl.textContent = 'Completá los dos campos.'; errEl.classList.remove('hidden'); } return; }
+  if (nueva !== confirmar) { if (errEl) { errEl.textContent = 'Las contraseñas no coinciden.'; errEl.classList.remove('hidden'); } return; }
+  if (nueva.length < 6) { if (errEl) { errEl.textContent = 'La contraseña tiene que tener al menos 6 caracteres.'; errEl.classList.remove('hidden'); } return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+  const { error } = await supa.auth.updateUser({ password: nueva });
+  if (btn) { btn.disabled = false; btn.textContent = 'Guardar contraseña'; }
+
+  if (error) { if (errEl) { errEl.textContent = 'No se pudo actualizar la contraseña: ' + error.message; errEl.classList.remove('hidden'); } return; }
+
+  closeModal('nuevaclave');
+  await supa.auth.signOut();
+  toast('Contraseña actualizada. Ingresá con tu nueva contraseña.');
+  document.querySelectorAll('.modal-backdrop').forEach(m=>m.classList.add('hidden'));
+  document.getElementById('view-app').style.display='none';
+  document.getElementById('view-landing').style.display='block';
+  openModal('login');
+}
+
+// Cuando alguien hace clic en el enlace del mail de recuperación, Supabase detecta el
+// token en la URL y dispara este evento — ahí forzamos el modal de nueva contraseña,
+// sin depender de que restaurarSesion() ya haya corrido.
+supa.auth.onAuthStateChange((event) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    document.querySelectorAll('.modal-backdrop').forEach(m=>m.classList.add('hidden'));
+    openModal('nuevaclave');
+  }
+});
+
 /* ---------------- panel de administrador ---------------- */
 function daysSince(dateStr){ return Math.floor((new Date() - new Date(dateStr)) / (1000*60*60*24)); }
 function agenciesAtRisk(){ return ADMIN_AGENCIES.filter(a=>a.status==='Activo' && daysSince(a.registeredAt)>30 && a.ops===0); }
@@ -5601,6 +5718,17 @@ function proveedoresAdminRowsHTML(list){
   </tr>`;
   }).join('');
 }
+let proveedorLogoDataUrl = null;
+function handleProveedorLogoChange(event){
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    proveedorLogoDataUrl = e.target.result;
+    document.getElementById('prov-logo-preview').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+  };
+  reader.readAsDataURL(file);
+}
 function openNuevoProveedorModal(){
   document.getElementById('prov-id').value = '';
   document.getElementById('prov-modal-title').textContent = 'Agregar proveedor';
@@ -5611,6 +5739,9 @@ function openNuevoProveedorModal(){
   document.getElementById('prov-telefono').value = '';
   document.getElementById('prov-descripcion').value = '';
   document.getElementById('prov-plan').value = 'basico';
+  proveedorLogoDataUrl = null;
+  document.getElementById('prov-logo-input').value = '';
+  document.getElementById('prov-logo-preview').innerHTML = '<i class="fa-solid fa-shop"></i>';
   openModal('proveedor');
 }
 function editarProveedorAdmin(id){
@@ -5625,6 +5756,9 @@ function editarProveedorAdmin(id){
   document.getElementById('prov-telefono').value = p.telefono || '';
   document.getElementById('prov-descripcion').value = p.descripcion || '';
   document.getElementById('prov-plan').value = p.plan === 'destacado' ? 'destacado' : 'basico';
+  proveedorLogoDataUrl = null;
+  document.getElementById('prov-logo-input').value = '';
+  document.getElementById('prov-logo-preview').innerHTML = p.foto_url ? `<img src="${p.foto_url}" style="width:100%;height:100%;object-fit:cover;">` : '<i class="fa-solid fa-shop"></i>';
   openModal('proveedor');
 }
 async function guardarProveedorAdmin(){
@@ -5634,6 +5768,17 @@ async function guardarProveedorAdmin(){
   if (!nombre) { toast('Completá el nombre del proveedor.'); return; }
   if (!rubro) { toast('Completá el rubro.'); return; }
 
+  let foto_url = id ? (ADMIN_PROVEEDORES.find(x=>x.id===id)?.foto_url || null) : null;
+  if (proveedorLogoDataUrl) {
+    try {
+      const path = `proveedores-logos/${id || 'nuevo'}-${Date.now()}.jpg`;
+      foto_url = await supaUpload('red-de-autos', path, proveedorLogoDataUrl);
+    } catch (e) {
+      console.error('guardarProveedorAdmin (logo):', e);
+      toast('No se pudo subir el logo, se guardó el resto de los datos.');
+    }
+  }
+
   const payload = {
     nombre,
     rubro,
@@ -5642,6 +5787,7 @@ async function guardarProveedorAdmin(){
     telefono: document.getElementById('prov-telefono').value.trim() || null,
     descripcion: document.getElementById('prov-descripcion').value.trim() || null,
     plan: document.getElementById('prov-plan').value,
+    foto_url,
   };
 
   const btn = document.getElementById('proveedor-submit-btn');
@@ -5882,6 +6028,35 @@ async function openAgencyDetail(agencyId){
 function setAgencyDetailSlide(idx){
   if(agencyDetailSwiperInstance) agencyDetailSwiperInstance.slideTo(idx);
 }
+
+/* ---------------- filtro de mes/año reusable para pestañas del panel de admin ---------------- */
+let adminFiltroFecha = { pagos: 'todos', operaciones: 'todos', matches: 'todos', ingresos: 'todos' };
+let adminFiltroFechaAnio = { pagos: new Date().getFullYear(), operaciones: new Date().getFullYear(), matches: new Date().getFullYear(), ingresos: new Date().getFullYear() };
+function cambiarAdminFiltroMes(view, v){ adminFiltroFecha[view] = v; showAdmin(view); }
+function cambiarAdminFiltroAnio(view, v){ adminFiltroFechaAnio[view] = Number(v); showAdmin(view); }
+function enMesFiltroAdmin(view, fechaIso){
+  const mes = adminFiltroFecha[view];
+  if (mes === 'todos') return true;
+  if (!fechaIso) return false;
+  const d = new Date(fechaIso);
+  return (d.getMonth() + 1) === Number(mes) && d.getFullYear() === adminFiltroFechaAnio[view];
+}
+function adminFiltroFechaBarHTML(view){
+  const anioActual = new Date().getFullYear();
+  const anios = [anioActual - 1, anioActual, anioActual + 1];
+  const mes = adminFiltroFecha[view];
+  const anio = adminFiltroFechaAnio[view];
+  return `
+  <div class="mes-anio-picker" style="margin-bottom:16px;">
+    <select onchange="cambiarAdminFiltroMes('${view}', this.value)">
+      <option value="todos" ${mes==='todos'?'selected':''}>Todos los meses</option>
+      ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${mes===String(i+1)?'selected':''}>${m}</option>`).join('')}
+    </select>
+    <select onchange="cambiarAdminFiltroAnio('${view}', this.value)" ${mes==='todos'?'disabled':''}>
+      ${anios.map(a=>`<option value="${a}" ${anio===a?'selected':''}>${a}</option>`).join('')}
+    </select>
+  </div>`;
+}
 const adminRenderers = {
   dashboard: ()=>{
     const verifiedCount = ADMIN_AGENCIES.filter(a=>a.status==='Activo').length;
@@ -6055,7 +6230,7 @@ const adminRenderers = {
     </table>
   `,
   operaciones: ()=>{
-    const ops = ADMIN_MATCHES.filter(m => m.estado === 'concretada' || m.estado === 'cancelada')
+    const ops = ADMIN_MATCHES.filter(m => (m.estado === 'concretada' || m.estado === 'cancelada') && enMesFiltroAdmin('operaciones', m.created_at))
       .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
     const concretadas = ops.filter(o => o.estado === 'concretada');
     const canceladas = ops.filter(o => o.estado === 'cancelada');
@@ -6068,6 +6243,7 @@ const adminRenderers = {
     const comisionesTxt = [comisionesArs ? fmtARS(comisionesArs) : null, comisionesUsd ? 'USD ' + Math.round(comisionesUsd).toLocaleString('es-AR') : null].filter(Boolean).join(' + ') || fmtARS(0);
     return `
     <div class="main-head"><div><h1>Operaciones</h1><p class="sub">Historial de todas las operaciones cerradas en la red — para tener registro ante cualquier disputa</p></div></div>
+    ${adminFiltroFechaBarHTML('operaciones')}
     <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px;">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Concretadas</div><div class="val kpi-green">${concretadas.length}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-xmark"></i>Caídas</div><div class="val kpi-red">${canceladas.length}</div></div>
@@ -6100,7 +6276,7 @@ const adminRenderers = {
     // a Supabase) con nombres de campo que no existían en el esquema real (.status, .claimedAt,
     // matchFlowData(), AGENCY.name). Por eso siempre aparecía vacía. La reescribo sobre
     // ADMIN_MATCHES, que es la misma fuente de datos que ya usa correctamente "Operaciones".
-    const conEtapa = ADMIN_MATCHES.map(m => {
+    const conEtapa = ADMIN_MATCHES.filter(m => enMesFiltroAdmin('matches', m.created_at)).map(m => {
       let etapa = 'propuesta';
       if (m.estado === 'concretada') etapa = 'concretada';
       else if (m.estado === 'cancelada') etapa = 'cancelada';
@@ -6116,6 +6292,7 @@ const adminRenderers = {
     const ETAPA_LABELS = { propuesta: 'Comisión propuesta', contactado: 'Agencia contactada', visita: 'Visita agendada', concretada: 'Concretada', cancelada: 'Caída' };
     return `
     <div class="main-head"><div><h1>Matches</h1><p class="sub">Todos los cruces detectados en la red, en cualquier etapa del pipeline</p></div></div>
+    ${adminFiltroFechaBarHTML('matches')}
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-link"></i>Matches totales</div><div class="val">${total}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-brands fa-whatsapp"></i>En seguimiento</div><div class="val">${enSeguimiento}</div></div>
@@ -6137,12 +6314,15 @@ const adminRenderers = {
   `;
   },
   ingresos: ()=>{
-    const verified = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
+    const filtroActivo = adminFiltroFecha.ingresos !== 'todos';
+    const verified = ADMIN_AGENCIES.filter(a=>a.status==='Activo' && (!filtroActivo || enMesFiltroAdmin('ingresos', a.registeredAt)));
     const proCount = verified.filter(a=>a.plan==='Pro').length;
     const premiumCount = verified.filter(a=>a.plan==='Premium').length;
     const mrrReal = proCount*190000 + premiumCount*390000;
     return `
     <div class="main-head"><div><h1>Ingresos</h1><p class="sub">Facturación por suscripciones de la red</p></div></div>
+    ${adminFiltroFechaBarHTML('ingresos')}
+    ${filtroActivo ? `<p style="font-size:12.5px;color:var(--paper-dim);margin:-10px 0 16px;">Mostrando solo agencias dadas de alta en el período seleccionado.</p>` : ''}
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-arrows-rotate"></i>MRR</div><div class="val mono">${fmtARS(mrrReal)}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-sack-dollar"></i>Ingresos totales</div><div class="val mono">${fmtARS(mrrReal*6)}</div></div>
@@ -6161,12 +6341,15 @@ const adminRenderers = {
   },
   pagos: ()=>{
     const activas = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
-    const filas = activas.map(a => ({ a, ...estadoPagoAgencia(a) })).sort((x,y)=>x.vencimiento - y.vencimiento);
+    const filas = activas.map(a => ({ a, ...estadoPagoAgencia(a) }))
+      .filter(f => enMesFiltroAdmin('pagos', f.vencimiento))
+      .sort((x,y)=>x.vencimiento - y.vencimiento);
     const vencidas = filas.filter(f=>f.estado==='Vencido').length;
     const pendientes = filas.filter(f=>f.estado==='Pendiente').length;
     const pagadas = filas.filter(f=>f.estado==='Pagado').length;
     return `
     <div class="main-head"><div><h1>Pagos</h1><p class="sub">Vencimiento mensual de cada agencia y estado de pago de la suscripción</p></div></div>
+    ${adminFiltroFechaBarHTML('pagos')}
     <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px;">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Pagadas este período</div><div class="val kpi-green">${pagadas}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-clock"></i>Pendientes</div><div class="val">${pendientes}</div></div>
@@ -8025,29 +8208,46 @@ function verDescuentoProveedor(id){
   }
   openModal('descuentoproveedor');
 }
+// Ícono genérico por rubro, para cuando el proveedor todavía no tiene logo cargado.
+function proveedorRubroIcon(rubro){
+  const r = (rubro || '').toLowerCase();
+  if (r.includes('gomer')) return 'fa-solid fa-circle-dot';
+  if (r.includes('mecán') || r.includes('mecan')) return 'fa-solid fa-screwdriver-wrench';
+  if (r.includes('chapa') || r.includes('pintura')) return 'fa-solid fa-spray-can-sparkles';
+  if (r.includes('gestor')) return 'fa-solid fa-file-signature';
+  if (r.includes('seguro')) return 'fa-solid fa-shield-halved';
+  if (r.includes('repuesto')) return 'fa-solid fa-gears';
+  if (r.includes('merchandising')) return 'fa-solid fa-shirt';
+  if (r.includes('detailing') || r.includes('lavad')) return 'fa-solid fa-soap';
+  if (r.includes('polariz') || r.includes('vidrio')) return 'fa-solid fa-car-side';
+  return 'fa-solid fa-shop';
+}
 function proveedorCardHTML(p){
   const direccionTexto = [p.direccion, p.ciudad].filter(Boolean).join(', ');
   const mapsQuery = encodeURIComponent([p.direccion, p.ciudad, 'Argentina'].filter(Boolean).join(', '));
   const tieneDescuento = descuentoVigente(p);
+  const logoHTML = p.foto_url
+    ? `<img src="${esc(p.foto_url)}" alt="${esc(p.nombre)}">`
+    : `<i class="${proveedorRubroIcon(p.rubro)}"></i>`;
   const botonMapa = direccionTexto
-    ? `<a class="btn btn-sm" href="https://www.google.com/maps/search/?api=1&query=${esc(mapsQuery)}" target="_blank" onclick="registrarClicReal('proveedor','${p.id}','mapa')"><i class="fa-solid fa-location-dot"></i> Mapa</a>`
+    ? `<a class="btn btn-sm" href="https://www.google.com/maps/search/?api=1&query=${esc(mapsQuery)}" target="_blank" onclick="registrarClicReal('proveedor','${p.id}','mapa')"><i class="fa-solid fa-location-dot"></i> Ver mapa</a>`
     : '';
   const botonWhatsapp = p.telefono
     ? `<a class="btn btn-sm whatsapp-btn" style="text-decoration:none;" href="https://wa.me/${esc(p.telefono.replace(/\D/g,''))}" target="_blank" onclick="registrarClicReal('proveedor','${p.id}','whatsapp')"><i class="fa-brands fa-whatsapp"></i> Contactar</a>`
     : '';
   const botonDescuento = tieneDescuento
-    ? `<button class="btn btn-sm btn-solid" onclick="verDescuentoProveedor('${p.id}')"><i class="fa-solid fa-tag"></i> Descuentos</button>`
-    : `<button class="btn btn-sm" onclick="verDescuentoProveedor('${p.id}')"><i class="fa-solid fa-tag"></i> Descuentos</button>`;
+    ? `<button class="btn btn-sm btn-solid" onclick="verDescuentoProveedor('${p.id}')"><i class="fa-solid fa-tag"></i> Ver descuentos</button>`
+    : `<button class="btn btn-sm" onclick="verDescuentoProveedor('${p.id}')"><i class="fa-solid fa-tag"></i> Ver descuentos</button>`;
   return `
-  <div class="card" style="margin-bottom:12px;${tieneDescuento ? 'border-color:var(--red);' : ''}">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:200px;">
-        <div style="font-weight:700;font-size:14.5px;display:flex;align-items:center;gap:8px;">${esc(p.nombre)}${p.plan==='destacado'?'<span class="pill pill-sage"><i class="fa-solid fa-star"></i> Destacado</span>':''}${tieneDescuento?'<span class="pill" style="background:var(--red);color:#fff;border-color:var(--red);"><i class="fa-solid fa-tag"></i> Con descuento</span>':''}</div>
-        <div style="font-size:12.5px;color:var(--paper-dim);margin-top:2px;">${esc(direccionTexto || '—')}</div>
-        ${p.descripcion ? `<div style="font-size:12.5px;color:var(--ink);margin-top:6px;">${esc(p.descripcion)}</div>` : ''}
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">${botonMapa}${botonDescuento}${botonWhatsapp}</div>
+  <div class="prov-card">
+    <div class="prov-card-logo">${logoHTML}</div>
+    <div>
+      <div class="prov-card-name">${esc(p.nombre)}${p.plan==='destacado'?' <i class="fa-solid fa-star" style="color:var(--star);font-size:11px;" title="Destacado"></i>':''}</div>
+      <div class="prov-card-rubro">${esc(direccionTexto || '—')}</div>
     </div>
+    ${p.descripcion ? `<div class="prov-card-desc">${esc(p.descripcion)}</div>` : ''}
+    ${tieneDescuento ? `<span class="prov-card-badge"><i class="fa-solid fa-tag"></i> Con descuentos disponibles</span>` : ''}
+    <div class="prov-card-actions">${botonMapa}${botonWhatsapp}${botonDescuento}</div>
   </div>`;
 }
 function proveedoresListaHTML(){
@@ -8059,7 +8259,7 @@ function proveedoresListaHTML(){
   items.forEach(p => { (grupos[p.rubro] ||= []).push(p); });
   return Object.keys(grupos).sort((a,b)=>a.localeCompare(b,'es')).map(rubro => `
     <div class="match-section-title"><i class="fa-solid fa-tag"></i> ${esc(rubro)} <span class="match-section-count">${esc(grupos[rubro].length)}</span></div>
-    ${grupos[rubro].map(p=>proveedorCardHTML(p)).join('')}
+    <div class="prov-grid">${grupos[rubro].map(p=>proveedorCardHTML(p)).join('')}</div>
   `).join('');
 }
 function renderProveedoresListaReal(){
