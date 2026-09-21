@@ -193,12 +193,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     font-size:13.5px;
     width:100%;
   }
-  /* Los <select> de filtro de mes/año viven dentro de contenedores flex sin ancho propio —
-     el width:100% de arriba dejaba que se achicaran hasta cortar el texto (ej. "Septieml"). */
-  .select-fecha{width:auto;flex-shrink:0;min-width:132px;}
-  .select-fecha[onchange*="Anio"]{min-width:88px;}
   textarea{resize:vertical;}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--red);}
+  /* Selects de mes/año (Mis Matches, Matches Manuales, Performance): sin esto, el <select> de mes
+     y el de año se repartían el ancho del contenedor a la mitad cada uno y el texto largo
+     ("Septiembre") quedaba cortado. Acá cada uno mide según su contenido, no según el flex. */
+  .mes-anio-picker{display:flex;gap:10px;flex-wrap:wrap;}
+  .mes-anio-picker select{width:auto;min-width:150px;flex:0 0 auto;}
   label{font-size:11.5px;color:var(--paper-dim);display:block;margin-bottom:5px;font-family:var(--font-mono);letter-spacing:.02em;}
   .field{margin-bottom:14px;}
   .row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
@@ -475,68 +476,63 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .pipeline-step-v{display:flex;align-items:flex-start;gap:12px;position:relative;padding-bottom:22px;}
   .pipeline-step-v:last-child{padding-bottom:0;}
   .pipeline-dot-v{width:28px;height:28px;border-radius:50%;background:var(--ink-3);border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--paper-dim);flex-shrink:0;z-index:1;}
-  .pipeline-step-v.done .pipeline-dot-v{background:#6FBF73;border-color:#6FBF73;color:#FFFFFF;}
+  .pipeline-step-v.done .pipeline-dot-v{background:#4FBE82;border-color:#4FBE82;color:#FFFFFF;}
   .pipeline-step-v.current .pipeline-dot-v{background:#FFFFFF;border-color:var(--red);box-shadow:0 0 0 3px #FDEDED;color:var(--red);}
   .pipeline-label-v{font-size:13px;font-weight:700;color:var(--paper-dim);padding-top:5px;}
   .pipeline-step-v.done .pipeline-label-v,.pipeline-step-v.current .pipeline-label-v{color:var(--ink);}
-  .pipeline-line-v{position:absolute;left:12px;top:28px;bottom:-22px;width:4px;border-radius:999px;background:#4A7FC1;}
-  .pipeline-line-v::before,.pipeline-line-v::after{content:"";position:absolute;left:50%;width:9px;height:9px;border-radius:50%;background:#3968A5;transform:translateX(-50%);}
-  .pipeline-line-v::before{top:-4px;}
-  .pipeline-line-v::after{bottom:-4px;}
-  .pipeline-line-v.done{background:#6FBF73;}
-  .pipeline-line-v.done::before,.pipeline-line-v.done::after{background:#5AAD5E;}
+  .pipeline-line-v{position:absolute;left:13px;top:28px;bottom:-22px;width:2px;background:var(--line-strong);}
+  .pipeline-line-v.done{background:linear-gradient(to bottom,#4FBE82,var(--line-strong));}
   .pipeline-line.done{background:var(--red);}
   .pipeline-caida{color:#E2726B;font-weight:700;font-size:13px;padding-top:16px;margin-top:2px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;}
   .match-row{border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:20px;display:flex;flex-direction:column;gap:14px;background:#FFFFFF;box-shadow:0 3px 10px rgba(28,43,54,.06);}
   .match-vehicle-hero{display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--line);}
+  /* La foto del auto en la tarjeta de match se ve completa (sin recortar) en vez de "cover" */
+  .match-vehicle-hero .stock-thumb{background:var(--ink-3);padding:3px;}
+  .match-vehicle-hero .stock-thumb img{width:100%;height:100%;object-fit:contain;border-radius:1px;}
+  /* Toggle para elegir qué sección de matches ver — evita que se junten "busco" y "vendo" */
+  .match-filter-toggle{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 20px;}
+  .match-filter-btn{font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:20px;border:1px solid var(--line);background:#FFFFFF;color:var(--paper-dim);cursor:pointer;display:inline-flex;align-items:center;gap:7px;line-height:1.2;white-space:nowrap;appearance:none;-webkit-appearance:none;transition:all .15s ease;}
+  .match-filter-btn:hover{border-color:var(--red);color:var(--ink);}
+  .match-filter-btn.active{background:var(--red);border-color:var(--red);color:#FFFFFF;}
+  .match-filter-count{background:rgba(28,43,54,.1);color:inherit;font-size:11px;font-weight:800;padding:1px 7px;border-radius:10px;}
+  .match-filter-btn.active .match-filter-count{background:rgba(255,255,255,.28);}
   .match-vehicle-title{font-size:19px;font-weight:800;color:var(--ink);line-height:1.2;}
   .match-vehicle-sub{font-size:13.5px;color:var(--red-dark);font-weight:700;margin-top:3px;}
   .match-row-main{display:flex;flex-direction:column;gap:16px;}
   .match-flow{display:flex;align-items:center;width:100%;flex-wrap:wrap;gap:10px;}
   .flow-node{display:flex;align-items:center;gap:9px;flex-shrink:0;}
-  .flow-node .dot-icon{width:26px;height:26px;border-radius:50%;background:var(--ink-3);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid var(--line-strong);flex-shrink:0;}
+  .flow-node .dot-icon{width:26px;height:26px;border-radius:50%;background:var(--ink-3);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid var(--line-strong);flex-shrink:0;overflow:hidden;}
+  .flow-node .dot-icon img{width:100%;height:100%;object-fit:cover;display:block;}
+  .flow-node .dot-agency-fallback{background:var(--red);border-color:var(--red);color:#FFFFFF;font-weight:800;font-size:12px;}
   .flow-node .text strong{display:block;font-size:13.5px;color:var(--ink);line-height:1.3;}
   .flow-pill{display:inline-block;background:var(--red);color:#FFFFFF;font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;margin-bottom:8px;letter-spacing:.03em;text-transform:uppercase;box-shadow:0 2px 5px rgba(226,92,92,.35);}
   .flow-node .text strong.flow-my-agency{color:#E25C5C;}
   .flow-node .text span{display:block;font-size:11.5px;color:var(--paper-dim);margin-top:2px;line-height:1.3;max-width:180px;}
-  .flow-connector{flex:1;height:4px;border-radius:999px;background:#4A7FC1;min-width:26px;margin:0 16px;position:relative;}
-  .flow-connector::before,.flow-connector::after{content:"";position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:#3968A5;transform:translateY(-50%);}
-  .flow-connector::before{left:-4px;}
-  .flow-connector::after{right:-4px;}
+  .flow-connector{flex:1;height:3px;min-width:26px;margin:0 12px;position:relative;background:linear-gradient(to right,rgba(248,58,58,.12),var(--red));border-radius:2px;}
+  .flow-connector::after{content:'';position:absolute;right:-3px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 0 3px var(--ink-2);}
   .match-actions{display:flex;gap:8px;flex-wrap:wrap;width:100%;align-items:flex-start;}
+  .match-actions-pair{display:flex;gap:10px;}
+  .match-actions-pair .btn{flex:1 1 0;}
+  /* Fila de acciones: botones a la izquierda, mensajes de estado/espera apilados a la derecha */
+  .match-actions-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;width:100%;}
+  .match-actions-row .match-actions{flex:1 1 200px;width:auto;}
+  .notes-stack{display:flex;flex-direction:column;gap:7px;align-items:flex-end;text-align:right;flex:0 0 auto;max-width:260px;margin-left:auto;}
+  .notes-stack .waiting-note,.notes-stack .match-done-note{justify-content:flex-end;}
+  .info-pill{font-size:11.5px;font-weight:700;padding:6px 11px;border-radius:7px;display:inline-flex;align-items:center;gap:6px;line-height:1.3;}
+  .info-pill.sage{background:var(--sage-bg,#EAF3EB);color:#3F7A46;}
+  .info-pill.violet{background:#F1E9F5;color:#8A5A9E;}
+  .btn-interes{background:#8A5A9E;border-color:#8A5A9E;color:#FFFFFF;}
+  .btn-interes:hover{background:#744A87;border-color:#744A87;color:#FFFFFF;}
+  .interes-options{display:flex;flex-direction:column;gap:8px;margin:4px 0 10px;}
+  .interes-opt{font-family:inherit;text-align:left;font-size:13.5px;font-weight:700;padding:11px 14px;border:1.5px solid var(--line-strong);border-radius:8px;background:var(--bg,#FBFAF7);color:var(--ink);cursor:pointer;transition:all .12s ease;}
+  .interes-opt:hover{border-color:#8A5A9E;background:#F6F1F8;}
+  .interes-confirm-msg{font-size:13px;color:var(--ink);background:var(--sage-bg,#EAF3EB);border-radius:8px;padding:12px 14px;line-height:1.5;margin-bottom:10px;}
+  /* Link "ver vehículo" bajo el nombre de la agencia que tiene el auto, en el diagrama lateral */
+  .see-vehicle-link{font-size:11px;font-weight:700;color:var(--red);text-decoration:underline;cursor:pointer;display:inline-block;margin-top:2px;}
+  .see-vehicle-link:hover{color:var(--red-dark);}
   .match-done-note{color:#3F7A46;font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;}
   .match-claim-note{font-size:11px;color:var(--paper-dim);display:flex;align-items:center;gap:6px;margin-bottom:2px;}
   .match-section-title{font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:9px;margin:28px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--line-strong);}
-  .profile-layout{display:flex;gap:24px;align-items:flex-start;}
-  .profile-nav{width:210px;flex-shrink:0;display:flex;flex-direction:column;gap:2px;position:sticky;top:20px;}
-  .profile-nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-family:var(--font-body);
-    font-size:13.5px;font-weight:600;color:var(--paper-dim);cursor:pointer;border:none;background:transparent;text-align:left;width:100%;}
-  .profile-nav-item:hover{background:var(--ink-3);}
-  .profile-nav-item.active{background:#FDEDED;color:var(--red-dark);}
-  .profile-nav-item i{width:18px;text-align:center;font-size:14.5px;}
-  .profile-content{flex:1;min-width:0;}
-  .profile-pane{display:none;}
-  .profile-pane.active{display:block;}
-  .profile-pane-title{font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--ink);margin:0 0 4px;}
-  .profile-pane-sub{font-size:13px;color:var(--paper-dim);margin:0 0 22px;max-width:560px;line-height:1.5;}
-  @media (max-width:860px){
-    .profile-layout{flex-direction:column;}
-    .profile-nav{width:100%;flex-direction:row;overflow-x:auto;gap:6px;position:static;padding-bottom:4px;}
-    .profile-nav-item{white-space:nowrap;}
-  }
-  .provider-card-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));gap:14px;margin-bottom:8px;}
-  .provider-card{display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid var(--line);border-radius:16px;padding:18px;}
-  .provider-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-  .provider-card-avatar{width:48px;height:48px;border-radius:12px;background:var(--ink-3);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:var(--red);flex-shrink:0;overflow:hidden;}
-  .provider-card-name{font-weight:700;font-size:15px;color:var(--ink);}
-  .provider-card-rubro{font-size:12px;color:var(--paper-dim);margin-top:2px;}
-  .provider-card-addr{font-size:12px;color:var(--paper-dim);margin-top:8px;}
-  .provider-card-desc{font-size:12px;color:var(--ink);margin-top:6px;}
-  .provider-card-discount-badge{display:inline-flex;align-items:center;gap:5px;background:#FDEDED;color:var(--red-dark);border:none;
-    font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;margin-top:10px;cursor:pointer;font-family:var(--font-body);}
-  .provider-card-discount-badge:hover{background:#FADCDC;}
-  .provider-card-actions{display:flex;flex-direction:column;gap:6px;margin-top:auto;padding-top:2px;box-sizing:border-box;}
-  .provider-card-btn{box-sizing:border-box;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;}
   .match-section-title:first-child{margin-top:0;}
   .match-section-title i{color:var(--red);}
   .match-section-count{background:var(--ink-3);color:var(--paper-dim);font-size:12px;font-weight:700;padding:2px 9px;border-radius:10px;margin-left:auto;}
@@ -849,8 +845,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .notif-text{font-size:12.5px;color:var(--paper-dim);margin-top:3px;line-height:1.4;}
   .notif-date{font-size:10.5px;color:var(--paper-dim);margin-top:6px;}
 
-  .view-toggle{display:flex;gap:8px;margin-bottom:22px;}
-  .view-toggle-btn{padding:9px 18px;border-radius:20px;border:1px solid var(--line-strong);font-size:12.5px;font-weight:700;color:var(--paper-dim);cursor:pointer;background:#FFFFFF;font-family:var(--font-body);}
+  .view-toggle{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;align-items:center;}
+  .view-toggle-btn{padding:9px 18px;border-radius:20px;border:1px solid var(--line-strong);font-size:12.5px;font-weight:700;color:var(--paper-dim);cursor:pointer;background:#FFFFFF;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px;line-height:1.2;white-space:nowrap;appearance:none;-webkit-appearance:none;}
   .view-toggle-btn:hover{border-color:var(--red);color:var(--red);}
   .view-toggle-btn.active{background:var(--red);color:#FFFFFF;border-color:var(--red);}
 
@@ -1238,9 +1234,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .lp-feature-text h2,.lp-scale h2,.lp-why-head h2,.lp-faq-head h2,.lp-steps-title{font-size:26px;}
   }
 
-  .dolar-banner{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:8px;background:#4A7FC1;margin-bottom:12px;font-size:12px;}
-  .dolar-banner .dolar-valor{font-weight:600;font-size:13.5px;color:#B9F2B4;}
-  .dolar-banner .dolar-fuente{font-size:10.5px;color:#B9F2B4;}
+  .dolar-banner{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:8px;background:var(--bg-soft,#f5f4f0);margin-bottom:12px;font-size:12px;}
+  .dolar-banner .dolar-valor{font-weight:600;font-size:13.5px;color:var(--ink);}
+  .dolar-banner .dolar-fuente{font-size:10.5px;color:var(--paper-dim);}
   .agencyprofile-header{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
   .agencyprofile-fotos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px;}
   .agencyprofile-foto-item{width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--bg-soft,#f5f4f0);}
@@ -1292,7 +1288,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <h1 class="hero-dark-title" id="hero-dark-title" data-plain="La red de concesionarias que " data-em="cruza stock" data-suffix=" y cierra operaciones."></h1>
       <p class="hero-dark-lead">Conectamos concesionarias del NOA para que ningún vehículo ni ningún cliente se quede sin encontrar su match — y para que la comisión por colaborar quede clara desde el primer día.</p>
       <div class="hero-dark-actions">
-        <button class="btn btn-solid" onclick="openModal('activate')">Solicitar acceso →</button>
+        <button class="btn btn-solid" onclick="pedirAccesoWhatsapp('hero')">Solicitar acceso →</button>
         <button class="btn btn-on-dark" onclick="scrollToSection('como-funciona')">Cómo funciona</button>
       </div>
     </div>
@@ -1363,7 +1359,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <p style="margin-bottom:18px;">La sección La Red está buscando es el espejo del marketplace: ves en tiempo real qué autos están pidiendo los clientes de otras agencias. Si tenés ese vehículo en tu lote, vos sos quien sale a ofrecerlo — y cobrás la comisión por traer la solución.</p>
       <p>Además la pestaña de Oportunidades Exclusivas son oportunidades en el que se te notifica con un aviso destacado cuando otra agencia publica stock a precio especial que coincide con lo que buscás.</p>
       <div class="lp-feature-actions" style="margin-top:28px;">
-        <button class="btn btn-solid" onclick="openModal('activate')">Unirme a la Red</button>
+        <button class="btn btn-solid" onclick="pedirAccesoWhatsapp('hero')">Unirme a la Red</button>
         <button class="btn" onclick="scrollToSection('precios')">Consultar planes</button>
       </div>
     </div>
@@ -1479,7 +1475,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Contacto interno con todas las agencias</span></li>
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Contacto con proveedores internos</span></li>
         </ul>
-        <button class="btn mt-8 w-full" onclick="openModal('activate')">Consultar este plan</button>
+        <button class="btn mt-8 w-full" onclick="pedirAccesoWhatsapp('pro')">Consultar este plan</button>
       </div>
 
       <div class="relative rounded-2xl border-2 border-red bg-white p-8 flex flex-col">
@@ -1496,7 +1492,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Contacto con proveedores internos</span></li>
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Soporte prioritario</span></li>
         </ul>
-        <button class="btn btn-solid mt-8 w-full" onclick="openModal('activate')">Consultar este plan</button>
+        <button class="btn btn-solid mt-8 w-full" onclick="pedirAccesoWhatsapp('premium')">Consultar este plan</button>
       </div>
     </div>
   </div>
@@ -1764,7 +1760,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="field"><label>Contraseña</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
     <div id="loginError" class="hidden" style="color:#E2726B;font-size:12.5px;margin:-6px 0 14px;"></div>
     <button class="btn btn-solid" id="loginBtn" style="width:100%;" onclick="enterApp()">Ingresar al sistema</button>
-    <div class="switch-link">¿No tenés cuenta? <a onclick="switchModal('activate')">Activar código</a></div>
+    <div class="switch-link">¿Ya tenés un código? <a onclick="switchModal('activate')">Activalo acá</a></div>
+    <div class="switch-link" style="margin-top:6px;">¿Todavía no sos parte de la red? <a onclick="pedirAccesoWhatsapp('codigo')">Pedí tu acceso por WhatsApp</a></div>
   </div>
 </div>
 
@@ -1815,15 +1812,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   <div class="modal modal-wide">
     <h3 id="prov-modal-title">Agregar proveedor</h3>
     <input type="hidden" id="prov-id">
-    <input type="hidden" id="prov-foto-url">
-    <div class="profile-logo-row" style="margin-bottom:18px;">
-      <div class="profile-logo-preview" id="prov-foto-preview"><i class="fa-solid fa-shop"></i></div>
-      <div>
-        <input type="file" id="prov-foto-upload" accept="image/*" style="display:none;" onchange="handleProveedorFotoUpload(event)">
-        <button class="btn btn-sm" type="button" onclick="document.getElementById('prov-foto-upload').click()"><i class="fa-solid fa-upload"></i> Subir foto del local</button>
-        <p style="font-size:11.5px;color:var(--paper-dim);margin:8px 0 0;">Se muestra como portada de la tarjeta en el directorio de Proveedores.</p>
-      </div>
-    </div>
     <div class="row-2">
       <div class="field"><label>Nombre</label><input id="prov-nombre" placeholder="Gomería Central"></div>
       <div class="field"><label>Rubro</label><input id="prov-rubro" list="prov-rubro-list" placeholder="Gomería"></div>
@@ -1906,6 +1894,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <button class="avatar-modal-close" onclick="closeModal('activate')"><i class="fa-solid fa-xmark"></i></button>
     <h3>Activar código de acceso</h3>
     <p class="sub">Completá los datos de tu concesionaria para unirte a la red. Necesitás un código de invitación.</p>
+    <p class="sub" style="margin-top:-8px;">¿No tenés código? <a onclick="pedirAccesoWhatsapp('codigo')" style="cursor:pointer;color:var(--red);font-weight:600;">Pedilo por WhatsApp</a> y te lo damos nosotros.</p>
     <div class="step-dots"><span id="dot1" class="active"></span><span id="dot2"></span><span id="dot3"></span></div>
 
     <div id="act-step-1">
@@ -1925,7 +1914,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <div class="field"><label>Apellido *</label><input id="act-fapellido" placeholder="Apellido"></div>
       </div>
       <div class="field"><label>Cargo en la concesionaria *</label>
-        <select id="act-cargo"><option>Seleccioná tu cargo...</option><option>Dueño / Socio</option><option>Martillero / Corredor</option><option>Gerente Comercial</option><option>Asesor Inmobiliario</option><option>Administrador</option><option>Otro</option></select>
+        <select id="act-cargo"><option>Seleccioná tu cargo...</option><option>Dueño / Socio</option><option>Gerente General</option><option>Gerente Comercial</option><option>Gerente de Ventas</option><option>Gerente de Usados</option><option>Vendedor</option><option>Administrativo</option><option>Otro</option></select>
       </div>
       <div class="field"><label>Teléfono / WhatsApp *</label><input id="act-telefono" placeholder="+54 9 ..."></div>
       <div class="field"><label>Email *</label><input id="act-email" placeholder="vos@concesionaria.com"></div>
@@ -2242,6 +2231,37 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="modal-close-row">
       <button class="btn" onclick="closeModal('cerrarmatch')">Cancelar</button>
       <button class="btn btn-solid" onclick="confirmarCerrarMatch()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-agendarvisita" class="modal-backdrop hidden">
+  <div class="modal">
+    <h3>Agendar visita</h3>
+    <p class="sub">Proponele a la otra agencia al menos 3 días estimativos para que tu cliente visite el vehículo. Ellos van a confirmar cuál les queda mejor.</p>
+    <div id="agendarvisita-fechas"></div>
+    <button type="button" class="btn" style="align-self:flex-start;margin-top:4px;" onclick="agregarFechaVisitaInput()"><i class="fa-solid fa-plus"></i> Agregar otro día</button>
+    <p id="agendarvisita-hint" style="color:var(--red);font-size:12.5px;margin:8px 0 0;"></p>
+    <div class="modal-close-row">
+      <button class="btn" onclick="closeModal('agendarvisita')">Cancelar</button>
+      <button class="btn btn-solid" onclick="confirmarAgendarVisita()">Enviar propuesta</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-interes" class="modal-backdrop hidden">
+  <div class="modal">
+    <h3>¿Interesa el auto?</h3>
+    <p class="sub">Contale a la otra agencia (y quedará registrado en el match) qué pasó después de la visita.</p>
+    <div class="interes-options" id="interes-options">
+      <button type="button" class="interes-opt" onclick="elegirInteres('si')"><i class="fa-solid fa-circle-check"></i> Sí, compro ya</button>
+      <button type="button" class="interes-opt" onclick="elegirInteres('no')"><i class="fa-solid fa-circle-xmark"></i> No</button>
+      <button type="button" class="interes-opt" onclick="elegirInteres('reserva')"><i class="fa-solid fa-lock"></i> Reserva de unidad</button>
+      <button type="button" class="interes-opt" onclick="elegirInteres('credito')"><i class="fa-solid fa-building-columns"></i> Crédito</button>
+      <button type="button" class="interes-opt" onclick="elegirInteres('espera')"><i class="fa-solid fa-sack-dollar"></i> Espera capital</button>
+    </div>
+    <div class="modal-close-row">
+      <button class="btn" onclick="closeModal('interes')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -2639,6 +2659,13 @@ function esc(v){
   return String(v).replace(/[&<>"']/g, c => (
     { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]
   ));
+}
+// Avatar circular de una agencia para el diagrama de matches: el logo real si lo cargó,
+// o un círculo rojo con la inicial del nombre si todavía no tiene uno.
+function agencyAvatarHTML(nombre, logoUrl){
+  if (logoUrl) return `<span class="dot-icon"><img src="${esc(logoUrl)}" alt="${esc(nombre || '')}"></span>`;
+  const inicial = (nombre || '?').trim().charAt(0).toUpperCase() || '?';
+  return `<span class="dot-icon dot-agency-fallback">${esc(inicial)}</span>`;
 }
 
 /* Para texto que cae DENTRO de un atributo onclick/onchange: código JS que a su
@@ -4527,6 +4554,24 @@ function listingCardReal(v, esAdminView=false){
 
 /* ---------------- modal helpers ---------------- */
 function openModal(name){document.getElementById('modal-'+name).classList.remove('hidden');}
+
+/* ---------------- contacto comercial (prospectos) ----------------
+   Todos los CTAs comerciales de la landing terminan acá. Antes abrían el modal
+   de activación, que exige un código que el prospecto todavía no tiene: el que
+   no estaba invitado no podía dejar sus datos por ningún lado.
+   El número va en una sola constante para no tener que buscarlo por el archivo. */
+const WHATSAPP_RDA = '5493816335234';
+const MENSAJES_ACCESO = {
+  hero:    'Hola! Vi Red de Autos y quiero sumar mi agencia a la red. ¿Cómo hago para acceder?',
+  demo:    'Hola! Quiero ver una demo de Red de Autos para mi agencia.',
+  pro:     'Hola! Me interesa el Plan Pro de Red de Autos. ¿Me cuentan cómo sigo?',
+  premium: 'Hola! Me interesa el Plan Premium de Red de Autos. ¿Me cuentan cómo sigo?',
+  codigo:  'Hola! Quiero unirme a Red de Autos pero todavía no tengo código de invitación. ¿Me lo pueden dar?',
+};
+function pedirAccesoWhatsapp(origen){
+  const msg = MENSAJES_ACCESO[origen] || MENSAJES_ACCESO.hero;
+  window.open(`https://wa.me/${WHATSAPP_RDA}?text=${encodeURIComponent(msg)}`, '_blank');
+}
 function openKpiInfo(titulo, texto){
   document.getElementById('kpiinfo-titulo').textContent = titulo;
   document.getElementById('kpiinfo-texto').textContent = texto;
@@ -4833,35 +4878,6 @@ function cicloPagoAgencia(registeredAtIso, ultimoPagoStr){
   return { inicioPeriodo, vencimiento };
 }
 // Estado de pago vigente de una agencia (a = objeto de ADMIN_AGENCIES, con registeredAt y ultimoPago)
-// Filtro de mes/año reutilizable para las secciones del admin con calendario (Pagos, Operaciones,
-// Matches, Ingresos) — un solo mecanismo compartido en vez de repetirlo 4 veces.
-const adminFiltroFechaMes = { pagos:'todos', operaciones:'todos', matches:'todos', ingresos:'todos' };
-const adminFiltroFechaAnio = { pagos:new Date().getFullYear(), operaciones:new Date().getFullYear(), matches:new Date().getFullYear(), ingresos:new Date().getFullYear() };
-function cambiarAdminFiltroMes(seccion, v){ adminFiltroFechaMes[seccion] = v; showAdmin(seccion); }
-function cambiarAdminFiltroAnio(seccion, v){ adminFiltroFechaAnio[seccion] = Number(v); showAdmin(seccion); }
-function enMesFiltroAdmin(seccion, fecha){
-  const mes = adminFiltroFechaMes[seccion];
-  if (mes === 'todos') return true;
-  if (!fecha) return false;
-  const d = new Date(fecha);
-  return (d.getMonth() + 1) === Number(mes) && d.getFullYear() === adminFiltroFechaAnio[seccion];
-}
-function adminFiltroBarHTML(seccion){
-  const anioActual = new Date().getFullYear();
-  const anios = [anioActual - 1, anioActual, anioActual + 1];
-  const mes = adminFiltroFechaMes[seccion];
-  return `
-  <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:16px;">
-    <select class="select-fecha" onchange="cambiarAdminFiltroMes('${seccion}', this.value)">
-      <option value="todos" ${mes==='todos'?'selected':''}>Todos los meses</option>
-      ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${mes===String(i+1)?'selected':''}>${m}</option>`).join('')}
-    </select>
-    <select class="select-fecha" onchange="cambiarAdminFiltroAnio('${seccion}', this.value)" ${mes==='todos'?'disabled':''}>
-      ${anios.map(a=>`<option value="${a}" ${adminFiltroFechaAnio[seccion]===a?'selected':''}>${a}</option>`).join('')}
-    </select>
-  </div>`;
-}
-
 function estadoPagoAgencia(a){
   const { inicioPeriodo, vencimiento } = cicloPagoAgencia(a.registeredAt, a.ultimoPago);
   const hoy = new Date(); hoy.setHours(0,0,0,0);
@@ -5344,11 +5360,8 @@ function ticketThreadHTML(t, side){
       ${cajaRespuesta}
     </div>`;
 }
-function verificadaBadgeHTML(verificada, compact){
-  if (!verificada) return '';
-  return compact
-    ? ` <span class="pill pill-verificada" style="padding:3px 7px;" title="Agencia verificada por Red de Autos"><i class="fa-solid fa-circle-check"></i></span>`
-    : ` <span class="pill pill-verificada" title="Agencia verificada por Red de Autos"><i class="fa-solid fa-circle-check"></i> Verificada</span>`;
+function verificadaBadgeHTML(verificada){
+  return verificada ? ` <span class="pill pill-verificada" title="Agencia verificada por Red de Autos"><i class="fa-solid fa-circle-check"></i> Verificada</span>` : '';
 }
 function adminStatusPill(status, label){
   const map = {
@@ -5383,19 +5396,12 @@ function reportWhatsappBtn(r){
   return `<a href="${url}" target="_blank" class="btn btn-sm whatsapp-btn" style="text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp</a>`;
 }
 function adminAgencyRowsHTML(list){
-  const btnStyle = 'padding:5px 10px;font-size:11.5px;white-space:nowrap;';
-  return list.length ? list.map(a=>`<tr>
-    <td style="color:var(--red);font-weight:700;">${a.name}${verificadaBadgeHTML(a.verificada, true)}</td>
-    <td>${a.city||'—'}</td>
-    <td>${a.tipo}</td>
-    <td>${a.plan}</td>
-    <td>${a.ops}</td>
-    <td>${adminStatusPill(a.status)}</td>
-    <td><button class="btn btn-sm btn-editar-violeta btn-hover-fill" style="${btnStyle}" onclick="openAgencyDetail('${a.id}')"><i class="fa-solid fa-eye"></i> Ver detalle</button></td>
-    <td><button class="btn btn-sm ${esc(a.verificada?'btn-eliminar-pastel':'whatsapp-btn')}" style="${btnStyle}" onclick="toggleVerificarAgencia('${a.id}', ${a.verificada})"><i class="fa-solid ${a.verificada?'fa-circle-minus':'fa-circle-check'}"></i> ${a.verificada?'Quitar verificación':'Verificar agencia'}</button></td>
-    <td><button class="btn btn-sm ${esc(a.status==='Pausado'?'whatsapp-btn':'btn-eliminar-pastel')}" style="${btnStyle}" onclick="toggleSuspenderAgencia('${a.id}', ${a.status==='Pausado'})"><i class="fa-solid ${a.status==='Pausado'?'fa-rotate-left':'fa-ban'}"></i> ${a.status==='Pausado'?'Reactivar':'Suspender'}</button></td>
-    <td><button class="btn btn-sm btn-eliminar-pastel" style="${btnStyle}" onclick="eliminarAgenciaAdmin('${a.id}','${(a.name||'').replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i> Eliminar</button></td>
-  </tr>`).join('') : `<tr><td colspan="10" class="empty-row">No se encontraron agencias con ese nombre.</td></tr>`;
+  return list.length ? list.map(a=>`<tr><td style="color:var(--red);font-weight:700;">${a.name}${verificadaBadgeHTML(a.verificada)}</td><td>${a.city||'—'}</td><td>${a.tipo}</td><td>${a.plan}</td><td>${a.ops}</td><td>${adminStatusPill(a.status)}</td><td style="display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-sm btn-editar-violeta btn-hover-fill" onclick="openAgencyDetail('${a.id}')"><i class="fa-solid fa-eye"></i> Ver detalle</button>
+    <button class="btn btn-sm ${esc(a.verificada?'btn-eliminar-pastel':'whatsapp-btn')}" onclick="toggleVerificarAgencia('${a.id}', ${a.verificada})"><i class="fa-solid ${a.verificada?'fa-circle-minus':'fa-circle-check'}"></i> ${a.verificada?'Quitar verificación':'Verificar agencia'}</button>
+    <button class="btn btn-sm ${esc(a.status==='Pausado'?'whatsapp-btn':'btn-eliminar-pastel')}" onclick="toggleSuspenderAgencia('${a.id}', ${a.status==='Pausado'})"><i class="fa-solid ${a.status==='Pausado'?'fa-rotate-left':'fa-ban'}"></i> ${a.status==='Pausado'?'Reactivar':'Suspender'}</button>
+    <button class="btn btn-sm btn-eliminar-pastel" onclick="eliminarAgenciaAdmin('${a.id}','${(a.name||'').replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i> Eliminar</button>
+  </td></tr>`).join('') : `<tr><td colspan="7" class="empty-row">No se encontraron agencias con ese nombre.</td></tr>`;
 }
 function filterAgencyTable(query){
   const q = query.trim().toLowerCase();
@@ -5453,8 +5459,6 @@ function proveedoresAdminRowsHTML(list){
 }
 function openNuevoProveedorModal(){
   document.getElementById('prov-id').value = '';
-  document.getElementById('prov-foto-url').value = '';
-  document.getElementById('prov-foto-preview').innerHTML = '<i class="fa-solid fa-shop"></i>';
   document.getElementById('prov-modal-title').textContent = 'Agregar proveedor';
   document.getElementById('prov-nombre').value = '';
   document.getElementById('prov-rubro').value = '';
@@ -5469,8 +5473,6 @@ function editarProveedorAdmin(id){
   const p = ADMIN_PROVEEDORES.find(x=>x.id===id);
   if (!p) return;
   document.getElementById('prov-id').value = p.id;
-  document.getElementById('prov-foto-url').value = p.foto_url || '';
-  document.getElementById('prov-foto-preview').innerHTML = p.foto_url ? `<img src="${p.foto_url}" alt="Foto del local">` : '<i class="fa-solid fa-shop"></i>';
   document.getElementById('prov-modal-title').textContent = 'Editar proveedor';
   document.getElementById('prov-nombre').value = p.nombre || '';
   document.getElementById('prov-rubro').value = p.rubro || '';
@@ -5496,7 +5498,6 @@ async function guardarProveedorAdmin(){
     telefono: document.getElementById('prov-telefono').value.trim() || null,
     descripcion: document.getElementById('prov-descripcion').value.trim() || null,
     plan: document.getElementById('prov-plan').value,
-    foto_url: document.getElementById('prov-foto-url').value || null,
   };
 
   const btn = document.getElementById('proveedor-submit-btn');
@@ -5818,7 +5819,7 @@ const adminRenderers = {
       </div>
     </div>
     <table>
-      <thead><tr><th>Agencia</th><th>Ciudad</th><th>Tipo</th><th>Plan</th><th>Operaciones</th><th>Estado</th><th></th><th></th><th></th><th></th></tr></thead>
+      <thead><tr><th>Agencia</th><th>Ciudad</th><th>Tipo</th><th>Plan</th><th>Operaciones</th><th>Estado</th><th></th></tr></thead>
       <tbody id="agency-table-body">
         ${adminAgencyRowsHTML(ADMIN_AGENCIES)}
       </tbody>
@@ -5910,7 +5911,7 @@ const adminRenderers = {
     </table>
   `,
   operaciones: ()=>{
-    const ops = ADMIN_MATCHES.filter(m => (m.estado === 'concretada' || m.estado === 'cancelada') && enMesFiltroAdmin('operaciones', m.created_at))
+    const ops = ADMIN_MATCHES.filter(m => m.estado === 'concretada' || m.estado === 'cancelada')
       .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
     const concretadas = ops.filter(o => o.estado === 'concretada');
     const canceladas = ops.filter(o => o.estado === 'cancelada');
@@ -5923,7 +5924,6 @@ const adminRenderers = {
     const comisionesTxt = [comisionesArs ? fmtARS(comisionesArs) : null, comisionesUsd ? 'USD ' + Math.round(comisionesUsd).toLocaleString('es-AR') : null].filter(Boolean).join(' + ') || fmtARS(0);
     return `
     <div class="main-head"><div><h1>Operaciones</h1><p class="sub">Historial de todas las operaciones cerradas en la red — para tener registro ante cualquier disputa</p></div></div>
-    ${adminFiltroBarHTML('operaciones')}
     <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px;">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Concretadas</div><div class="val kpi-green">${concretadas.length}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-xmark"></i>Caídas</div><div class="val kpi-red">${canceladas.length}</div></div>
@@ -5956,7 +5956,7 @@ const adminRenderers = {
     // a Supabase) con nombres de campo que no existían en el esquema real (.status, .claimedAt,
     // matchFlowData(), AGENCY.name). Por eso siempre aparecía vacía. La reescribo sobre
     // ADMIN_MATCHES, que es la misma fuente de datos que ya usa correctamente "Operaciones".
-    const conEtapa = ADMIN_MATCHES.filter(m => enMesFiltroAdmin('matches', m.created_at)).map(m => {
+    const conEtapa = ADMIN_MATCHES.map(m => {
       let etapa = 'propuesta';
       if (m.estado === 'concretada') etapa = 'concretada';
       else if (m.estado === 'cancelada') etapa = 'cancelada';
@@ -5972,7 +5972,6 @@ const adminRenderers = {
     const ETAPA_LABELS = { propuesta: 'Comisión propuesta', contactado: 'Agencia contactada', visita: 'Visita agendada', concretada: 'Concretada', cancelada: 'Caída' };
     return `
     <div class="main-head"><div><h1>Matches</h1><p class="sub">Todos los cruces detectados en la red, en cualquier etapa del pipeline</p></div></div>
-    ${adminFiltroBarHTML('matches')}
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-link"></i>Matches totales</div><div class="val">${total}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-brands fa-whatsapp"></i>En seguimiento</div><div class="val">${enSeguimiento}</div></div>
@@ -5994,13 +5993,12 @@ const adminRenderers = {
   `;
   },
   ingresos: ()=>{
-    const verified = ADMIN_AGENCIES.filter(a=>a.status==='Activo' && enMesFiltroAdmin('ingresos', a.registeredAt));
+    const verified = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
     const proCount = verified.filter(a=>a.plan==='Pro').length;
     const premiumCount = verified.filter(a=>a.plan==='Premium').length;
     const mrrReal = proCount*190000 + premiumCount*390000;
     return `
     <div class="main-head"><div><h1>Ingresos</h1><p class="sub">Facturación por suscripciones de la red</p></div></div>
-    ${adminFiltroBarHTML('ingresos')}
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-arrows-rotate"></i>MRR</div><div class="val mono">${fmtARS(mrrReal)}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-sack-dollar"></i>Ingresos totales</div><div class="val mono">${fmtARS(mrrReal*6)}</div></div>
@@ -6014,18 +6012,17 @@ const adminRenderers = {
         ${verified.map(a=>`<tr><td>${a.name}</td><td>${a.plan}</td><td class="mono">${fmtARS(a.plan==='Pro'?190000:390000)}</td></tr>`).join('')}
       </tbody>
     </table>
-    <p style="font-size:12.5px;color:var(--ink);margin-top:14px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-bell" style="margin-top:2px;color:var(--red);"></i><span>MRR y el desglose por concesionaria se calculan en base a los planes reales asignados. "Ingresos totales" es un acumulado ilustrativo (6 meses de MRR), ya que el prototipo no lleva un historial de facturación real. El filtro de mes/año de arriba muestra las agencias dadas de alta en ese período — no una vista histórica real de lo facturado mes a mes, ya que eso todavía no se registra.</span></p>
+    <p style="font-size:12.5px;color:var(--ink);margin-top:14px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-bell" style="margin-top:2px;color:var(--red);"></i><span>MRR y el desglose por concesionaria se calculan en base a los planes reales asignados. "Ingresos totales" es un acumulado ilustrativo (6 meses de MRR), ya que el prototipo no lleva un historial de facturación real.</span></p>
   `;
   },
   pagos: ()=>{
     const activas = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
-    const filas = activas.map(a => ({ a, ...estadoPagoAgencia(a) })).filter(f => enMesFiltroAdmin('pagos', f.vencimiento)).sort((x,y)=>x.vencimiento - y.vencimiento);
+    const filas = activas.map(a => ({ a, ...estadoPagoAgencia(a) })).sort((x,y)=>x.vencimiento - y.vencimiento);
     const vencidas = filas.filter(f=>f.estado==='Vencido').length;
     const pendientes = filas.filter(f=>f.estado==='Pendiente').length;
     const pagadas = filas.filter(f=>f.estado==='Pagado').length;
     return `
     <div class="main-head"><div><h1>Pagos</h1><p class="sub">Vencimiento mensual de cada agencia y estado de pago de la suscripción</p></div></div>
-    ${adminFiltroBarHTML('pagos')}
     <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px;">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-check"></i>Pagadas este período</div><div class="val kpi-green">${pagadas}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-clock"></i>Pendientes</div><div class="val">${pendientes}</div></div>
@@ -6184,7 +6181,7 @@ async function cargarMisMatches(){
   if (!currentAgencia) { actualizarMatchPendienteBadge(); actualizarMatchDot(); return; }
   const { data, error } = await supa
     .from('matches')
-    .select('*, veh:vehiculo_id(marca,modelo,anio,precio,moneda,km,transmision,comision,agencia_id,fotos,color,combustible,es_gremio,precio_gremio), bus:busqueda_id(marca,modelo,anio_desde,anio_hasta,precio_max,cliente_nombre,cliente_telefono), vend:agencia_vendedora(nombre,telefono,direccion,horarios,contacto,verificada), comp:agencia_compradora(nombre,telefono,direccion,horarios,contacto,verificada)')
+    .select('*, veh:vehiculo_id(marca,modelo,anio,precio,moneda,km,transmision,comision,agencia_id,fotos), bus:busqueda_id(marca,modelo,anio_desde,anio_hasta,precio_max,cliente_nombre,cliente_telefono), vend:agencia_vendedora(nombre,telefono,direccion,horarios,contacto,verificada,logo_url), comp:agencia_compradora(nombre,telefono,direccion,horarios,contacto,verificada,logo_url)')
     .or(`agencia_vendedora.eq.${currentAgencia.id},agencia_compradora.eq.${currentAgencia.id}`)
     .order('created_at', { ascending: false });
   if (error) { console.error('cargarMisMatches:', error); toast('Error al cargar matches: ' + error.message); actualizarMatchPendienteBadge(); actualizarMatchDot(); return; }
@@ -6205,6 +6202,7 @@ async function cargarMisMatches(){
     const otraAgencia = soyVendedor ? (m.comp?.nombre || '—') : (m.vend?.nombre || '—');
     const otraAgenciaTel = soyVendedor ? (m.comp?.telefono || '') : (m.vend?.telefono || '');
     const otraAgenciaVerificada = soyVendedor ? !!m.comp?.verificada : !!m.vend?.verificada;
+    const otraAgenciaLogo = soyVendedor ? (m.comp?.logo_url || null) : (m.vend?.logo_url || null);
     // Datos de la agencia vendedora (siempre "vend"), para el mensaje de visita al cliente
     const otraAgenciaDireccion = soyVendedor ? '' : (m.vend?.direccion || '');
     const otraAgenciaHorarios = soyVendedor ? '' : (m.vend?.horarios || '');
@@ -6216,12 +6214,13 @@ async function cargarMisMatches(){
     let etapa = 'propuesta';
     if (m.estado === 'concretada') etapa = 'concretada';
     else if (m.estado === 'cancelada') etapa = 'cancelada';
+    else if (m.visita_realizada_at) etapa = 'realizada';
     else if (m.visita_agendada_at) etapa = 'visita';
+    else if (m.cliente_informado_at) etapa = 'visita';
     else if (m.comision_aceptada_at || (m.es_compra_directa && m.contactado_at)) etapa = 'contactado';
     return {
       id: m.id,
       vehiculoId: m.vehiculo_id,
-      vehiculoFull: veh,
       busquedaId: m.busqueda_id,
       vehiculo: [veh.marca, veh.modelo, veh.anio].filter(Boolean).join(' ') || '—',
       vehiculoMarcaModelo: [veh.marca, veh.modelo].filter(Boolean).join(' ') || '—',
@@ -6229,7 +6228,7 @@ async function cargarMisMatches(){
       detalle: [veh.km ? Number(veh.km).toLocaleString('es-AR') + ' km' : null, veh.transmision].filter(Boolean).join(' · '),
       precio: veh.precio ? fmtMoney(veh.precio, veh.moneda) : (bus.precio_max ? 'Hasta ' + fmtMoney(bus.precio_max, 'USD') : '—'),
       soyVendedor,
-      otraAgenciaId, otraAgencia, otraAgenciaTel, otraAgenciaVerificada, otraAgenciaDireccion, otraAgenciaHorarios, otraAgenciaContacto,
+      otraAgenciaId, otraAgencia, otraAgenciaTel, otraAgenciaVerificada, otraAgenciaLogo, otraAgenciaDireccion, otraAgenciaHorarios, otraAgenciaContacto,
       // Si soy el vendedor, el cliente es de la otra agencia — nombre protegido, como en el diseño de Exe.
       // El teléfono del cliente solo lo tenemos (y solo lo usamos) cuando el match es nuestro como compradores.
       // Los matches manuales no vienen de una búsqueda (bus vacío), así que el dato sale directo del match.
@@ -6243,6 +6242,12 @@ async function cargarMisMatches(){
       etapa,
       contactadoAt: m.contactado_at || null,
       visitaAgendadaAt: m.visita_agendada_at || null,
+      clienteInformadoAt: m.cliente_informado_at || null,
+      visitaFechasPropuestas: m.visita_fechas_propuestas || null,
+      visitaFechaConfirmada: m.visita_fecha_confirmada || null,
+      visitaRealizadaAt: m.visita_realizada_at || null,
+      interesResultado: m.interes_resultado || null,
+      interesRegistradoAt: m.interes_registrado_at || null,
       comisionAceptadaAt: m.comision_aceptada_at || null,
       motivoCancelacion: m.motivo_cancelacion || '',
       comisionMonto: m.comision_monto || null,
@@ -6304,11 +6309,14 @@ async function marcarTicketNotifsLeidas(){
 // que ya viene fija en el vehículo — no hace falta acordarla).
 const MATCH_PIPELINE_STAGES = [
   { key: 'propuesta', label: 'Comisión propuesta', icon: 'fa-hand-holding-dollar' },
-  { key: 'contactado', label: 'Agencia contactada', icon: 'fa-brands fa-whatsapp' },
-  { key: 'visita', label: 'Cliente informado', icon: 'fa-comment-dots' },
+  // Label distinto para compra directa (sin cliente): ahí este paso sigue siendo, como antes,
+  // simplemente "están coordinando por WhatsApp" — no hay cliente al que informar.
+  { key: 'contactado', label: 'Cliente informado', labelCompraDirecta: 'Agencia contactada', icon: 'fa-comment-dots' },
+  { key: 'visita', label: 'Visita agendada', icon: 'fa-calendar-check' },
+  { key: 'realizada', label: 'Visita realizada', icon: 'fa-flag-checkered' },
   { key: 'concretada', label: 'Finalizado', icon: 'fa-circle-check' },
 ];
-function renderMatchPipelineStepper(etapa){
+function renderMatchPipelineStepper(etapa, esCompraDirecta){
   if (etapa === 'cancelada') {
     return `<div class="pipeline-caida"><i class="fa-solid fa-circle-xmark"></i> Operación caída</div>`;
   }
@@ -6317,7 +6325,7 @@ function renderMatchPipelineStepper(etapa){
     <div class="pipeline-step-v ${i<=idx?'done':''} ${i===idx?'current':''}">
       ${i<MATCH_PIPELINE_STAGES.length-1?`<div class="pipeline-line-v ${i<idx?'done':''}"></div>`:''}
       <span class="pipeline-dot-v"><i class="${s.icon.includes('fa-brands')?s.icon:'fa-solid '+s.icon}"></i></span>
-      <span class="pipeline-label-v">${s.label}</span>
+      <span class="pipeline-label-v">${(esCompraDirecta && s.labelCompraDirecta) ? s.labelCompraDirecta : s.label}</span>
     </div>
   `).join('')}</div>`;
 }
@@ -6334,12 +6342,16 @@ function vistaMatchesActual(){
 async function aceptarComisionMatch(matchId){
   const m = misMatchesReal.find(x=>x.id===matchId);
   if (!m) return;
-  const { data, error } = await supa.rpc('aceptar_comision_match', { p_match_id: matchId });
+  // Aceptar la comisión ya no reserva el vehículo: varias agencias pueden tener la comisión
+  // aceptada sobre el mismo auto a la vez, cada una avanza en su propio match.
+  const { data, error } = await supa.from('matches')
+    .update({ comision_aceptada_at: new Date().toISOString() })
+    .eq('id', matchId).eq('estado', 'pendiente').is('comision_aceptada_at', null)
+    .select('id');
   if (error) { toast('Error al aceptar la comisión: ' + (error.message || 'error desconocido')); console.error('aceptarComisionMatch:', error); return; }
-  if (data === 'reservado_por_otro') {
-    toast('Este vehículo ya fue reservado por otra agencia mientras tanto. La operación quedó caída.');
+  if (!data || !data.length) {
+    toast('No se pudo aceptar la comisión: el match ya no está pendiente o ya estaba aceptada.');
   } else {
-    // Solo si realmente se reservó (no si llegamos tarde) tiene sentido avisarle a la otra agencia.
     crearNotificacion(m.otraAgenciaId, 'match_etapa', '¡Comisión aceptada!', `${currentAgencia?.nombre || 'La agencia'} aceptó la comisión propuesta (${m.comisionVehiculo || '—'}) para ${m.vehiculo}. Ya pueden coordinar por WhatsApp.`, m.id);
     toast('Comisión aceptada. Ya podés contactar a la otra agencia.');
   }
@@ -6380,13 +6392,13 @@ async function contactarMatch(matchId){
   await showApp(vistaMatchesActual());
 }
 // Marca el match como "cliente informado". Si soy la agencia compradora (tengo el teléfono del
-// cliente), le abre un WhatsApp pre-armado avisándole dónde y con quién visitar el vehículo.
+// cliente), le abre un WhatsApp pre-armado avisándole que se encontró el vehículo. Ya no depende
+// de haber contactado antes a la otra agencia por WhatsApp — ese paso intermedio se sacó del flujo.
 async function informarClienteMatch(matchId){
   const m = misMatchesReal.find(x=>x.id===matchId);
   if (!m) return;
   if (!m.comisionAceptadaAt) { toast('Todavía no se aceptó la comisión propuesta.'); return; }
-  if (!m.soyVendedor && !m.contactadoAt) { toast('Primero contactá a la agencia que tiene el vehículo.'); return; }
-  const { error } = await supa.from('matches').update({ visita_agendada_at: new Date().toISOString() }).eq('id', matchId);
+  const { error } = await supa.from('matches').update({ cliente_informado_at: new Date().toISOString() }).eq('id', matchId);
   if (error) { toast('Error al actualizar el match.'); console.error('informarClienteMatch:', error); return; }
   crearNotificacion(m.otraAgenciaId, 'match_etapa', 'Avance en un match', `${currentAgencia?.nombre || 'La agencia compradora'} ya informó a su cliente sobre ${m.vehiculo}.`, m.id);
 
@@ -6400,14 +6412,119 @@ async function informarClienteMatch(matchId){
   }
   await showApp(vistaMatchesActual());
 }
+
+/* ---------------- Agendar visita: la compradora propone >=3 fechas, la vendedora confirma una ---------------- */
+let _agendarVisitaMatchId = null;
+function abrirAgendarVisitaModal(matchId){
+  _agendarVisitaMatchId = matchId;
+  const cont = document.getElementById('agendarvisita-fechas');
+  cont.innerHTML = '';
+  agregarFechaVisitaInput();
+  agregarFechaVisitaInput();
+  agregarFechaVisitaInput();
+  const hoy = new Date().toISOString().slice(0,10);
+  cont.querySelectorAll('input[type="date"]').forEach(inp => inp.min = hoy);
+  document.getElementById('agendarvisita-hint').textContent = '';
+  openModal('agendarvisita');
+}
+function agregarFechaVisitaInput(){
+  const cont = document.getElementById('agendarvisita-fechas');
+  const n = cont.children.length + 1;
+  const hoy = new Date().toISOString().slice(0,10);
+  const wrap = document.createElement('div');
+  wrap.className = 'field';
+  wrap.innerHTML = `<label>Opción ${n}</label><input type="date" min="${hoy}">`;
+  cont.appendChild(wrap);
+}
+async function confirmarAgendarVisita(){
+  const m = misMatchesReal.find(x=>x.id===_agendarVisitaMatchId);
+  if (!m) return;
+  const inputs = Array.from(document.querySelectorAll('#agendarvisita-fechas input[type="date"]'));
+  const fechas = [...new Set(inputs.map(i => i.value).filter(Boolean))];
+  if (fechas.length < 3) { document.getElementById('agendarvisita-hint').textContent = 'Elegí al menos 3 días distintos antes de enviar.'; return; }
+  fechas.sort();
+  const { error } = await supa.from('matches').update({ visita_fechas_propuestas: fechas }).eq('id', _agendarVisitaMatchId);
+  if (error) { toast('Error al proponer las fechas.'); console.error('confirmarAgendarVisita:', error); return; }
+  crearNotificacion(m.otraAgenciaId, 'match_etapa', 'Te proponen fecha de visita', `${currentAgencia?.nombre || 'La agencia compradora'} propuso ${fechas.length} fechas posibles para visitar por ${m.vehiculo}.`, m.id);
+  closeModal('agendarvisita');
+  toast('Fechas propuestas. Esperando que confirmen una.');
+  _agendarVisitaMatchId = null;
+  await showApp(vistaMatchesActual());
+}
+// La vendedora elige, entre las fechas que propuso la compradora, la que le queda mejor.
+async function confirmarFechaVisita(matchId, fechaISO){
+  const m = misMatchesReal.find(x=>x.id===matchId);
+  if (!m) return;
+  const { error } = await supa.from('matches').update({ visita_fecha_confirmada: fechaISO, visita_agendada_at: new Date().toISOString() }).eq('id', matchId);
+  if (error) { toast('Error al confirmar la fecha.'); console.error('confirmarFechaVisita:', error); return; }
+  crearNotificacion(m.otraAgenciaId, 'match_etapa', '¡Visita confirmada!', `${currentAgencia?.nombre || 'La agencia'} confirmó la visita para el ${fmtFechaVisita(fechaISO)} por ${m.vehiculo}.`, m.id);
+  toast('Visita confirmada');
+  await showApp(vistaMatchesActual());
+}
+function fmtFechaVisita(fechaISO){
+  if (!fechaISO) return '—';
+  const [y,mo,d] = fechaISO.split('-');
+  return `${d}/${mo}/${y}`;
+}
+
+/* ---------------- Touchpoint "Interés": paso manual post-visita, solo para quien tiene el vehículo ---------------- */
+// Paso manual: recién cuando la vendedora confirma que el cliente ya fue a ver el auto, se
+// habilita el botón "Interés". No se dispara solo con la fecha de la visita porque puede
+// reprogramarse o no confirmarse fuera de la plataforma.
+async function marcarVisitaRealizada(matchId){
+  const m = misMatchesReal.find(x=>x.id===matchId);
+  if (!m) return;
+  const { error } = await supa.from('matches').update({ visita_realizada_at: new Date().toISOString() }).eq('id', matchId);
+  if (error) { toast('Error al actualizar el match.'); console.error('marcarVisitaRealizada:', error); return; }
+  crearNotificacion(m.otraAgenciaId, 'match_etapa', 'Avance en un match', `${currentAgencia?.nombre || 'La agencia'} confirmó que tu cliente visitó el vehículo (${m.vehiculo}).`, m.id);
+  toast('Visita marcada como realizada');
+  await showApp(vistaMatchesActual());
+}
+let _interesMatchId = null;
+function abrirInteresModal(matchId){
+  _interesMatchId = matchId;
+  openModal('interes');
+}
+// Registra qué pasó después de la visita. "Sí"/"No" reutilizan el modal de cierre que ya existe
+// (concretada / caída con motivo). Las otras tres opciones dejan una nota informativa y la
+// operación sigue abierta — el vehículo NO se bloquea para otras agencias.
+async function elegirInteres(resultado){
+  const matchId = _interesMatchId;
+  const m = misMatchesReal.find(x=>x.id===matchId);
+  if (!m) return;
+  closeModal('interes');
+  if (resultado === 'si') {
+    abrirCerrarMatch(matchId, false);
+    elegirResultadoMatch('concretada');
+    return;
+  }
+  if (resultado === 'no') {
+    abrirCerrarMatch(matchId, true);
+    return;
+  }
+  const { error } = await supa.from('matches').update({ interes_resultado: resultado, interes_registrado_at: new Date().toISOString() }).eq('id', matchId);
+  if (error) { toast('Error al registrar el interés.'); console.error('elegirInteres:', error); return; }
+  const TXT = { reserva: 'reservó el auto para tu cliente (el vehículo sigue disponible para otras agencias)', credito: 'tu cliente está gestionando un crédito', espera: 'tu cliente está esperando disponer del capital' };
+  crearNotificacion(m.otraAgenciaId, 'match_etapa', 'Avance en un match', `${currentAgencia?.nombre || 'La agencia'} marcó que ${TXT[resultado] || 'hay novedades'} por ${m.vehiculo}.`, m.id);
+  toast('Match actualizado');
+  _interesMatchId = null;
+  await showApp(vistaMatchesActual());
+}
+function interesResultadoTxt(resultado){
+  return { reserva: 'Reserva de unidad', credito: 'Crédito en trámite', espera: 'Espera de capital' }[resultado] || '';
+}
 // Retrocede el match un paso en el pipeline (por si se avanzó por error)
 async function retrocederMatch(matchId){
   const m = misMatchesReal.find(x=>x.id===matchId);
   if (!m) return;
   let payload = null;
-  if (m.etapa === 'visita') payload = { visita_agendada_at: null };
-  else if (m.etapa === 'contactado') payload = { contactado_at: null };
-  else { toast('Este match ya está en el primer paso.'); return; }
+  if (m.etapa === 'visita' && m.visitaFechasPropuestas && m.visitaFechasPropuestas.length) {
+    // Ya había fechas propuestas (confirmadas o no): las borra y vuelve al botón "Agendar visita".
+    payload = { visita_fechas_propuestas: null, visita_fecha_confirmada: null, visita_agendada_at: null };
+  } else if (m.etapa === 'visita') {
+    // Cliente informado pero sin fechas propuestas todavía: vuelve al botón "Informar cliente".
+    payload = { cliente_informado_at: null };
+  } else { toast('Este match ya está en el primer paso.'); return; }
   showConfirm('¿Volver un paso atrás en este match?', async () => {
     const { error } = await supa.from('matches').update(payload).eq('id', matchId);
     if (error) { toast('Error al retroceder el match.'); console.error('retrocederMatch:', error); return; }
@@ -6416,7 +6533,14 @@ async function retrocederMatch(matchId){
   });
 }
 
-// Agrupa una lista de matches en dos secciones: lo que busco para mis clientes / lo que quieren de mi stock
+// Qué sección de matches mostrar: 'todos' (las dos, como antes) / 'busco' / 'vendo'. Se mantiene
+// entre renders (igual que el filtro de mes) para no perder la selección al hacer una acción.
+let matchesVistaFiltro = 'todos';
+function cambiarMatchesVistaFiltro(v){ matchesVistaFiltro = v; showApp(vistaMatchesActual()); }
+
+// Agrupa una lista de matches en dos secciones: lo que busco para mis clientes / lo que quieren de
+// mi stock. Con muchos matches activos se mezclaban en una sola lista larga, así que arriba hay un
+// selector para ver una sección a la vez (o las dos juntas, como antes).
 function renderMatchSections(list, emptyMsg){
   if (!list.length) return `<div class="card"><p style="color:var(--paper-dim);margin:0;">${emptyMsg}</p></div>`;
   const busco = list.filter(m=>!m.soyVendedor);
@@ -6425,36 +6549,51 @@ function renderMatchSections(list, emptyMsg){
     <div class="match-section-title"><i class="fa-solid ${icon}"></i> ${esc(titulo)} <span class="match-section-count">${items.length}</span></div>
     ${items.length ? items.map(m=>matchCardHTML(m)).join('') : `<p style="color:var(--paper-dim);font-size:13px;margin:0 0 24px;">Nada por acá todavía.</p>`}
   `;
-  return seccion('Lo que busco para mis clientes', 'fa-magnifying-glass', busco) + seccion('Lo que quieren de mi stock', 'fa-car', vendo);
+  const toggle = `
+    <div class="match-filter-toggle">
+      <button type="button" class="match-filter-btn ${matchesVistaFiltro==='todos'?'active':''}" onclick="cambiarMatchesVistaFiltro('todos')">Ver todo</button>
+      <button type="button" class="match-filter-btn ${matchesVistaFiltro==='busco'?'active':''}" onclick="cambiarMatchesVistaFiltro('busco')"><i class="fa-solid fa-magnifying-glass"></i> Lo que busco para mis clientes <span class="match-filter-count">${busco.length}</span></button>
+      <button type="button" class="match-filter-btn ${matchesVistaFiltro==='vendo'?'active':''}" onclick="cambiarMatchesVistaFiltro('vendo')"><i class="fa-solid fa-car"></i> Lo que quieren de mi stock <span class="match-filter-count">${vendo.length}</span></button>
+    </div>`;
+  let secciones = '';
+  if (matchesVistaFiltro !== 'vendo') secciones += seccion('Lo que busco para mis clientes', 'fa-magnifying-glass', busco);
+  if (matchesVistaFiltro !== 'busco') secciones += seccion('Lo que quieren de mi stock', 'fa-car', vendo);
+  return toggle + secciones;
 }
 
 function matchCardHTML(m){
-  const verBtn = m.vehiculoId ? `<button class="btn btn-sm" onclick="abrirVehiculoDeMatch('${m.id}')"><i class="fa-solid fa-eye"></i> Ver vehículo</button>` : '';
+  const verVehiculoLink = m.vehiculoId ? `<span class="see-vehicle-link" onclick="openPropertyDetailReal('${m.vehiculoId}')">Ver vehículo</span>` : '';
+  // La agencia que tiene el auto es mi propio nodo si soy la vendedora, o el de la otra agencia si soy la compradora.
+  const verVehiculoMio = m.soyVendedor ? verVehiculoLink : '';
+  const verVehiculoOtro = !m.soyVendedor ? verVehiculoLink : '';
   const motivoHTML = m.estado === 'cancelada' && m.motivoCancelacion ? `<div style="font-size:12px;color:var(--paper-dim);">Motivo: ${m.motivoCancelacion}</div>` : '';
 
   let primaryActions = '';
-  let primaryNote = '';
+  // Mensajes de estado/espera de este match: van todos apilados a la derecha de la tarjeta,
+  // separados de los botones de acción (antes se mezclaban sueltos entre los botones).
+  const notas = [];
   if (m.estado === 'concretada') {
     if (m.esCompraDirecta) {
-      primaryNote = `<div class="match-done-note"><i class="fa-solid fa-circle-check"></i> Operación finalizada · Compra directa, sin comisión</div>`;
+      notas.push(`<div class="match-done-note"><i class="fa-solid fa-circle-check"></i> Operación finalizada · Compra directa, sin comisión</div>`);
       if (!m.soyVendedor) {
         primaryActions = m.yaCalifique
-          ? `<div class="waiting-note"><i class="fa-solid fa-star"></i> Ya calificaste esta operación</div>`
+          ? ''
           : `<button class="btn btn-sm" onclick="openRatingModal('${m.otraAgenciaId}','${m.otraAgencia}','${m.id}')"><i class="fa-solid fa-star"></i> Calificar a ${esc(m.otraAgencia)}</button>`;
+        if (m.yaCalifique) notas.push(`<div class="waiting-note"><i class="fa-solid fa-star"></i> Ya calificaste esta operación</div>`);
       }
     } else if (!m.soyVendedor) {
       // Soy el comprador (traje al cliente): la comisión ya se calculó sola al cerrarse la operación
       const estadoPagoTxt = { pendiente: 'pendiente de pago', pagada: 'pagada', parcial: 'con pago parcial' }[m.comisionEstado] || '';
-      const calificarBtn = m.yaCalifique
-        ? `<div class="waiting-note"><i class="fa-solid fa-star"></i> Ya calificaste esta operación</div>`
+      primaryActions = m.yaCalifique
+        ? ''
         : `<button class="btn btn-sm" onclick="openRatingModal('${m.otraAgenciaId}','${m.otraAgencia}','${m.id}')"><i class="fa-solid fa-star"></i> Calificar a ${esc(m.otraAgencia)}</button>`;
-      primaryActions = calificarBtn;
-      primaryNote = `<div class="match-done-note"><i class="fa-solid fa-circle-check"></i> Operación finalizada · Comisión: ${fmtMoney(m.comisionMonto, m.comisionMoneda)} ${estadoPagoTxt}</div>`;
+      if (m.yaCalifique) notas.push(`<div class="waiting-note"><i class="fa-solid fa-star"></i> Ya calificaste esta operación</div>`);
+      notas.push(`<div class="match-done-note"><i class="fa-solid fa-circle-check"></i> Operación finalizada · Comisión: ${fmtMoney(m.comisionMonto, m.comisionMoneda)} ${estadoPagoTxt}</div>`);
     } else {
       // Soy el vendedor: la comisión se calculó sola (precio × % del vehículo). Sin botón de
       // edición: el monto queda fijo según ese cálculo.
       primaryActions = '';
-      primaryNote = `<div class="match-done-note"><i class="fa-solid fa-circle-check"></i> Operación finalizada · Comisión: ${fmtMoney(m.comisionMonto, m.comisionMoneda)}</div>`;
+      notas.push(`<div class="match-done-note"><i class="fa-solid fa-circle-check"></i> Operación finalizada · Comisión: ${fmtMoney(m.comisionMonto, m.comisionMoneda)}</div>`);
     }
   } else if (m.estado === 'cancelada') {
     primaryActions = '';
@@ -6465,37 +6604,99 @@ function matchCardHTML(m){
     if (!m.soyVendedor) {
       primaryActions = `
         <div style="font-size:13px;color:var(--paper-dim);margin-bottom:2px;"><i class="fa-solid fa-hand-holding-dollar"></i> ${esc(m.otraAgencia)} propone una comisión de <strong style="color:var(--paper);">${esc(comisionTxt)}</strong></div>
-        <button class="btn btn-sm whatsapp-btn" onclick="aceptarComisionMatch('${m.id}')"><i class="fa-solid fa-check"></i> Aceptar comisión</button>
-        <button class="btn btn-sm btn-eliminar-pastel" onclick="rechazarComisionMatch('${m.id}')"><i class="fa-solid fa-xmark"></i> Rechazar</button>`;
+        <div class="match-actions-pair">
+          <button class="btn btn-sm whatsapp-btn" onclick="aceptarComisionMatch('${m.id}')"><i class="fa-solid fa-check"></i> Aceptar comisión</button>
+          <button class="btn btn-sm btn-eliminar-pastel" onclick="rechazarComisionMatch('${m.id}')"><i class="fa-solid fa-xmark"></i> Rechazar</button>
+        </div>`;
     } else {
-      primaryNote = `<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} acepte la comisión propuesta (${esc(comisionTxt)})</div>`;
+      notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} acepte la comisión propuesta (${esc(comisionTxt)})</div>`);
     }
   } else if (m.etapa === 'contactado') {
-    // Touchpoint 2: ya se aceptó la comisión. El contacto por WhatsApp lo inicia siempre la
-    // compradora (paso 1); la vendedora solo espera, sin botón de contacto propio.
+    // Touchpoint 2: ya se aceptó la comisión.
     // En una compra directa no hay cliente al que informar: la vendedora puede finalizar
-    // directo apenas se pongan de acuerdo, sin el paso intermedio de "informar al cliente".
+    // directo apenas se pongan de acuerdo, sin pasos intermedios.
     if (m.esCompraDirecta) {
-      primaryActions = m.soyVendedor
-        ? `<button class="btn btn-sm whatsapp-btn" onclick="abrirCerrarMatch('${m.id}', false)"><i class="fa-solid fa-flag-checkered"></i> Finalizar operación</button>`
-        : `<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} confirme la venta</div>`;
-    } else if (m.soyVendedor) {
-      primaryActions = `<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} informe al cliente</div>`;
+      if (m.soyVendedor) primaryActions = `<button class="btn btn-sm whatsapp-btn" onclick="abrirCerrarMatch('${m.id}', false)"><i class="fa-solid fa-flag-checkered"></i> Finalizar operación</button>`;
+      else notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} confirme la venta</div>`);
+    } else if (m.origen === 'manual') {
+      // Matches manuales: sin cambios — ya se contactaron por fuera para armar el match manual,
+      // así que pasan directo a informar al cliente, como venía funcionando.
+      if (m.soyVendedor) {
+        notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} informe al cliente</div>`);
+      } else {
+        primaryActions = `<button class="btn btn-sm whatsapp-btn" onclick="informarClienteMatch('${m.id}')"><i class="fa-solid fa-comment-dots"></i> Informar cliente</button>`;
+      }
     } else if (!m.contactadoAt) {
-      // Paso 1: contactar a la agencia que tiene el vehículo
-      primaryActions = m.otraAgenciaTel
-        ? `<button class="btn btn-sm whatsapp-btn" onclick="contactarMatch('${m.id}')"><i class="fa-brands fa-whatsapp"></i> Contactar agencia</button>`
-        : `<span style="font-size:12px;color:var(--paper-dim);">Esta agencia no tiene WhatsApp cargado.</span>`;
+      // Matches automáticos: primer touchpoint tras aceptar la comisión — avisarle por WhatsApp
+      // (mensaje automatizado) a la agencia que tiene el auto que hay un cliente potencial.
+      // Recién después de eso se habilita "Informar cliente".
+      if (m.soyVendedor) {
+        notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} te contacte</div>`);
+      } else {
+        primaryActions = `<button class="btn btn-sm whatsapp-btn" onclick="contactarMatch('${m.id}')"><i class="fa-brands fa-whatsapp"></i> Contactar agencia</button>`;
+      }
+    } else if (m.soyVendedor) {
+      notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} informe al cliente</div>`);
     } else {
-      // Paso 2: ya contactó a la agencia, ahora puede informar al cliente
-      primaryActions = `<button class="btn btn-sm whatsapp-btn" onclick="informarClienteMatch('${m.id}')"><i class="fa-solid fa-comment-dots"></i> Informar al cliente</button>`;
+      primaryActions = `<button class="btn btn-sm whatsapp-btn" onclick="informarClienteMatch('${m.id}')"><i class="fa-solid fa-comment-dots"></i> Informar cliente</button>`;
     }
   } else if (m.etapa === 'visita') {
-    // Touchpoint 3 (parte "exitosa"): cerrar la operación como concretada queda reservado a la
-    // agencia vendedora, que es quien tiene el poder de decisión de vender o no el vehículo.
-    primaryActions = m.soyVendedor
-      ? `<button class="btn btn-sm whatsapp-btn" onclick="abrirCerrarMatch('${m.id}', false)"><i class="fa-solid fa-flag-checkered"></i> Finalizar operación</button>`
-      : `<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que el cliente visite a ${esc(m.otraAgencia)}.</div>`;
+    // Touchpoint 3: la compradora propone al menos 3 fechas de visita; la vendedora confirma una.
+    // Recién con la visita confirmada la vendedora puede marcarla como realizada.
+    const fechasProp = m.visitaFechasPropuestas || [];
+    if (m.visitaAgendadaAt) {
+      // Fecha ya confirmada: la vendedora espera a que el cliente visite y recién ahí marca la
+      // visita como realizada (paso manual, ver etapa 'realizada' más abajo).
+      const fechaTxt = fmtFechaVisita(m.visitaFechaConfirmada);
+      notas.push(`<div class="match-done-note"><i class="fa-solid fa-calendar-check"></i> Visita confirmada para el ${fechaTxt}</div>`);
+      if (m.soyVendedor) primaryActions = `<button class="btn btn-sm" onclick="marcarVisitaRealizada('${m.id}')"><i class="fa-solid fa-check"></i> Marcar visita realizada</button>`;
+      else notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que el cliente visite a ${esc(m.otraAgencia)}.</div>`);
+    } else if (fechasProp.length) {
+      // Fechas propuestas, esperando que la vendedora confirme una.
+      if (m.soyVendedor) {
+        primaryActions = `
+          <div style="font-size:13px;color:var(--paper-dim);margin-bottom:6px;"><i class="fa-solid fa-calendar-days"></i> ${esc(m.otraAgencia)} propone estas fechas de visita:</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${fechasProp.map(fISO => `
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:8px;padding:8px 12px;">
+                <span style="font-size:13.5px;">${esc(fmtFechaVisita(fISO))}</span>
+                <button class="btn btn-sm whatsapp-btn" onclick="confirmarFechaVisita('${m.id}','${fISO}')">Confirmar esta fecha</button>
+              </div>`).join('')}
+          </div>`;
+      } else {
+        notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} confirme una de las ${fechasProp.length} fechas propuestas.</div>`);
+      }
+    } else if (m.soyVendedor) {
+      notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} proponga fechas de visita</div>`);
+    } else {
+      primaryActions = `<button class="btn btn-sm whatsapp-btn" onclick="abrirAgendarVisitaModal('${m.id}')"><i class="fa-solid fa-calendar-days"></i> Agendar visita</button>`;
+    }
+  } else if (m.etapa === 'realizada') {
+    // Touchpoint 4 (nuevo): recién cuando la vendedora marcó la visita como realizada aparece
+    // "Interés", que registra qué va a pasar con la venta. Reserva/Crédito/Espera capital dejan
+    // una nota informativa y la operación sigue abierta — el auto NO se bloquea para otras agencias.
+    if (m.soyVendedor) {
+      if (m.interesResultado) {
+        notas.push(`<span class="info-pill sage"><i class="fa-solid fa-flag-checkered"></i> Visita realizada</span>`);
+        notas.push(`<span class="info-pill violet"><i class="fa-solid fa-circle-info"></i> ${esc(interesResultadoTxt(m.interesResultado))}</span>`);
+        primaryActions = `
+          <button class="btn btn-sm whatsapp-btn" onclick="abrirCerrarMatch('${m.id}', false)"><i class="fa-solid fa-flag-checkered"></i> Finalizar operación</button>
+          <button class="btn btn-sm btn-interes" onclick="abrirInteresModal('${m.id}')"><i class="fa-solid fa-bullseye"></i> Cambiar interés</button>`;
+      } else {
+        notas.push(`<span class="info-pill sage"><i class="fa-solid fa-flag-checkered"></i> Visita realizada</span>`);
+        primaryActions = `<button class="btn btn-sm btn-interes" onclick="abrirInteresModal('${m.id}')"><i class="fa-solid fa-bullseye"></i> Interés</button>`;
+      }
+    } else if (m.interesResultado) {
+      const TXT_COMPRADOR = {
+        reserva: `${esc(m.otraAgencia)} reservó el auto para tu cliente — no queda bloqueado para otras agencias`,
+        credito: `Tu cliente está gestionando un crédito con ${esc(m.otraAgencia)}`,
+        espera: `Tu cliente está esperando disponer del capital`,
+      };
+      notas.push(`<span class="waiting-note"><i class="fa-solid fa-flag-checkered"></i> Visita realizada</span>`);
+      notas.push(`<span class="info-pill violet"><i class="fa-solid fa-circle-info"></i> ${TXT_COMPRADOR[m.interesResultado] || ''}</span>`);
+    } else {
+      notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Visita realizada. Esperando que ${esc(m.otraAgencia)} cuente cómo siguió</div>`);
+    }
   }
   // Touchpoint 3 (parte "caída"): marcar la operación como caída queda disponible para cualquiera
   // de las dos agencias en cualquier etapa activa. En 'propuesta' la compradora ya tiene su propio
@@ -6503,7 +6704,7 @@ function matchCardHTML(m){
   const puedeMarcarCaida = m.estado === 'pendiente' && !(m.etapa === 'propuesta' && !m.soyVendedor);
   const cerrarCaidaBtn = puedeMarcarCaida ? `<button class="btn btn-sm btn-eliminar-pastel" onclick="abrirCerrarMatch('${m.id}', true)"><i class="fa-solid fa-trash"></i> Marcar como caída</button>` : '';
   // Volver un paso atrás: solo para quien busca el vehículo (el vendedor espera, no retrocede su propio match)
-  const volverBtn = (!m.soyVendedor && !m.esCompraDirecta && m.estado === 'pendiente' && (m.etapa === 'contactado' || m.etapa === 'visita'))
+  const volverBtn = (!m.soyVendedor && !m.esCompraDirecta && m.estado === 'pendiente' && m.etapa === 'visita')
     ? `<button class="btn btn-sm" onclick="retrocederMatch('${m.id}')"><i class="fa-solid fa-rotate-left"></i> Volver un paso atrás</button>` : '';
   // Reabrir una operación ya finalizada (concretada o caída): solo la agencia vendedora, que fue
   // quien la finalizó originalmente.
@@ -6530,16 +6731,17 @@ function matchCardHTML(m){
     <div class="match-row-main">
       <div class="match-flow">
         <div class="flow-node">
-          <span class="dot-icon"><i class="fa-solid fa-building"></i></span>
+          ${agencyAvatarHTML(currentAgencia?.nombre || 'Tu concesionaria', currentAgencia?.logo_url)}
           <div class="text">
             <strong class="flow-my-agency">${esc(currentAgencia?.nombre || 'Tu concesionaria')}</strong>
             <span>${m.soyVendedor ? 'Tu vehículo' : 'Tu búsqueda'}</span>
+            ${verVehiculoMio}
           </div>
         </div>
         <div class="flow-connector"></div>
         <div class="flow-node">
-          <span class="dot-icon"><i class="fa-solid fa-building"></i></span>
-          <div class="text"><strong>${esc(m.otraAgencia)}</strong>${m.otraAgenciaVerificada ? `<i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:11px;margin-left:4px;" title="Agencia verificada por Red de Autos"></i>` : ''}<span>${m.soyVendedor ? 'La búsqueda' : 'Tiene el vehículo'}</span></div>
+          ${agencyAvatarHTML(m.otraAgencia, m.otraAgenciaLogo)}
+          <div class="text"><strong>${esc(m.otraAgencia)}</strong>${m.otraAgenciaVerificada ? `<i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:11px;margin-left:4px;" title="Agencia verificada por Red de Autos"></i>` : ''}<span>${m.soyVendedor ? 'La búsqueda' : 'Tiene el vehículo'}</span>${verVehiculoOtro}</div>
         </div>
         <div class="flow-connector"></div>
         <div class="flow-node">
@@ -6547,14 +6749,15 @@ function matchCardHTML(m){
           <div class="text">${clienteNombreHTML}${m.clienteProtegido ? '<span>Nombre protegido</span>' : (m.esCompraDirecta ? '<span>Sin cliente ni comisión</span>' : '')}</div>
         </div>
       </div>
-      ${renderMatchPipelineStepper(m.etapa)}
-      <div class="match-actions">
-        ${verBtn}
-        ${primaryActions}
-        ${volverBtn}
-        ${cerrarCaidaBtn}
-        ${reabrirBtn}
-        ${primaryNote}
+      ${renderMatchPipelineStepper(m.etapa, m.esCompraDirecta)}
+      <div class="match-actions-row">
+        <div class="match-actions">
+          ${primaryActions}
+          ${volverBtn}
+          ${cerrarCaidaBtn}
+          ${reabrirBtn}
+        </div>
+        ${notas.length ? `<div class="notes-stack">${notas.join('')}</div>` : ''}
       </div>
       ${motivoHTML}
     </div>
@@ -6626,10 +6829,10 @@ async function confirmarCerrarMatch(){
     else console.warn('confirmarCerrarMatch: match sin vehiculoId, no se pudo marcar el vehículo como inactivo.', mCerrado);
     if (mCerrado.busquedaId) tareas.push(supa.from('busquedas').update({ estado: 'resuelta' }).eq('id', mCerrado.busquedaId));
     else console.warn('confirmarCerrarMatch: match sin busquedaId, no se pudo marcar la búsqueda como resuelta.', mCerrado);
-    // Si quedaba algún otro match pendiente para este mismo vehículo (nunca llegó a que le acepten
-    // la comisión, así que la RPC de reserva no lo había cancelado todavía), se cancela solo acá:
-    // el vehículo ya se vendió en esta otra operación. Como somos la agencia vendedora, somos parte
-    // de todos esos matches (mismo vehículo = misma vendedora), así que no hace falta RPC.
+    // Como varias agencias pueden tener un match pendiente sobre el mismo vehículo, cuando una
+    // operación se concreta el auto se vende: los demás matches pendientes de ese vehículo se
+    // cancelan acá. Como somos la agencia vendedora, somos parte de todos esos matches
+    // (mismo vehículo = misma vendedora).
     if (mCerrado.vehiculoId) {
       tareas.push(supa.from('matches').update({ estado: 'cancelada', motivo_cancelacion: 'Vehículo vendido en otra operación', cerrado_at: new Date().toISOString() })
         .eq('vehiculo_id', mCerrado.vehiculoId).neq('id', mCerrado.id).eq('estado', 'pendiente'));
@@ -6654,30 +6857,6 @@ async function confirmarCerrarMatch(){
     );
   } else if (mCerrado) {
     crearNotificacion(mCerrado.otraAgenciaId, 'match_cerrado', 'Operación caída', `El match de ${mCerrado.vehiculo} se marcó como caído.`, mCerrado.id);
-
-    // Si este match había ganado la reserva del vehículo (le habían aceptado la comisión) y ahora
-    // se cae sin concretarse, reabrimos a las agencias rivales que habían quedado afuera por su
-    // culpa — antes quedaban canceladas para siempre aunque el auto siguiera disponible en la red.
-    if (mCerrado.comisionAceptadaAt) {
-      const { data: rivalesReabiertos, error: errRivales } = await supa.from('matches')
-        .update({ estado: 'pendiente', motivo_cancelacion: null, cerrado_at: null, comision_aceptada_at: null, cancelado_por_match_id: null })
-        .eq('cancelado_por_match_id', mCerrado.id)
-        .eq('estado', 'cancelada')
-        .select('id, agencia_compradora, origen');
-      if (errRivales) {
-        console.warn('confirmarCerrarMatch (reabrir rivales):', errRivales);
-      } else if (rivalesReabiertos && rivalesReabiertos.length) {
-        rivalesReabiertos.forEach(r => {
-          crearNotificacion(
-            r.agencia_compradora,
-            'match_etapa',
-            '¡El vehículo volvió a estar disponible!',
-            `La operación de otra agencia por el ${mCerrado.vehiculo} no se concretó. Tu match volvió a quedar activo — entrá a ${r.origen === 'manual' ? 'Matches Manuales' : 'Mis Matches'} para retomarlo.`,
-            r.id
-          );
-        });
-      }
-    }
   }
 
   closeModal('cerrarmatch');
@@ -6880,12 +7059,10 @@ function abrirContactoManual(vehiculoId){
   setContactoManualTipo('cliente');
   openModal('contactomanual');
 }
-// A diferencia de un match automático, el contacto manual no reserva el vehículo ni bloquea a
-// otras agencias — varias pueden "tantear" el mismo auto en paralelo (quedan varios matches
-// manuales en estado 'propuesta', uno por cada agencia que contactó). La reserva real recién pasa
-// cuando alguna, desde Matches Manuales, aprieta "Aceptar comisión" — ahí se dispara la misma
-// función que ya usan los matches automáticos (aceptarComisionMatch), que sí reserva el vehículo
-// y cancela a las demás. Contactar es solo "avisar que estoy interesado", no "me lo quedo".
+// Nada en el flujo reserva el vehículo: varias agencias pueden contactar el mismo auto, y también
+// aceptar la comisión, en paralelo (quedan varios matches manuales en estado 'propuesta' o más
+// avanzados, uno por cada agencia que contactó). El auto solo deja de estar disponible cuando
+// alguna operación se concreta.
 async function confirmarContactoManual(){
   if (!currentAgencia) return;
   const v = _buscarVehiculoParaContacto(_contactoManualVehiculoId);
@@ -6933,7 +7110,7 @@ async function confirmarContactoManual(){
     window.open(waHref, '_blank');
     toast(esDirecta
       ? 'Contacto registrado en Matches Manuales.'
-      : 'Contacto registrado en Matches Manuales. Si el cliente sigue interesado, aceptá la comisión desde ahí para reservar el vehículo.');
+      : 'Contacto registrado en Matches Manuales. Si el cliente sigue interesado, aceptá la comisión desde ahí para seguir con la operación.');
     await cargarMisMatches();
   } catch (e) {
     console.error('confirmarContactoManual:', e);
@@ -7136,13 +7313,6 @@ document.addEventListener('click', (e) => {
 // Geocodifica la dirección cargada en Mi Perfil (Nominatim/OpenStreetMap) y la guarda en Supabase.
 // El resto del formulario de Mi Perfil todavía no está conectado a datos reales — eso queda para
 // cuando convirtamos esa página completa; por ahora este botón solo persiste la dirección/mapa.
-// Cambia de sección dentro de Mi Perfil. Todos los campos siguen existiendo en el DOM aunque su
-// sección esté oculta (solo se ocultan con CSS), así que "Guardar cambios" sigue funcionando igual
-// que antes sin importar en qué pestaña esté parada la agencia.
-function mostrarPerfilTab(tab){
-  document.querySelectorAll('.profile-nav-item').forEach(btn => btn.classList.toggle('active', btn.dataset.pane === tab));
-  document.querySelectorAll('.profile-pane').forEach(pane => pane.classList.toggle('active', pane.id === 'perfil-pane-' + tab));
-}
 async function guardarPerfil(){
   if (!currentAgencia) return;
   const estadoEl = document.getElementById('perfilDireccionEstado');
@@ -7275,27 +7445,6 @@ async function eliminarFotoLocal(index){
   currentAgencia.fotos_local = actuales;
   document.getElementById('perfil-fotos-local-grid').innerHTML = renderFotosLocalGrid(actuales);
 }
-// Sube la foto a Storage al elegir el archivo (no hace falta que el proveedor ya exista: para uno
-// nuevo todavía no tiene id). La URL queda en un campo oculto y se guarda recién al hacer "Guardar".
-async function handleProveedorFotoUpload(event){
-  const file = event.target.files && event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    document.getElementById('prov-foto-preview').innerHTML = `<img src="${e.target.result}" alt="Foto del local">`;
-    try {
-      const ext = (file.type.split('/')[1] || 'jpg');
-      const path = `proveedores/${Date.now()}.${ext}`;
-      const url = await supaUpload('red-de-autos', path, e.target.result);
-      document.getElementById('prov-foto-url').value = url;
-      toast('Foto cargada');
-    } catch (err) {
-      console.error('handleProveedorFotoUpload:', err);
-      toast('Error al subir la foto.');
-    }
-  };
-  reader.readAsDataURL(file);
-}
 async function handleLogoUpload(event){
   const file = event.target.files && event.target.files[0];
   if (!file || !currentAgencia) return;
@@ -7386,16 +7535,6 @@ function propertyCoords(p){
   for(let i=0;i<p.id.length;i++){ hash = (hash*31 + p.id.charCodeAt(i)) % 1000; }
   const jitter = (hash/1000 - 0.5) * 0.05;
   return [base[0]+jitter, base[1]+jitter*1.3];
-}
-// A diferencia de Explorar la Red, acá no dependemos de que redStock esté cargado (no lo está al
-// mirar Mis Matches) — usamos el vehículo que el propio match ya trae consigo desde el join.
-function abrirVehiculoDeMatch(matchId){
-  const m = misMatchesReal.find(x => x.id === matchId);
-  if (!m || !m.vehiculoFull || !Object.keys(m.vehiculoFull).length) { toast('No se pudo cargar el detalle de este vehículo.'); return; }
-  const agenciaInfo = m.soyVendedor
-    ? currentAgencia
-    : { nombre: m.otraAgencia, telefono: m.otraAgenciaTel };
-  renderDetailModalReal({ ...m.vehiculoFull, id: m.vehiculoId, agencias: agenciaInfo });
 }
 function openPropertyDetailReal(vehiculoId){
   const v = redStock.find(x=>x.id===vehiculoId);
@@ -7624,6 +7763,7 @@ async function cargarMisBusquedas(){
       notas: c.notas || '',
       estado: b.estado,
       fechaVisita: '',
+      createdAtRaw: b.created_at || null,
       avatar: (c.avatar ?? null),
     };
   });
@@ -7731,30 +7871,25 @@ function proveedorCardHTML(p){
   const direccionTexto = [p.direccion, p.ciudad].filter(Boolean).join(', ');
   const mapsQuery = encodeURIComponent([p.direccion, p.ciudad, 'Argentina'].filter(Boolean).join(', '));
   const tieneDescuento = descuentoVigente(p);
-  const inicial = (p.nombre || '?').trim().charAt(0).toUpperCase();
-  const avatarHTML = p.foto_url
-    ? `<img src="${esc(p.foto_url)}" alt="${esc(p.nombre)}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`
-    : `<span>${esc(inicial)}</span>`;
   const botonMapa = direccionTexto
-    ? `<a class="btn btn-sm provider-card-btn" href="https://www.google.com/maps/search/?api=1&query=${esc(mapsQuery)}" target="_blank" onclick="registrarClicReal('proveedor','${p.id}','mapa')"><i class="fa-solid fa-location-dot"></i> Mapa</a>`
-    : `<span class="btn btn-sm provider-card-btn" style="opacity:.45;pointer-events:none;"><i class="fa-solid fa-location-dot"></i> Sin dirección</span>`;
+    ? `<a class="btn btn-sm" href="https://www.google.com/maps/search/?api=1&query=${esc(mapsQuery)}" target="_blank" onclick="registrarClicReal('proveedor','${p.id}','mapa')"><i class="fa-solid fa-location-dot"></i> Mapa</a>`
+    : '';
   const botonWhatsapp = p.telefono
-    ? `<a class="btn btn-sm whatsapp-btn provider-card-btn" style="text-decoration:none;" href="https://wa.me/${esc(p.telefono.replace(/\D/g,''))}" target="_blank" onclick="registrarClicReal('proveedor','${p.id}','whatsapp')"><i class="fa-brands fa-whatsapp"></i> Contactar</a>`
-    : `<span class="btn btn-sm provider-card-btn" style="opacity:.45;pointer-events:none;"><i class="fa-brands fa-whatsapp"></i> Sin WhatsApp</span>`;
+    ? `<a class="btn btn-sm whatsapp-btn" style="text-decoration:none;" href="https://wa.me/${esc(p.telefono.replace(/\D/g,''))}" target="_blank" onclick="registrarClicReal('proveedor','${p.id}','whatsapp')"><i class="fa-brands fa-whatsapp"></i> Contactar</a>`
+    : '';
+  const botonDescuento = tieneDescuento
+    ? `<button class="btn btn-sm btn-solid" onclick="verDescuentoProveedor('${p.id}')"><i class="fa-solid fa-tag"></i> Descuentos</button>`
+    : `<button class="btn btn-sm" onclick="verDescuentoProveedor('${p.id}')"><i class="fa-solid fa-tag"></i> Descuentos</button>`;
   return `
-  <div class="provider-card">
-    <div class="provider-card-top">
-      <div class="provider-card-avatar">${avatarHTML}</div>
-      ${p.plan==='destacado' ? `<span class="pill pill-sage" style="font-size:10.5px;"><i class="fa-solid fa-star"></i> Destacado</span>` : ''}
+  <div class="card" style="margin-bottom:12px;${tieneDescuento ? 'border-color:var(--red);' : ''}">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;">
+        <div style="font-weight:700;font-size:14.5px;display:flex;align-items:center;gap:8px;">${esc(p.nombre)}${p.plan==='destacado'?'<span class="pill pill-sage"><i class="fa-solid fa-star"></i> Destacado</span>':''}${tieneDescuento?'<span class="pill" style="background:var(--red);color:#fff;border-color:var(--red);"><i class="fa-solid fa-tag"></i> Con descuento</span>':''}</div>
+        <div style="font-size:12.5px;color:var(--paper-dim);margin-top:2px;">${esc(direccionTexto || '—')}</div>
+        ${p.descripcion ? `<div style="font-size:12.5px;color:var(--ink);margin-top:6px;">${esc(p.descripcion)}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">${botonMapa}${botonDescuento}${botonWhatsapp}</div>
     </div>
-    <div class="provider-card-body">
-      <div class="provider-card-name">${esc(p.nombre)}</div>
-      <div class="provider-card-rubro">${esc(p.rubro || '—')}</div>
-      <div class="provider-card-addr">${esc(direccionTexto || 'Sin dirección cargada')}</div>
-      ${p.descripcion ? `<div class="provider-card-desc">${esc(p.descripcion)}</div>` : ''}
-      ${tieneDescuento ? `<button class="provider-card-discount-badge" onclick="verDescuentoProveedor('${p.id}')"><i class="fa-solid fa-tag"></i> Descuentos disponibles</button>` : ''}
-    </div>
-    <div class="provider-card-actions">${botonMapa}${botonWhatsapp}</div>
   </div>`;
 }
 function proveedoresListaHTML(){
@@ -7766,7 +7901,7 @@ function proveedoresListaHTML(){
   items.forEach(p => { (grupos[p.rubro] ||= []).push(p); });
   return Object.keys(grupos).sort((a,b)=>a.localeCompare(b,'es')).map(rubro => `
     <div class="match-section-title"><i class="fa-solid fa-tag"></i> ${esc(rubro)} <span class="match-section-count">${esc(grupos[rubro].length)}</span></div>
-    <div class="provider-card-grid">${grupos[rubro].map(p=>proveedorCardHTML(p)).join('')}</div>
+    ${grupos[rubro].map(p=>proveedorCardHTML(p)).join('')}
   `).join('');
 }
 function renderProveedoresListaReal(){
@@ -7943,7 +8078,10 @@ async function showApp(view){
   if (view === 'dashboard') {
     await cargarDashboardData();
   } else if (view === 'performance') {
-    await cargarMisMatches();
+    // La vista del dueno cruza operaciones, demanda propia, stock y reputacion.
+    // cargarStatsInteresStock() depende de misStock, por eso va en un segundo tramo.
+    await Promise.all([cargarMisMatches(), cargarMisBusquedas(), cargarMiStock(), cargarPerfReputacion()]);
+    await cargarStatsInteresStock();
   } else if (view === 'comisiones') {
     await cargarMisMatches();
   } else if (view === 'vehículos') {
@@ -7988,6 +8126,58 @@ async function showApp(view){
 
 function fmtMoney(n,cur){ if(!n) return '—'; return (cur==='USD'?'USD ':'ARS ') + n.toLocaleString('es-AR'); }
 
+/* ---------------- helpers de Performance (vista del dueno) ---------------- */
+
+// Calificaciones recibidas por la agencia, para el bloque de confianza.
+let perfReputacion = { promedio: null, cantidad: 0 };
+async function cargarPerfReputacion(){
+  perfReputacion = { promedio: null, cantidad: 0 };
+  if (!currentAgencia) return;
+  const { data, error } = await supa
+    .from('calificaciones')
+    .select('estrellas')
+    .eq('agencia_destino_id', currentAgencia.id)
+    .eq('visible', true);
+  if (error) { console.error('cargarPerfReputacion:', error); return; }
+  const puntajes = (data || []).map(c => Number(c.estrellas)).filter(n => n > 0);
+  if (!puntajes.length) return;
+  perfReputacion = {
+    promedio: puntajes.reduce((a, b) => a + b, 0) / puntajes.length,
+    cantidad: puntajes.length,
+  };
+}
+
+// Costo mensual del plan de la agencia. Es el denominador del retorno.
+function perfPrecioPlan(){
+  const plan = (currentAgencia && currentAgencia.plan) ? String(currentAgencia.plan).toLowerCase() : '';
+  if (plan === 'premium') return 390000;
+  if (plan === 'pro') return 190000;
+  return null;
+}
+
+// Cotizacion del dolar de la cache de DolarAPI (la misma que alimenta el banner lateral).
+// Solo se usa para poder comparar comisiones en USD contra un abono en pesos.
+function perfCotizacionDolar(){
+  try {
+    const cache = JSON.parse(localStorage.getItem('rda_dolar_cache') || 'null');
+    const venta = cache && cache.data ? Number(cache.data.venta) : 0;
+    return (venta > 0) ? venta : null;
+  } catch (e) { return null; }
+}
+
+function perfDiasDesde(iso){
+  if (!iso) return null;
+  return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+}
+
+// Suma por moneda -> texto. Nunca mezcla ARS con USD en un mismo numero.
+function perfMoneda(o){
+  const partes = [];
+  if (o.ARS) partes.push(fmtMoney(Math.round(o.ARS), 'ARS'));
+  if (o.USD) partes.push(fmtMoney(Math.round(o.USD), 'USD'));
+  return partes.length ? partes.join('  +  ') : '—';
+}
+
 let perfMes = new Date().getMonth() + 1;
 let perfAnio = new Date().getFullYear();
 const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -8015,12 +8205,12 @@ function matchesFiltroBarHTML(){
   return `
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
     <button class="btn btn-solid" onclick="toggleMatchesLista()"><i class="fa-solid ${matchesListaOculta?'fa-eye':'fa-eye-slash'}"></i> ${matchesListaOculta?'Mostrar lista':'Ocultar lista'}</button>
-    <div style="display:flex;gap:10px;">
-      <select class="select-fecha" onchange="cambiarMatchesFiltroMes(this.value)">
+    <div class="mes-anio-picker">
+      <select onchange="cambiarMatchesFiltroMes(this.value)">
         <option value="todos" ${matchesFiltroMes==='todos'?'selected':''}>Todos los meses</option>
         ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${matchesFiltroMes===String(i+1)?'selected':''}>${m}</option>`).join('')}
       </select>
-      <select class="select-fecha" onchange="cambiarMatchesFiltroAnio(this.value)" ${matchesFiltroMes==='todos'?'disabled':''}>
+      <select onchange="cambiarMatchesFiltroAnio(this.value)" ${matchesFiltroMes==='todos'?'disabled':''}>
         ${anios.map(a=>`<option value="${a}" ${matchesFiltroAnio===a?'selected':''}>${a}</option>`).join('')}
       </select>
     </div>
@@ -8042,44 +8232,18 @@ function enMesFiltroMatchesManuales(fechaIso){
   const d = new Date(fechaIso);
   return (d.getMonth() + 1) === Number(matchesManualesFiltroMes) && d.getFullYear() === matchesManualesFiltroAnio;
 }
-// Estado propio del filtro de mes/año de Comisiones.
-let comisionesFiltroMes = 'todos';
-let comisionesFiltroAnio = new Date().getFullYear();
-function cambiarComisionesFiltroMes(v){ comisionesFiltroMes = v; showApp('comisiones'); }
-function cambiarComisionesFiltroAnio(v){ comisionesFiltroAnio = Number(v); showApp('comisiones'); }
-function enMesFiltroComisiones(fechaIso){
-  if (comisionesFiltroMes === 'todos') return true;
-  if (!fechaIso) return false;
-  const d = new Date(fechaIso);
-  return (d.getMonth() + 1) === Number(comisionesFiltroMes) && d.getFullYear() === comisionesFiltroAnio;
-}
-function comisionesFiltroBarHTML(){
-  const anioActual = new Date().getFullYear();
-  const anios = [anioActual - 1, anioActual, anioActual + 1];
-  return `
-  <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:6px;">
-    <select class="select-fecha" onchange="cambiarComisionesFiltroMes(this.value)">
-      <option value="todos" ${comisionesFiltroMes==='todos'?'selected':''}>Todos los meses</option>
-      ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${comisionesFiltroMes===String(i+1)?'selected':''}>${m}</option>`).join('')}
-    </select>
-    <select class="select-fecha" onchange="cambiarComisionesFiltroAnio(this.value)" ${comisionesFiltroMes==='todos'?'disabled':''}>
-      ${anios.map(a=>`<option value="${a}" ${comisionesFiltroAnio===a?'selected':''}>${a}</option>`).join('')}
-    </select>
-  </div>`;
-}
-
 function matchesManualesFiltroBarHTML(){
   const anioActual = new Date().getFullYear();
   const anios = [anioActual - 1, anioActual, anioActual + 1];
   return `
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
     <button class="btn btn-solid" onclick="toggleMatchesManualesLista()"><i class="fa-solid ${matchesManualesListaOculta?'fa-eye':'fa-eye-slash'}"></i> ${matchesManualesListaOculta?'Mostrar lista':'Ocultar lista'}</button>
-    <div style="display:flex;gap:10px;">
-      <select class="select-fecha" onchange="cambiarMatchesManualesFiltroMes(this.value)">
+    <div class="mes-anio-picker">
+      <select onchange="cambiarMatchesManualesFiltroMes(this.value)">
         <option value="todos" ${matchesManualesFiltroMes==='todos'?'selected':''}>Todos los meses</option>
         ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${matchesManualesFiltroMes===String(i+1)?'selected':''}>${m}</option>`).join('')}
       </select>
-      <select class="select-fecha" onchange="cambiarMatchesManualesFiltroAnio(this.value)" ${matchesManualesFiltroMes==='todos'?'disabled':''}>
+      <select onchange="cambiarMatchesManualesFiltroAnio(this.value)" ${matchesManualesFiltroMes==='todos'?'disabled':''}>
         ${anios.map(a=>`<option value="${a}" ${matchesManualesFiltroAnio===a?'selected':''}>${a}</option>`).join('')}
       </select>
     </div>
@@ -8168,96 +8332,346 @@ performance: ()=>{
     return (d.getMonth() + 1) === perfMes && d.getFullYear() === perfAnio;
   };
 
-  const hechosEsteMes = misMatchesReal.filter(m => enMes(m.createdAtRaw));
+  /* ============ 1. OPERACIONES DEL MES ============ */
+  const generadosEsteMes = misMatchesReal.filter(m => enMes(m.createdAtRaw));
+  const contactadosEsteMes = misMatchesReal.filter(m => enMes(m.contactadoAt));
   const concretadas = misMatchesReal.filter(m => m.estado === 'concretada' && enMes(m.cerradoAtRaw));
   const caidas = misMatchesReal.filter(m => m.estado === 'cancelada' && enMes(m.cerradoAtRaw));
   const totalCerradas = concretadas.length + caidas.length;
   const tasaConversion = totalCerradas ? Math.round((concretadas.length / totalCerradas) * 100) : 0;
 
-  // La comisión la cobra la agencia compradora (quien hizo la búsqueda), no la vendedora.
-  const comisionesPorMoneda = {};
+  /* ============ 2. GENERÉ ============
+     La comisión la cobra la agencia compradora (la que puso el cliente).
+     La venta del vehículo la factura la vendedora. Son dos ingresos distintos y
+     no se suman: uno es margen puro, el otro es facturación. */
+  const comisiones = { ARS: 0, USD: 0 };
+  const ventas = { ARS: 0, USD: 0 };
+  let unidadesPropiasVendidas = 0;
   concretadas.forEach(m => {
     if (!m.soyVendedor && m.comisionMonto) {
-      comisionesPorMoneda[m.comisionMoneda] = (comisionesPorMoneda[m.comisionMoneda] || 0) + Number(m.comisionMonto);
+      comisiones[m.comisionMoneda === 'USD' ? 'USD' : 'ARS'] += Number(m.comisionMonto);
+    }
+    if (m.soyVendedor) {
+      unidadesPropiasVendidas++;
+      if (m.precioVehiculoNumerico) ventas[m.monedaVehiculo === 'USD' ? 'USD' : 'ARS'] += Number(m.precioVehiculoNumerico);
     }
   });
-  const comisionesUsd = comisionesPorMoneda['USD'] || 0;
-  const comisionesArs = comisionesPorMoneda['ARS'] || 0;
 
-  // Ventas realizadas: el precio del vehículo cuando SOS la vendedora, a diferencia de la
-  // comisión de arriba (que cobra la compradora). Mismo criterio de mes/año que el resto del resumen.
-  const ventasPorMoneda = {};
-  concretadas.forEach(m => {
-    if (m.soyVendedor && m.precioVehiculoNumerico) {
-      ventasPorMoneda[m.monedaVehiculo] = (ventasPorMoneda[m.monedaVehiculo] || 0) + Number(m.precioVehiculoNumerico);
-    }
+  /* ============ 3. DEJÉ SOBRE LA MESA ============
+     Dos fugas distintas: oportunidades que la red ya trajo y nadie tocó, y
+     clientes propios esperando una unidad que todavía no apareció. */
+  const sinContactar = misMatchesReal.filter(m => m.estado === 'pendiente' && !m.contactadoAt);
+  const busquedasActivas = misBusquedasReal.filter(b => b.estado === 'activa');
+  const busquedasConMatch = new Set(misMatchesReal.filter(m => m.busquedaId).map(m => m.busquedaId));
+  const busquedasSinMatch = busquedasActivas.filter(b => !busquedasConMatch.has(b.id));
+  const cobertura = busquedasActivas.length
+    ? Math.round(((busquedasActivas.length - busquedasSinMatch.length) / busquedasActivas.length) * 100)
+    : null;
+
+  // Comisión en juego: la que cobraría la agencia si esos matches abiertos se cierran.
+  const enJuego = { ARS: 0, USD: 0 };
+  misMatchesReal
+    .filter(m => m.estado === 'pendiente' && !m.soyVendedor && m.comisionMonto)
+    .forEach(m => { enJuego[m.comisionMoneda === 'USD' ? 'USD' : 'ARS'] += Number(m.comisionMonto); });
+
+  /* ============ 4. ME COSTÓ / RETORNO ============
+     El retorno se calcula solo contra las comisiones cobradas, que son margen limpio.
+     No se computa el precio de las unidades propias vendidas: eso es facturación, no
+     ganancia, y meterlo acá inflaría el número hasta volverlo inútil. */
+  const costoPlan = perfPrecioPlan();
+  const dolar = perfCotizacionDolar();
+  const comisionesEnPesos = comisiones.ARS + (dolar ? comisiones.USD * dolar : 0);
+  const hayUsdSinCotizar = comisiones.USD > 0 && !dolar;
+  const retorno = (costoPlan && comisionesEnPesos > 0) ? (comisionesEnPesos / costoPlan) : null;
+
+  /* ============ 5. STOCK PROPIO ============ */
+  const stockActivo = misStock.filter(v => v.estado === 'activo');
+  let vistasTotales = 0, contactosTotales = 0;
+  stockActivo.forEach(v => {
+    const st = statsInteresStock[v.id];
+    if (st) { vistasTotales += st.vistas; contactosTotales += st.mensajes; }
   });
-  const ventasUsd = ventasPorMoneda['USD'] || 0;
-  const ventasArs = ventasPorMoneda['ARS'] || 0;
+  const antiguedades = stockActivo.map(v => perfDiasDesde(v.created_at)).filter(n => n !== null);
+  const antiguedadProm = antiguedades.length
+    ? Math.round(antiguedades.reduce((a, b) => a + b, 0) / antiguedades.length)
+    : null;
+  const topMirados = stockActivo
+    .map(v => ({ v, st: statsInteresStock[v.id] || { vistas: 0, mensajes: 0 } }))
+    .filter(x => x.st.vistas > 0)
+    .sort((a, b) => b.st.vistas - a.st.vistas)
+    .slice(0, 3);
+
+  /* ============ 6. CONFIANZA ============ */
+  const comisionesPorCobrar = misMatchesReal.filter(m => m.estado === 'concretada' && !m.soyVendedor && m.comisionMonto && m.comisionEstado !== 'pagada');
+  const comisionesPorPagar = misMatchesReal.filter(m => m.estado === 'concretada' && m.soyVendedor && m.comisionMonto && m.comisionEstado !== 'pagada');
+  const caidasPorMi = caidas.filter(m => m.soyVendedor);
 
   const anioActual = new Date().getFullYear();
   const aniosDisponibles = [anioActual - 1, anioActual, anioActual + 1];
+  const nombreMes = MESES_ES[perfMes - 1];
+
+  /* ============ VEREDICTO ============ */
+  let veredicto;
+  if (concretadas.length === 0 && sinContactar.length === 0 && busquedasSinMatch.length === 0) {
+    veredicto = `<i class="fa-solid fa-circle-info"></i> Sin movimiento en ${esc(nombreMes)}. Cargá las búsquedas de tus clientes y actualizá tu stock para que la red pueda trabajar.`;
+  } else if (concretadas.length === 0) {
+    veredicto = `<i class="fa-solid fa-triangle-exclamation"></i> No cerraste operaciones en ${esc(nombreMes)}, pero tenés <strong>${sinContactar.length + busquedasSinMatch.length}</strong> oportunidades vivas sin resolver. El abono no se justifica con la red parada: el cuello de botella está acá abajo.`;
+  } else if (retorno !== null) {
+    veredicto = `<i class="fa-solid fa-circle-check"></i> Por cada <strong>$1</strong> de abono, la red te devolvió <strong>$${retorno.toFixed(1)}</strong> en comisiones cobradas${unidadesPropiasVendidas ? `, además de sacarte <strong>${unidadesPropiasVendidas}</strong> ${unidadesPropiasVendidas === 1 ? 'unidad' : 'unidades'} de la playa` : ''}.`;
+  } else {
+    veredicto = `<i class="fa-solid fa-circle-check"></i> Cerraste <strong>${concretadas.length}</strong> ${concretadas.length === 1 ? 'operación' : 'operaciones'} en ${esc(nombreMes)}${unidadesPropiasVendidas ? ` y sacaste <strong>${unidadesPropiasVendidas}</strong> ${unidadesPropiasVendidas === 1 ? 'unidad' : 'unidades'} de la playa` : ''}.`;
+  }
+
+  const paso = (etiqueta, valor) => `
+    <div class="kpi" style="flex:1;min-width:132px;text-align:center;padding:14px 10px;">
+      <div class="lbl" style="justify-content:center;margin-bottom:8px;">${esc(etiqueta)}</div>
+      <div class="val" style="font-size:26px;">${valor}</div>
+    </div>`;
+  const flecha = `<div style="display:flex;align-items:center;color:var(--paper-dim);opacity:.45;"><i class="fa-solid fa-chevron-right"></i></div>`;
 
   return `
-  <div class="main-head"><div><h1>Performance</h1><p class="sub">Tu actividad mes a mes: matches, operaciones y comisiones</p></div></div>
+  <div class="main-head">
+    <div>
+      <h1>Performance</h1>
+      <p class="sub">Lo que la red te devolvió este mes, lo que quedó sin usar y lo que te costó</p>
+    </div>
+  </div>
+
+  <!-- ============ EL MES EN TRES NÚMEROS ============ -->
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
-      <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Resumen mensual</strong>
-      <div style="display:flex;gap:10px;">
-        <select class="select-fecha" onchange="cambiarPerfMes(this.value)">
-          ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${perfMes===i+1?'selected':''}>${m}</option>`).join('')}
+      <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">El mes en tres números</strong>
+      <div class="mes-anio-picker">
+        <select onchange="cambiarPerfMes(this.value)">
+          ${MESES_ES.map((m, i) => `<option value="${i + 1}" ${perfMes === i + 1 ? 'selected' : ''}>${m}</option>`).join('')}
         </select>
-        <select class="select-fecha" onchange="cambiarPerfAnio(this.value)">
-          ${aniosDisponibles.map(a=>`<option value="${a}" ${perfAnio===a?'selected':''}>${a}</option>`).join('')}
+        <select onchange="cambiarPerfAnio(this.value)">
+          ${aniosDisponibles.map(a => `<option value="${a}" ${perfAnio === a ? 'selected' : ''}>${a}</option>`).join('')}
         </select>
       </div>
     </div>
-    <div class="kpi-grid">
-      <div class="kpi"><div class="lbl">Matches hechos</div><div class="val">${hechosEsteMes.length}</div></div>
-      <div class="kpi"><div class="lbl">Concretadas</div><div class="val" style="color:#3F7A46;">${concretadas.length}</div></div>
-      <div class="kpi"><div class="lbl">Caídas</div><div class="val" style="color:#C0392B;">${caidas.length}</div></div>
-      <div class="kpi"><div class="lbl">Tasa de conversión</div><div class="val">${tasaConversion}%</div></div>
+
+    <div class="row-3">
+      <div class="kpi" style="border-left:3px solid var(--sage);">
+        <button class="kpi-info-btn" onclick="openKpiInfo('Generé','Comisiones que cobraste este mes por operaciones cerradas en las que vos pusiste el cliente. Se cuentan al cerrarse la operación, no al pactarse. Abajo aparecen además las unidades de tu propio stock que se vendieron gracias a la red: esa plata es facturación tuya, no comisión, por eso se muestra aparte.')"><i class="fa-solid fa-circle-info"></i></button>
+        <div class="lbl"><i class="fa-solid fa-arrow-trend-up"></i>Generé</div>
+        <div class="val" style="color:var(--sage);font-size:${(comisiones.ARS && comisiones.USD) ? '20px' : '28px'};">${perfMoneda(comisiones)}</div>
+        <p class="sub" style="margin:8px 0 0;font-size:12px;">
+          en comisiones cobradas &middot; ${concretadas.length} ${concretadas.length === 1 ? 'operación cerrada' : 'operaciones cerradas'}
+        </p>
+        ${unidadesPropiasVendidas ? `<p class="sub" style="margin:6px 0 0;font-size:12px;border-top:1px dashed var(--line);padding-top:6px;">+ ${unidadesPropiasVendidas} ${unidadesPropiasVendidas === 1 ? 'unidad propia vendida' : 'unidades propias vendidas'} por la red <span class="mono">(${perfMoneda(ventas)} facturados)</span></p>` : ''}
+      </div>
+
+      <div class="kpi" style="border-left:3px solid var(--red);">
+        <button class="kpi-info-btn" onclick="openKpiInfo('Dejé sobre la mesa','Dos fugas distintas. Primero: oportunidades que la red ya te trajo y que nadie del equipo contactó todavía. Segundo: búsquedas activas de tus clientes que no tienen ninguna unidad compatible en la red. La primera es un problema de uso interno y se arregla hoy; la segunda es falta de oferta y se arregla pidiéndole esa unidad a la red. La comisión en juego es la que cobrarías vos si esos matches abiertos se cerraran.')"><i class="fa-solid fa-circle-info"></i></button>
+        <div class="lbl"><i class="fa-solid fa-hourglass-half"></i>Dejé sobre la mesa</div>
+        <div class="val" style="color:var(--red);">${sinContactar.length + busquedasSinMatch.length}</div>
+        <p class="sub" style="margin:8px 0 0;font-size:12px;">
+          ${sinContactar.length} ${sinContactar.length === 1 ? 'oportunidad sin contactar' : 'oportunidades sin contactar'} &middot; ${busquedasSinMatch.length} ${busquedasSinMatch.length === 1 ? 'cliente sin cubrir' : 'clientes sin cubrir'}
+        </p>
+        ${(enJuego.ARS || enJuego.USD) ? `<p class="sub" style="margin:6px 0 0;font-size:12px;border-top:1px dashed var(--line);padding-top:6px;">Comisión en juego: <span class="mono">${perfMoneda(enJuego)}</span></p>` : ''}
+      </div>
+
+      <div class="kpi">
+        <button class="kpi-info-btn" onclick="openKpiInfo('Me costó','Abono mensual de tu plan. Es el número contra el que se mide todo lo demás: si las comisiones cobradas no lo superan de forma sostenida, la red todavía no se está pagando sola. El retorno se calcula solo con comisiones, que son margen limpio, y no con el precio de los autos vendidos, que es facturación.')"><i class="fa-solid fa-circle-info"></i></button>
+        <div class="lbl"><i class="fa-solid fa-receipt"></i>Me costó</div>
+        <div class="val">${costoPlan ? fmtMoney(costoPlan, 'ARS') : '—'}</div>
+        <p class="sub" style="margin:8px 0 0;font-size:12px;">
+          ${costoPlan ? 'abono mensual del plan' : 'sin plan asignado'}
+        </p>
+        ${retorno !== null ? `<p class="sub" style="margin:6px 0 0;font-size:12px;border-top:1px dashed var(--line);padding-top:6px;">Retorno: <strong style="color:${retorno >= 1 ? 'var(--sage)' : 'var(--red)'};">${retorno.toFixed(1)}x</strong></p>` : ''}
+      </div>
     </div>
-    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;">
-      <div class="card" style="flex:1;min-width:220px;margin-top:0;">
-        <div class="lbl">Ingreso por comisiones en USD</div>
-        <div class="val" style="font-size:28px;">${comisionesUsd ? fmtMoney(comisionesUsd, 'USD') : '—'}</div>
+
+    <div style="margin-top:18px;padding:14px 16px;border-radius:10px;background:#F5F4F0;border:1px solid var(--line);font-size:13.5px;line-height:1.6;color:var(--ink);">
+      ${veredicto}
+    </div>
+    ${hayUsdSinCotizar ? `<p class="sub" style="margin:10px 0 0;font-size:11.5px;">El retorno no incluye las comisiones en dólares: no se pudo leer la cotización. Se muestran por separado arriba.</p>` : ''}
+  </div>
+
+  <!-- ============ EMBUDO ============ -->
+  <div class="card" style="margin-top:16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+      <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">De la búsqueda al cierre &middot; ${esc(nombreMes)}</strong>
+      <button class="kpi-info-btn" style="position:static;" onclick="openKpiInfo('Embudo del mes','Muestra dónde se corta el proceso. Si caen las búsquedas cargadas, el equipo no está usando la herramienta. Si hay matches pero pocos contactos, las oportunidades se enfrían adentro de la agencia. Si hay contactos pero pocos cierres, el problema está en el precio, la unidad o la contraparte. Aclaración técnica: los matches se generan cuando alguien de la agencia abre la aplicación, así que la fecha del match dice cuándo se vio la oportunidad, no cuándo apareció.')"><i class="fa-solid fa-circle-info"></i></button>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;">
+      ${paso('Búsquedas cargadas', misBusquedasReal.filter(b => enMes(b.createdAtRaw)).length)}
+      ${flecha}
+      ${paso('Matches', generadosEsteMes.length)}
+      ${flecha}
+      ${paso('Contactados', contactadosEsteMes.length)}
+      ${flecha}
+      ${paso('Concretadas', `<span style="color:var(--sage);">${concretadas.length}</span>`)}
+      ${flecha}
+      ${paso('Caídas', `<span style="color:var(--red);">${caidas.length}</span>`)}
+    </div>
+    <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr);margin:20px 0 0;">
+      <div class="kpi">
+        <button class="kpi-info-btn" onclick="openKpiInfo('Tasa de cierre','Operaciones concretadas sobre el total de operaciones que se cerraron este mes, contando las caídas. Con pocas operaciones por mes este porcentaje salta mucho de un mes a otro: mirá el número absoluto de cierres antes que el porcentaje.')"><i class="fa-solid fa-circle-info"></i></button>
+        <div class="lbl"><i class="fa-solid fa-percent"></i>Tasa de cierre</div>
+        <div class="val">${totalCerradas ? tasaConversion + '%' : '—'}</div>
+        <p class="sub" style="margin:8px 0 0;font-size:12px;">${totalCerradas ? `sobre ${totalCerradas} ${totalCerradas === 1 ? 'operación cerrada' : 'operaciones cerradas'}` : 'sin operaciones cerradas este mes'}</p>
       </div>
-      <div class="card" style="flex:1;min-width:220px;margin-top:0;">
-        <div class="lbl">Ingreso por comisiones en ARS</div>
-        <div class="val" style="font-size:28px;">${comisionesArs ? fmtMoney(comisionesArs, 'ARS') : '—'}</div>
+      <div class="kpi">
+        <button class="kpi-info-btn" onclick="openKpiInfo('Cobertura de tu demanda','Porcentaje de las búsquedas activas de tus clientes que tienen al menos una unidad compatible en la red. Es el mejor indicador de si la red te sirve: si está bajo, no importa cuántos autos haya publicados, no hay lo que tus clientes piden.')"><i class="fa-solid fa-circle-info"></i></button>
+        <div class="lbl"><i class="fa-solid fa-bullseye"></i>Cobertura de tu demanda</div>
+        <div class="val" style="color:${cobertura === null ? 'inherit' : (cobertura >= 50 ? 'var(--sage)' : 'var(--red)')};">${cobertura === null ? '—' : cobertura + '%'}</div>
+        <p class="sub" style="margin:8px 0 0;font-size:12px;">${busquedasActivas.length ? `${busquedasActivas.length - busquedasSinMatch.length} de ${busquedasActivas.length} búsquedas activas con match` : 'sin búsquedas activas'}</p>
       </div>
     </div>
-    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;">
-      <div class="card" style="flex:1;min-width:220px;margin-top:0;">
-        <div class="lbl">Ventas realizadas en USD</div>
-        <div class="val" style="font-size:28px;">${ventasUsd ? fmtMoney(ventasUsd, 'USD') : '—'}</div>
+  </div>
+
+  <!-- ============ DÓNDE SE ESTÁ PERDIENDO PLATA ============ -->
+  <div class="card" style="margin-top:16px;">
+    <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Dónde se está perdiendo plata ahora</strong>
+    <p class="sub" style="margin:6px 0 18px;">No depende del mes elegido: es el estado actual de la agencia.</p>
+
+    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:280px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <i class="fa-solid fa-phone-slash" style="color:var(--red);"></i>
+          <strong style="font-size:13.5px;">Oportunidades sin contactar (${sinContactar.length})</strong>
+        </div>
+        ${sinContactar.length ? `
+          <table>
+            <tbody>
+              ${sinContactar.slice(0, 5).map(m => {
+                const dias = perfDiasDesde(m.createdAtRaw);
+                return `<tr>
+                  <td>${esc(m.vehiculo)}<br><span class="sub" style="font-size:11.5px;">${esc(m.soyVendedor ? 'Te consultó ' + m.otraAgencia : 'Para ' + m.clienteNombre)}</span></td>
+                  <td style="text-align:right;white-space:nowrap;"><span class="pill ${dias !== null && dias >= 3 ? 'pill-brick' : ''}">${dias === null ? '—' : (dias === 0 ? 'hoy' : 'hace ' + dias + (dias === 1 ? ' día' : ' días'))}</span></td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+          <button class="btn btn-sm" onclick="showApp('matches')" style="margin-top:12px;">Ver todas las oportunidades</button>
+        ` : `<p class="sub" style="margin:0;">Todo contactado. Bien ahí.</p>`}
       </div>
-      <div class="card" style="flex:1;min-width:220px;margin-top:0;">
-        <div class="lbl">Ventas realizadas en ARS</div>
-        <div class="val" style="font-size:28px;">${ventasArs ? fmtMoney(ventasArs, 'ARS') : '—'}</div>
+
+      <div style="flex:1;min-width:280px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <i class="fa-solid fa-user-clock" style="color:var(--brick);"></i>
+          <strong style="font-size:13.5px;">Clientes esperando una unidad (${busquedasSinMatch.length})</strong>
+        </div>
+        ${busquedasSinMatch.length ? `
+          <table>
+            <tbody>
+              ${busquedasSinMatch.slice(0, 5).map(b => {
+                const dias = perfDiasDesde(b.createdAtRaw);
+                return `<tr>
+                  <td>${esc(b.nombre)}<br><span class="sub" style="font-size:11.5px;">${esc(b.tipo)}</span></td>
+                  <td style="text-align:right;white-space:nowrap;"><span class="pill ${dias !== null && dias >= 7 ? 'pill-brick' : ''}">${dias === null ? '—' : (dias === 0 ? 'hoy' : 'hace ' + dias + (dias === 1 ? ' día' : ' días'))}</span></td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+          <button class="btn btn-sm" onclick="showApp('busquedas')" style="margin-top:12px;">Ver todas las búsquedas</button>
+        ` : `<p class="sub" style="margin:0;">${busquedasActivas.length ? 'Todas tus búsquedas activas tienen al menos un match.' : 'No hay búsquedas activas cargadas.'}</p>`}
       </div>
     </div>
-    <div style="display:flex;gap:40px;flex-wrap:wrap;margin-top:20px;">
+  </div>
+
+  <!-- ============ TU STOCK EN LA RED ============ -->
+  <div class="card" style="margin-top:16px;">
+    <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Tu stock en la red</strong>
+    <div class="kpi-grid" style="margin:16px 0 0;">
+      <div class="kpi">
+        <div class="lbl"><i class="fa-solid fa-car"></i>Unidades publicadas</div>
+        <div class="val">${stockActivo.length}</div>
+      </div>
+      <div class="kpi">
+        <button class="kpi-info-btn" onclick="openKpiInfo('Vistas de la red','Cuántas veces otras agencias abrieron la ficha de alguna de tus unidades. Es el histórico completo, no solo el mes seleccionado. Muchas vistas con pocos contactos suele significar precio fuera de mercado o fotos insuficientes.')"><i class="fa-solid fa-circle-info"></i></button>
+        <div class="lbl"><i class="fa-solid fa-eye"></i>Vistas de la red</div>
+        <div class="val">${vistasTotales}</div>
+      </div>
+      <div class="kpi">
+        <div class="lbl"><i class="fa-brands fa-whatsapp"></i>Contactos recibidos</div>
+        <div class="val">${contactosTotales}</div>
+      </div>
+      <div class="kpi">
+        <button class="kpi-info-btn" onclick="openKpiInfo('Antigüedad de publicación','Promedio de días desde que cada unidad activa fue publicada en Red de Autos. Ojo: no son los días de stock reales del vehículo en tu playa, porque la plataforma solo sabe desde cuándo está publicada acá. Para medir rotación real hace falta cargar la fecha de ingreso de la unidad.')"><i class="fa-solid fa-circle-info"></i></button>
+        <div class="lbl"><i class="fa-solid fa-calendar-day"></i>Antigüedad promedio</div>
+        <div class="val">${antiguedadProm === null ? '—' : antiguedadProm + (antiguedadProm === 1 ? ' día' : ' días')}</div>
+      </div>
+    </div>
+    ${topMirados.length ? `
+      <div style="margin-top:18px;">
+        <strong style="font-size:13px;">Lo que más mira la red</strong>
+        <table style="margin-top:10px;">
+          <tbody>
+            ${topMirados.map(x => `<tr>
+              <td>${esc([x.v.marca, x.v.modelo, x.v.anio].filter(Boolean).join(' ') || '—')}</td>
+              <td style="text-align:right;white-space:nowrap;" class="mono">${x.st.vistas} ${x.st.vistas === 1 ? 'vista' : 'vistas'} &middot; ${x.st.mensajes} ${x.st.mensajes === 1 ? 'contacto' : 'contactos'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>` : ''}
+  </div>
+
+  <!-- ============ CONFIANZA ============ -->
+  <div class="card" style="margin-top:16px;">
+    <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Cómo te ve la red</strong>
+    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin:16px 0 0;">
+      <div class="kpi">
+        <button class="kpi-info-btn" onclick="openKpiInfo('Calificación recibida','Promedio de las estrellas que otras agencias te pusieron después de operar con vos. Es el dato que mira una contraparte antes de reservarte una unidad o aceptarte una comisión.')"><i class="fa-solid fa-circle-info"></i></button>
+        <div class="lbl"><i class="fa-solid fa-star"></i>Calificación recibida</div>
+        <div class="val">${perfReputacion.promedio === null ? '—' : perfReputacion.promedio.toFixed(1)}</div>
+        <p class="sub" style="margin:8px 0 0;font-size:12px;">${perfReputacion.cantidad ? `sobre ${perfReputacion.cantidad} ${perfReputacion.cantidad === 1 ? 'calificación' : 'calificaciones'}` : 'todavía sin calificaciones'}</p>
+      </div>
+      <div class="kpi">
+        <button class="kpi-info-btn" onclick="openKpiInfo('Comisiones pendientes','Por cobrar: operaciones cerradas donde vos pusiste el cliente y la contraparte todavía no registró el pago. Por pagar: operaciones donde vendiste tu unidad y le debés la comisión a la otra agencia. Deber comisiones es lo primero que rompe la confianza en una red entre competidores.')"><i class="fa-solid fa-circle-info"></i></button>
+        <div class="lbl"><i class="fa-solid fa-hand-holding-dollar"></i>Comisiones pendientes</div>
+        <div class="val">${comisionesPorCobrar.length} / ${comisionesPorPagar.length}</div>
+        <p class="sub" style="margin:8px 0 0;font-size:12px;">por cobrar / por pagar</p>
+      </div>
+      <div class="kpi">
+        <button class="kpi-info-btn" onclick="openKpiInfo('Operaciones caídas de tu lado','Operaciones del mes que se cayeron siendo vos la agencia que tenía el vehículo. Si el número crece, suele significar stock desactualizado: unidades publicadas que ya no están disponibles.')"><i class="fa-solid fa-circle-info"></i></button>
+        <div class="lbl"><i class="fa-solid fa-circle-xmark"></i>Caídas de tu lado</div>
+        <div class="val" style="color:${caidasPorMi.length ? 'var(--red)' : 'inherit'};">${caidasPorMi.length}</div>
+        <p class="sub" style="margin:8px 0 0;font-size:12px;">en ${esc(nombreMes)}</p>
+      </div>
+    </div>
+
+    ${(concretadas.length || caidas.length) ? `
+    <div style="display:flex;gap:40px;flex-wrap:wrap;margin-top:22px;">
       <div style="flex:1;min-width:220px;">
-        <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Cerraste operaciones con</strong>
+        <strong style="font-size:13px;">Cerraste operaciones con</strong>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-          ${concretadas.length ? concretadas.map(m=>`<span class="pill pill-sage">${esc(m.otraAgencia)}</span>`).join('') : '<p class="sub" style="margin:0;">Ninguna este mes.</p>'}
+          ${concretadas.length ? concretadas.map(m => `<span class="pill pill-sage">${esc(m.otraAgencia)}</span>`).join('') : '<p class="sub" style="margin:0;">Ninguna este mes.</p>'}
         </div>
       </div>
       <div style="flex:1;min-width:220px;">
-        <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Se te cayeron operaciones con</strong>
+        <strong style="font-size:13px;">Se te cayeron operaciones con</strong>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-          ${caidas.length ? caidas.map(m=>`<span class="pill pill-brick">${esc(m.otraAgencia)}</span>`).join('') : '<p class="sub" style="margin:0;">Ninguna este mes.</p>'}
+          ${caidas.length ? caidas.map(m => `<span class="pill pill-brick">${esc(m.otraAgencia)}</span>`).join('') : '<p class="sub" style="margin:0;">Ninguna este mes.</p>'}
         </div>
       </div>
+    </div>` : ''}
+  </div>
+
+  <!-- ============ PENDIENTE DE MEDIR ============ -->
+  <div class="card" style="margin-top:16px;background:#F5F4F0;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <i class="fa-solid fa-lock" style="color:var(--paper-dim);"></i>
+      <strong style="font-size:13.5px;">Métricas que todavía no se pueden calcular</strong>
     </div>
+    <p class="sub" style="margin:8px 0 14px;">Están definidas pero les falta un dato en la base. Se habilitan solas cuando ese dato exista.</p>
+    <table>
+      <tbody>
+        <tr><td><strong>Retorno real sobre el abono</strong><br><span class="sub" style="font-size:11.5px;">Hoy solo cuenta comisiones. Falta el margen de las unidades propias vendidas.</span></td><td style="text-align:right;white-space:nowrap;"><span class="pill">falta costo por unidad</span></td></tr>
+        <tr><td><strong>Rotación y días de stock reales</strong><br><span class="sub" style="font-size:11.5px;">La plataforma solo sabe desde cuándo la unidad está publicada acá.</span></td><td style="text-align:right;white-space:nowrap;"><span class="pill">falta fecha de ingreso</span></td></tr>
+        <tr><td><strong>Actividad por vendedor</strong><br><span class="sub" style="font-size:11.5px;">Toda la actividad cuelga de la agencia, no de la persona que la generó.</span></td><td style="text-align:right;white-space:nowrap;"><span class="pill">falta usuarios y roles</span></td></tr>
+        <tr><td><strong>Tiempo de respuesta</strong><br><span class="sub" style="font-size:11.5px;">El contacto sale a WhatsApp y la respuesta no vuelve a la plataforma.</span></td><td style="text-align:right;white-space:nowrap;"><span class="pill">falta marcar respuesta</span></td></tr>
+        <tr><td><strong>Reservas vencidas y stock bloqueado</strong><br><span class="sub" style="font-size:11.5px;">La reserva no tiene vencimiento ni estado propio del vehículo.</span></td><td style="text-align:right;white-space:nowrap;"><span class="pill">falta estado reservado</span></td></tr>
+      </tbody>
+    </table>
   </div>
   `;
 },
 
 comisiones: ()=>{
-  const conComision = misMatchesReal.filter(m => m.estado === 'concretada' && m.comisionMonto && enMesFiltroComisiones(m.cerradoAtRaw));
+  const conComision = misMatchesReal.filter(m => m.estado === 'concretada' && m.comisionMonto);
   const porPagar = conComision.filter(m => m.soyVendedor);
   const porCobrar = conComision.filter(m => !m.soyVendedor);
 
@@ -8273,7 +8687,7 @@ comisiones: ()=>{
       <td>${esc(m.comisionVehiculo || '—')}<br><span class="mono" style="color:var(--paper-dim);font-size:12px;">${esc(fmtMoney(m.comisionMonto, m.comisionMoneda))}</span></td>
       <td>
         ${m.comisionEstado === 'pagada'
-          ? `<span class="pill pill-sage" style="white-space:nowrap;">Pagada${m.comisionPagadaAt ? ' el ' + esc(fmtFechaHora(m.comisionPagadaAt)) : ''}</span>`
+          ? `<span class="pill pill-sage">Pagada${m.comisionPagadaAt ? ' el ' + esc(fmtFechaHora(m.comisionPagadaAt)) : ''}</span>`
           : (m.soyVendedor
               ? `<span class="pill">Pendiente</span> <button class="btn btn-sm btn-solid" onclick="registrarPagoComision('${m.id}')" style="margin-left:8px;">Registrar pago</button>`
               : `<span class="pill">Pendiente</span>`)
@@ -8287,8 +8701,7 @@ comisiones: ()=>{
       <strong>${esc(titulo)}</strong>
     </div>
     ${items.length ? `
-    <table class="comisiones-table" style="table-layout:fixed;">
-      <colgroup><col style="width:22%;"><col style="width:22%;"><col style="width:18%;"><col style="width:38%;"></colgroup>
+    <table>
       <thead><tr><th>Agencia</th><th>Vehículo</th><th>Comisión</th><th>Estado de cobro</th></tr></thead>
       <tbody>${items.map(filaHTML).join('')}</tbody>
     </table>` : `<div class="card"><p style="color:var(--paper-dim);margin:0;">No tenés comisiones ${titulo.toLowerCase()} por ahora.</p></div>`}
@@ -8296,7 +8709,6 @@ comisiones: ()=>{
 
   return `
   <div class="main-head"><div><h1>Comisiones</h1><p class="sub">Comisiones a pagar y a cobrar por tus operaciones concretadas</p></div></div>
-  ${comisionesFiltroBarHTML()}
   ${seccion('Por pagar', 'fa-arrow-up', 'var(--red)', porPagar)}
   ${seccion('Por cobrar', 'fa-arrow-down', '#3F7A46', porCobrar)}
   `;
@@ -8686,10 +9098,6 @@ manuales: ()=>{
   }
   return `
   <div class="main-head"><div><h1>Matches Manuales</h1><p class="sub">Contactos directos por WhatsApp desde Explorar la Red y Gremio — ${pendientes.length} pendiente${pendientes.length===1?'':'s'} · ${concretadas.length} concretada${concretadas.length===1?'':'s'} · ${caidas.length} caída${caidas.length===1?'':'s'}</p></div></div>
-  <div class="le-infobanner">
-    <i class="fa-solid fa-circle-info"></i>
-    <span><strong>Contactar no reserva el vehículo.</strong> Varias agencias pueden tener una consulta pendiente sobre el mismo auto al mismo tiempo, sin pisarse. La exclusividad recién se activa cuando alguna acepta la comisión: ahí se reserva el auto y las demás consultas pendientes sobre ese vehículo se marcan como caídas automáticamente. Si esa operación después no se concreta, esas agencias se reabren solas y les llega una notificación avisando que el vehículo volvió a estar disponible.</span>
-  </div>
   <div class="view-toggle">
     <button class="view-toggle-btn ${matchesManualesTab==='pipeline'?'active':''}" onclick="setMatchesManualesTab('pipeline')"><i class="fa-solid fa-timeline"></i> Pipeline</button>
     <button class="view-toggle-btn ${matchesManualesTab==='concretadas'?'active':''}" onclick="setMatchesManualesTab('concretadas')"><i class="fa-solid fa-circle-check"></i> Operaciones concretadas</button>
@@ -8807,139 +9215,111 @@ perfil: ()=>`
   <div class="main-head"><div><h1>Mi Perfil</h1><p class="sub">Datos de tu agencia en la red</p></div>
   <button class="btn btn-solid" id="btn-guardar-perfil" onclick="guardarPerfil()"><i class="fa-solid fa-check"></i> Guardar cambios</button></div>
 
-  <div class="profile-layout">
-    <div class="profile-nav">
-      <button class="profile-nav-item active" data-pane="datos" onclick="mostrarPerfilTab('datos')"><i class="fa-solid fa-shop"></i> Datos de la agencia</button>
-      <button class="profile-nav-item" data-pane="contacto" onclick="mostrarPerfilTab('contacto')"><i class="fa-solid fa-address-card"></i> Contacto y ubicación</button>
-      <button class="profile-nav-item" data-pane="fotos" onclick="mostrarPerfilTab('fotos')"><i class="fa-solid fa-images"></i> Fotos y logo</button>
-      <button class="profile-nav-item" data-pane="plan" onclick="mostrarPerfilTab('plan')"><i class="fa-solid fa-star"></i> Plan y facturación</button>
-      <button class="profile-nav-item" data-pane="seguridad" onclick="mostrarPerfilTab('seguridad')"><i class="fa-solid fa-lock"></i> Seguridad</button>
-      <button class="profile-nav-item" data-pane="preferencias" onclick="mostrarPerfilTab('preferencias')"><i class="fa-solid fa-gear"></i> Preferencias</button>
+  <div class="card profile-form">
+
+    <div class="profile-logo-row">
+      <div class="profile-logo-preview" id="perfil-logo-preview">${currentAgencia?.logo_url ? `<img src="${currentAgencia.logo_url}" alt="Logo">` : '<i class="fa-solid fa-car"></i>'}</div>
+      <div>
+        <input type="file" id="logo-upload" accept="image/*" style="display:none;" onchange="handleLogoUpload(event)">
+        <button class="btn btn-sm" onclick="document.getElementById('logo-upload').click()"><i class="fa-solid fa-upload"></i> Subir logo</button>
+        <p style="font-size:11.5px;color:var(--paper-dim);margin:8px 0 0;">PNG o JPG, se recomienda fondo cuadrado.</p>
+        <p style="font-size:11.5px;color:var(--paper-dim);margin:2px 0 0;">Tamaño ideal: 300x300 píxeles (mínimo 150x150) para que se vea nítido en todo el sistema.</p>
+      </div>
     </div>
 
-    <div class="profile-content">
+    <div class="profile-section-title"><i class="fa-solid fa-images"></i> Fotos del local</div>
+    <p style="font-size:11.5px;color:var(--paper-dim);margin:-4px 0 10px;">Se muestran en tu ficha dentro de Agencias Asociadas — ayudan a que otras agencias confíen en visitar tu local. Hasta 6 fotos.</p>
+    <div class="profile-fotos-local-grid" id="perfil-fotos-local-grid">${renderFotosLocalGrid(currentAgencia?.fotos_local || [])}</div>
+    <input type="file" id="fotos-local-upload" accept="image/*" multiple style="display:none;" onchange="handleFotosLocalUpload(event)">
 
-      <div class="card profile-pane active" id="perfil-pane-datos">
-        <div class="profile-pane-title">Datos de la agencia</div>
-        <p class="profile-pane-sub">El nombre y la ciudad con la que aparecés en toda la red — Explorar la Red, Agencias Asociadas y tus publicaciones.</p>
-        <div class="row-2">
-          <div class="field"><label>Nombre de la agencia</label><input id="perfilNombre" value="${esc(currentAgencia?.nombre ? currentAgencia.nombre.replace(/"/g,'&quot;') : '')}"></div>
-          <div class="field"><label>Ciudad</label>
-            <select id="perfilCiudad">${CIUDADES_RED.map(c=>`<option ${esc(currentAgencia?.ciudad===c?'selected':'')}>${c}</option>`).join('')}</select>
-          </div>
-        </div>
+    <div class="profile-section-title"><i class="fa-solid fa-car"></i> Datos de la agencia</div>
+    <div class="row-2">
+      <div class="field"><label>Nombre de la agencia</label><input id="perfilNombre" value="${esc(currentAgencia?.nombre ? currentAgencia.nombre.replace(/"/g,'&quot;') : '')}"></div>
+      <div class="field"><label>Ciudad</label>
+        <select id="perfilCiudad">${CIUDADES_RED.map(c=>`<option ${esc(currentAgencia?.ciudad===c?'selected':'')}>${c}</option>`).join('')}</select>
       </div>
-
-      <div class="card profile-pane" id="perfil-pane-contacto">
-        <div class="profile-pane-title">Contacto y ubicación</div>
-        <p class="profile-pane-sub">Así te contactan otras agencias, y de acá sale el mapa que se ve en el detalle de tus vehículos.</p>
-        <div class="row-3">
-          <div class="field"><label>WhatsApp</label><input id="perfilWhatsapp" value="${esc(currentAgencia?.telefono ? currentAgencia.telefono.replace(/"/g,'&quot;') : '')}" placeholder="+54 9 ..."></div>
-          <div class="field"><label>Email</label><input id="perfilEmail" value="${esc(currentAgencia?.email ? currentAgencia.email.replace(/"/g,'&quot;') : '')}" placeholder="contacto@agencia.com"></div>
-          <div class="field" style="position:relative;"><label>Dirección</label>
-            <input id="perfilDireccion" value="${esc(currentAgencia?.direccion ? currentAgencia.direccion.replace(/"/g,'&quot;') : '')}" placeholder="Calle y altura, ciudad — para mostrarla en el mapa del detalle del vehículo" oninput="onDireccionInputChange(this)" autocomplete="off">
-            <input type="hidden" id="perfilDireccionLat" value="${currentAgencia?.lat || ''}">
-            <input type="hidden" id="perfilDireccionLon" value="${currentAgencia?.lon || ''}">
-            <div id="perfilDireccionSugerencias" class="direccion-sugerencias hidden"></div>
-          </div>
-        </div>
-        <div class="row-2">
-          <div class="field"><label>Horarios de atención</label><input id="perfilHorarios" value="${esc(currentAgencia?.horarios ? currentAgencia.horarios.replace(/"/g,'&quot;') : '')}" placeholder="Ej: Lun a Vie 9 a 18hs, Sáb 9 a 13hs"></div>
-          <div class="field"><label>Nombre de contacto</label><input id="perfilContacto" value="${esc(currentAgencia?.contacto ? currentAgencia.contacto.replace(/"/g,'&quot;') : '')}" placeholder="A quién preguntar en el local"></div>
-        </div>
-        <div id="perfilDireccionEstado" style="font-size:11.5px;color:var(--paper-dim);margin:-10px 0 0;">${currentAgencia?.lat ? '<i class="fa-solid fa-circle-check" style="color:var(--sage);"></i> Ubicación guardada, ya se muestra en el mapa de tus vehículos.' : 'Todavía no cargaste tu ubicación — el mapa del detalle no va a mostrar nada hasta que guardes una dirección.'}</div>
-      </div>
-
-      <div class="card profile-pane" id="perfil-pane-fotos">
-        <div class="profile-pane-title">Fotos y logo</div>
-        <p class="profile-pane-sub">Se muestran en tu ficha dentro de Agencias Asociadas — ayudan a que otras agencias confíen en visitar tu local.</p>
-        <div class="profile-logo-row">
-          <div class="profile-logo-preview" id="perfil-logo-preview">${currentAgencia?.logo_url ? `<img src="${currentAgencia.logo_url}" alt="Logo">` : '<i class="fa-solid fa-car"></i>'}</div>
-          <div>
-            <input type="file" id="logo-upload" accept="image/*" style="display:none;" onchange="handleLogoUpload(event)">
-            <button class="btn btn-sm" onclick="document.getElementById('logo-upload').click()"><i class="fa-solid fa-upload"></i> Subir logo</button>
-            <p style="font-size:11.5px;color:var(--paper-dim);margin:8px 0 0;">PNG o JPG, se recomienda fondo cuadrado.</p>
-            <p style="font-size:11.5px;color:var(--paper-dim);margin:2px 0 0;">Tamaño ideal: 300x300 píxeles (mínimo 150x150) para que se vea nítido en todo el sistema.</p>
-          </div>
-        </div>
-        <div style="border-top:1px solid var(--line);margin:22px 0 18px;"></div>
-        <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 4px;">Fotos del local</p>
-        <p style="font-size:12.5px;color:var(--paper-dim);margin:0 0 12px;">Hasta 6 fotos.</p>
-        <div class="profile-fotos-local-grid" id="perfil-fotos-local-grid">${renderFotosLocalGrid(currentAgencia?.fotos_local || [])}</div>
-        <input type="file" id="fotos-local-upload" accept="image/*" multiple style="display:none;" onchange="handleFotosLocalUpload(event)">
-      </div>
-
-      <div class="card profile-pane" id="perfil-pane-plan">
-        <div class="profile-pane-title">Plan y facturación</div>
-        <p class="profile-pane-sub">Plan actual: <strong style="color:var(--ink);">${currentAgencia?.plan==='premium' ? 'Premium' : 'Pro'}</strong></p>
-        <div class="plan-choice-row">
-          <button class="plan-choice-btn ${currentAgencia?.plan!=='premium'?'selected':''}" onclick="solicitarCambioPlan('pro')" ${currentAgencia?.plan!=='premium'?'disabled':''}>
-            <span class="plan-choice-name">Plan Pro</span>
-            <span class="plan-choice-desc">${currentAgencia?.plan!=='premium' ? 'Tu plan actual' : 'Solicitar volver a Pro'}</span>
-          </button>
-          <button class="plan-choice-btn ${currentAgencia?.plan==='premium'?'selected':''}" onclick="solicitarCambioPlan('premium')" ${currentAgencia?.plan==='premium'?'disabled':''}>
-            <span class="plan-choice-name">Plan Premium</span>
-            <span class="plan-choice-desc">${currentAgencia?.plan==='premium' ? 'Tu plan actual' : 'Stock gestionada por nuestro equipo + soporte prioritario'}</span>
-          </button>
-          <button class="plan-choice-btn plan-choice-danger" onclick="abrirSolicitudBaja()">
-            <span class="plan-choice-name">Dar de baja</span>
-            <span class="plan-choice-desc">Cancelar tu cuenta en la red</span>
-          </button>
-        </div>
-        <p style="font-size:11.5px;color:var(--paper-dim);margin:14px 0 0;">Los cambios de plan y las bajas las gestiona el equipo de Red de Autos — al confirmar le llega el pedido a nuestro equipo, no es un cambio automático.</p>
-      </div>
-
-      <div class="card profile-pane" id="perfil-pane-seguridad">
-        <div class="profile-pane-title">Seguridad</div>
-        <p class="profile-pane-sub">Cambiá la contraseña con la que iniciás sesión.</p>
-        <div class="row-3">
-          <div class="field"><label>Contraseña actual</label><input type="password" id="pw-actual" placeholder="••••••••"></div>
-          <div class="field"><label>Nueva contraseña</label><input type="password" id="pw-nueva" placeholder="••••••••"></div>
-          <div class="field"><label>Confirmar nueva contraseña</label><input type="password" id="pw-confirmar" placeholder="••••••••"></div>
-        </div>
-        <button class="btn btn-solid" onclick="updatePassword()">Actualizar contraseña</button>
-      </div>
-
-      <div class="card profile-pane" id="perfil-pane-preferencias">
-        <div class="profile-pane-title">Preferencias</div>
-        <p class="profile-pane-sub">Personalizá cómo la plataforma trabaja para tu agencia.</p>
-
-        <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Semáforo de antigüedad en stock</p>
-        <p style="font-size:13px;color:var(--paper-dim);margin:0 0 16px;line-height:1.55;">Definí cuántos días tarda un vehículo en pasar de 🟢 a 🟡 y de 🟡 a 🔴 en Mi Stock, así podés priorizar precio gremio o más visibilidad según tu propio criterio.</p>
-        <div class="row-2">
-          <div class="field"><label>🟢 Verde hasta (días)</label><input type="number" id="cfg-verde-dias" value="${currentAgencia?.semaforo_dias_verde ?? 15}"></div>
-          <div class="field"><label>🟡 Amarillo hasta (días)</label><input type="number" id="cfg-amarillo-dias" value="${currentAgencia?.semaforo_dias_amarillo ?? 30}"></div>
-        </div>
-        <p style="font-size:12px;color:var(--paper-dim);margin:0;">🔴 Rojo: a partir del día siguiente al límite amarillo.</p>
-
-        <div style="border-top:1px solid var(--line);margin:26px 0;"></div>
-
-        <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Mensaje de WhatsApp precargado</p>
-        <p style="font-size:13px;color:var(--paper-dim);margin:0 0 12px;line-height:1.55;">El texto que se completa automáticamente cuando contactás a otra agencia por un vehículo que te interesa (en Explorar la Red y Oportunidades Exclusivas). Usá <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{agencia}</code> y <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{vehiculo}</code> para que se completen solos.</p>
-        <textarea id="cfg-whatsapp-msg" rows="3">${currentAgencia?.whatsapp_template ? currentAgencia.whatsapp_template.replace(/</g,'&lt;') : 'Hola {agencia}, vi el {vehiculo} en Red de Autos y me interesa. ¿Podés darme más info?'}</textarea>
-
-        <div style="border-top:1px solid var(--line);margin:26px 0;"></div>
-
-        <div class="row-2">
-          <div>
-            <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Comisión sugerida por defecto</p>
-            <p style="font-size:13px;color:var(--paper-dim);margin:0 0 10px;line-height:1.5;">La que aparece precargada al cargar un vehículo nuevo.</p>
-            <select id="cfg-comision-default">
-              ${['1%','1,5%','2%','2,5%','3%'].map(c=>`<option ${(currentAgencia?.comision_default||'3%')===c?'selected':''}>${c}</option>`).join('')}
-            </select>
-          </div>
-          <div>
-            <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Moneda por defecto</p>
-            <p style="font-size:13px;color:var(--paper-dim);margin:0 0 10px;line-height:1.5;">La que aparece precargada al cargar un vehículo nuevo.</p>
-            <select id="cfg-moneda-default">
-              <option ${(currentAgencia?.moneda_default||'USD')==='ARS'?'selected':''}>ARS</option>
-              <option ${(currentAgencia?.moneda_default||'USD')==='USD'?'selected':''}>USD</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
     </div>
+
+    <div class="profile-section-title"><i class="fa-solid fa-address-card"></i> Contacto</div>
+    <div class="row-3">
+      <div class="field"><label>WhatsApp</label><input id="perfilWhatsapp" value="${esc(currentAgencia?.telefono ? currentAgencia.telefono.replace(/"/g,'&quot;') : '')}" placeholder="+54 9 ..."></div>
+      <div class="field"><label>Email</label><input id="perfilEmail" value="${esc(currentAgencia?.email ? currentAgencia.email.replace(/"/g,'&quot;') : '')}" placeholder="contacto@agencia.com"></div>
+      <div class="field" style="position:relative;"><label>Dirección</label>
+        <input id="perfilDireccion" value="${esc(currentAgencia?.direccion ? currentAgencia.direccion.replace(/"/g,'&quot;') : '')}" placeholder="Calle y altura, ciudad — para mostrarla en el mapa del detalle del vehículo" oninput="onDireccionInputChange(this)" autocomplete="off">
+        <input type="hidden" id="perfilDireccionLat" value="${currentAgencia?.lat || ''}">
+        <input type="hidden" id="perfilDireccionLon" value="${currentAgencia?.lon || ''}">
+        <div id="perfilDireccionSugerencias" class="direccion-sugerencias hidden"></div>
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="field"><label>Horarios de atención</label><input id="perfilHorarios" value="${esc(currentAgencia?.horarios ? currentAgencia.horarios.replace(/"/g,'&quot;') : '')}" placeholder="Ej: Lun a Vie 9 a 18hs, Sáb 9 a 13hs"></div>
+      <div class="field"><label>Nombre de contacto</label><input id="perfilContacto" value="${esc(currentAgencia?.contacto ? currentAgencia.contacto.replace(/"/g,'&quot;') : '')}" placeholder="A quién preguntar en el local"></div>
+    </div>
+    <div id="perfilDireccionEstado" style="font-size:11.5px;color:var(--paper-dim);margin:-10px 0 16px;">${currentAgencia?.lat ? '<i class="fa-solid fa-circle-check" style="color:var(--sage);"></i> Ubicación guardada, ya se muestra en el mapa de tus vehículos.' : 'Todavía no cargaste tu ubicación — el mapa del detalle no va a mostrar nada hasta que guardes una dirección.'}</div>
+
+    <div class="profile-section-title"><i class="fa-solid fa-star"></i> Plan actual</div>
+    <p style="font-size:13px;color:var(--paper-dim);margin:-4px 0 16px;">Plan actual: <strong style="color:var(--ink);">${currentAgencia?.plan==='premium' ? 'Premium' : 'Pro'}</strong></p>
+    <div class="plan-choice-row">
+      <button class="plan-choice-btn ${currentAgencia?.plan!=='premium'?'selected':''}" onclick="solicitarCambioPlan('pro')" ${currentAgencia?.plan!=='premium'?'disabled':''}>
+        <span class="plan-choice-name">Plan Pro</span>
+        <span class="plan-choice-desc">${currentAgencia?.plan!=='premium' ? 'Tu plan actual' : 'Solicitar volver a Pro'}</span>
+      </button>
+      <button class="plan-choice-btn ${currentAgencia?.plan==='premium'?'selected':''}" onclick="solicitarCambioPlan('premium')" ${currentAgencia?.plan==='premium'?'disabled':''}>
+        <span class="plan-choice-name">Plan Premium</span>
+        <span class="plan-choice-desc">${currentAgencia?.plan==='premium' ? 'Tu plan actual' : 'Stock gestionada por nuestro equipo + soporte prioritario'}</span>
+      </button>
+      <button class="plan-choice-btn plan-choice-danger" onclick="abrirSolicitudBaja()">
+        <span class="plan-choice-name">Dar de baja</span>
+        <span class="plan-choice-desc">Cancelar tu cuenta en la red</span>
+      </button>
+    </div>
+    <p style="font-size:11.5px;color:var(--paper-dim);margin:10px 0 0;">Los cambios de plan y las bajas las gestiona el equipo de Red de Autos — al confirmar le llega el pedido a nuestro equipo, no es un cambio automático.</p>
+
+    <div class="profile-section-title"><i class="fa-solid fa-lock"></i> Cambiar contraseña</div>
+    <div class="row-3">
+      <div class="field"><label>Contraseña actual</label><input type="password" id="pw-actual" placeholder="••••••••"></div>
+      <div class="field"><label>Nueva contraseña</label><input type="password" id="pw-nueva" placeholder="••••••••"></div>
+      <div class="field"><label>Confirmar nueva contraseña</label><input type="password" id="pw-confirmar" placeholder="••••••••"></div>
+    </div>
+    <button class="btn btn-solid" onclick="updatePassword()">Actualizar contraseña</button>
+
+    <div class="profile-section-title"><i class="fa-solid fa-gear"></i> Configuración</div>
+    <p style="font-size:13px;color:var(--paper-dim);margin:-4px 0 20px;">Personalizá cómo la plataforma trabaja para tu agencia.</p>
+
+    <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Semáforo de antigüedad en stock</p>
+    <p style="font-size:13px;color:var(--paper-dim);margin:0 0 16px;line-height:1.55;max-width:640px;">Definí cuántos días tarda un vehículo en pasar de 🟢 a 🟡 y de 🟡 a 🔴 en Mi Stock, así podés priorizar precio gremio o más visibilidad según tu propio criterio.</p>
+    <div class="row-2">
+      <div class="field"><label>🟢 Verde hasta (días)</label><input type="number" id="cfg-verde-dias" value="${currentAgencia?.semaforo_dias_verde ?? 15}"></div>
+      <div class="field"><label>🟡 Amarillo hasta (días)</label><input type="number" id="cfg-amarillo-dias" value="${currentAgencia?.semaforo_dias_amarillo ?? 30}"></div>
+    </div>
+    <p style="font-size:12px;color:var(--paper-dim);margin:0;">🔴 Rojo: a partir del día siguiente al límite amarillo.</p>
+
+    <div style="border-top:1px solid var(--line);margin:26px 0;"></div>
+
+    <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Mensaje de WhatsApp precargado</p>
+    <p style="font-size:13px;color:var(--paper-dim);margin:0 0 12px;line-height:1.55;max-width:640px;">El texto que se completa automáticamente cuando contactás a otra agencia por un vehículo que te interesa (en Explorar la Red y Oportunidades Exclusivas). Usá <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{agencia}</code> y <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{vehiculo}</code> para que se completen solos.</p>
+    <textarea id="cfg-whatsapp-msg" rows="3" style="max-width:640px;">${currentAgencia?.whatsapp_template ? currentAgencia.whatsapp_template.replace(/</g,'&lt;') : 'Hola {agencia}, vi el {vehiculo} en Red de Autos y me interesa. ¿Podés darme más info?'}</textarea>
+
+    <div style="border-top:1px solid var(--line);margin:26px 0;"></div>
+
+    <div class="row-2">
+      <div>
+        <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Comisión sugerida por defecto</p>
+        <p style="font-size:13px;color:var(--paper-dim);margin:0 0 10px;line-height:1.5;">La que aparece precargada al cargar un vehículo nuevo.</p>
+        <select id="cfg-comision-default">
+          ${['1%','1,5%','2%','2,5%','3%'].map(c=>`<option ${(currentAgencia?.comision_default||'3%')===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Moneda por defecto</p>
+        <p style="font-size:13px;color:var(--paper-dim);margin:0 0 10px;line-height:1.5;">La que aparece precargada al cargar un vehículo nuevo.</p>
+        <select id="cfg-moneda-default">
+          <option ${(currentAgencia?.moneda_default||'USD')==='ARS'?'selected':''}>ARS</option>
+          <option ${(currentAgencia?.moneda_default||'USD')==='USD'?'selected':''}>USD</option>
+        </select>
+      </div>
+    </div>
+
   </div>
 `,
 
