@@ -6564,6 +6564,9 @@ async function cargarMisMatches(){
     else if (m.visita_realizada_at) etapa = 'realizada';
     else if (m.visita_agendada_at) etapa = 'visita';
     else if (m.cliente_informado_at) etapa = 'visita';
+    // Compra directa: no hay "cliente informado", así que entra a 'visita' directo cuando ya
+    // propuso fechas (con el botón "Agendar visita" que aparece apenas está contactada).
+    else if (m.visita_fechas_propuestas && m.visita_fechas_propuestas.length) etapa = 'visita';
     else if (m.comision_aceptada_at || (m.es_compra_directa && m.contactado_at)) etapa = 'contactado';
     return {
       id: m.id,
@@ -6823,7 +6826,7 @@ async function marcarVisitaRealizada(matchId){
   if (!m) return;
   const { error } = await supa.from('matches').update({ visita_realizada_at: new Date().toISOString() }).eq('id', matchId);
   if (error) { toast('Error al actualizar el match.'); console.error('marcarVisitaRealizada:', error); return; }
-  crearNotificacion(m.otraAgenciaId, 'match_etapa', 'Avance en un match', `${currentAgencia?.nombre || 'La agencia'} confirmó que tu cliente visitó el vehículo (${m.vehiculo}).`, m.id);
+  crearNotificacion(m.otraAgenciaId, 'match_etapa', 'Avance en un match', m.esCompraDirecta ? `${currentAgencia?.nombre || 'La agencia'} confirmó que visitaste el vehículo (${m.vehiculo}).` : `${currentAgencia?.nombre || 'La agencia'} confirmó que tu cliente visitó el vehículo (${m.vehiculo}).`, m.id);
   toast('Visita marcada como realizada');
   await showApp(vistaMatchesActual());
 }
@@ -6974,11 +6977,14 @@ function matchCardHTML(m){
     }
   } else if (m.etapa === 'contactado') {
     // Touchpoint 2: ya se aceptó la comisión.
-    // En una compra directa no hay cliente al que informar: la vendedora puede finalizar
-    // directo apenas se pongan de acuerdo, sin pasos intermedios.
+    // En una compra directa no hay cliente al que informar, así que se saltea ese paso — pero
+    // sigue habiendo una visita real que coordinar antes de poder finalizar la operación.
     if (m.esCompraDirecta) {
-      if (m.soyVendedor) primaryActions = `<button class="btn btn-sm whatsapp-btn" onclick="abrirCerrarMatch('${m.id}', false)"><i class="fa-solid fa-flag-checkered"></i> Finalizar operación</button>`;
-      else notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} confirme la venta</div>`);
+      if (!m.soyVendedor) {
+        primaryActions = `<button class="btn btn-sm whatsapp-btn" onclick="abrirAgendarVisitaModal('${m.id}')"><i class="fa-solid fa-calendar-days"></i> Agendar visita</button>`;
+      } else {
+        notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} proponga fechas de visita</div>`);
+      }
     } else if (m.origen === 'manual') {
       // Matches manuales: sin cambios — ya se contactaron por fuera para armar el match manual,
       // así que pasan directo a informar al cliente, como venía funcionando.
@@ -7011,7 +7017,7 @@ function matchCardHTML(m){
       const fechaTxt = fmtFechaVisita(m.visitaFechaConfirmada);
       notas.push(`<div class="match-done-note"><i class="fa-solid fa-calendar-check"></i> Visita confirmada para el ${fechaTxt}</div>`);
       if (m.soyVendedor) primaryActions = `<button class="btn btn-sm" onclick="marcarVisitaRealizada('${m.id}')"><i class="fa-solid fa-check"></i> Marcar visita realizada</button>`;
-      else notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que el cliente visite a ${esc(m.otraAgencia)}.</div>`);
+      else notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> ${m.esCompraDirecta ? `Esperando poder visitar a ${esc(m.otraAgencia)}.` : `Esperando que el cliente visite a ${esc(m.otraAgencia)}.`}</div>`);
     } else if (fechasProp.length) {
       // Fechas propuestas, esperando que la vendedora confirme una.
       if (m.soyVendedor) {
@@ -7036,7 +7042,16 @@ function matchCardHTML(m){
     // Touchpoint 4 (nuevo): recién cuando la vendedora marcó la visita como realizada aparece
     // "Interés", que registra qué va a pasar con la venta. Reserva/Crédito/Espera capital dejan
     // una nota informativa y la operación sigue abierta — el auto NO se bloquea para otras agencias.
-    if (m.soyVendedor) {
+    // En compra directa no hay cliente al que hacerle seguimiento, así que no pasa por "Interés":
+    // la vendedora puede finalizar directo apenas se hizo la visita.
+    if (m.esCompraDirecta) {
+      notas.push(`<span class="info-pill sage"><i class="fa-solid fa-flag-checkered"></i> Visita realizada</span>`);
+      if (m.soyVendedor) {
+        primaryActions = `<button class="btn btn-sm whatsapp-btn" onclick="abrirCerrarMatch('${m.id}', false)"><i class="fa-solid fa-flag-checkered"></i> Finalizar operación</button>`;
+      } else {
+        notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} finalice la operación.</div>`);
+      }
+    } else if (m.soyVendedor) {
       if (m.interesResultado) {
         notas.push(`<span class="info-pill sage"><i class="fa-solid fa-flag-checkered"></i> Visita realizada</span>`);
         notas.push(`<span class="info-pill violet"><i class="fa-solid fa-circle-info"></i> ${esc(interesResultadoTxt(m.interesResultado))}</span>`);
@@ -7064,8 +7079,9 @@ function matchCardHTML(m){
   // botón "Rechazar" (arriba), así que acá no se le duplica.
   const puedeMarcarCaida = m.estado === 'pendiente' && !(m.etapa === 'propuesta' && !m.soyVendedor);
   const cerrarCaidaBtn = puedeMarcarCaida ? `<button class="btn btn-sm btn-eliminar-pastel" onclick="abrirCerrarMatch('${m.id}', true)"><i class="fa-solid fa-trash"></i> Marcar como caída</button>` : '';
-  // Volver un paso atrás: solo para quien busca el vehículo (el vendedor espera, no retrocede su propio match)
-  const volverBtn = (!m.soyVendedor && !m.esCompraDirecta && m.estado === 'pendiente' && m.etapa === 'visita')
+  // Volver un paso atrás: solo para quien busca el vehículo (el vendedor espera, no retrocede su propio match).
+  // También vale para compra directa ahora que pasa por el mismo paso de agendar visita.
+  const volverBtn = (!m.soyVendedor && m.estado === 'pendiente' && m.etapa === 'visita')
     ? `<button class="btn btn-sm" onclick="retrocederMatch('${m.id}')"><i class="fa-solid fa-rotate-left"></i> Volver un paso atrás</button>` : '';
   // Reabrir una operación ya finalizada (concretada o caída): solo la agencia vendedora, que fue
   // quien la finalizó originalmente.
