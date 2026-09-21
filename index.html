@@ -6892,26 +6892,31 @@ function cambiarMatchesVistaFiltro(v){ matchesVistaFiltro = (matchesVistaFiltro 
 // para que todas las badges queden una al lado de la otra en una sola fila en vez de dos.
 // Sin badge "Ver todo": tocar un filtro ya activo lo apaga y muestra las dos secciones de nuevo.
 function matchFiltroBuscoVendoHTML(list){
-  const busco = list.filter(m=>!m.soyVendedor).length;
+  const busco = list.filter(m=>!m.soyVendedor && !m.esCompraDirecta).length;
+  const directa = list.filter(m=>!m.soyVendedor && m.esCompraDirecta).length;
   const vendo = list.filter(m=>m.soyVendedor).length;
   return `
     <button type="button" class="match-filter-btn ${matchesVistaFiltro==='busco'?'active':''}" onclick="cambiarMatchesVistaFiltro('busco')"><i class="fa-solid fa-magnifying-glass"></i> Lo que busco para mis clientes <span class="match-filter-count">${busco}</span></button>
+    <button type="button" class="match-filter-btn ${matchesVistaFiltro==='directa'?'active':''}" onclick="cambiarMatchesVistaFiltro('directa')"><i class="fa-solid fa-bolt"></i> Busco para compra directa <span class="match-filter-count">${directa}</span></button>
     <button type="button" class="match-filter-btn ${matchesVistaFiltro==='vendo'?'active':''}" onclick="cambiarMatchesVistaFiltro('vendo')"><i class="fa-solid fa-car"></i> Lo que quieren de mi stock <span class="match-filter-count">${vendo}</span></button>`;
 }
 
-// Agrupa una lista de matches en dos secciones: lo que busco para mis clientes / lo que quieren de
-// mi stock (según matchesVistaFiltro, elegido con los botones de matchFiltroBuscoVendoHTML).
+// Agrupa una lista de matches en tres secciones: lo que busco para mis clientes / lo que busco para
+// compra directa (sin cliente ni comisión) / lo que quieren de mi stock (según matchesVistaFiltro,
+// elegido con los botones de matchFiltroBuscoVendoHTML).
 function renderMatchSections(list, emptyMsg){
   if (!list.length) return `<div class="card"><p style="color:var(--paper-dim);margin:0;">${emptyMsg}</p></div>`;
-  const busco = list.filter(m=>!m.soyVendedor);
+  const busco = list.filter(m=>!m.soyVendedor && !m.esCompraDirecta);
+  const directa = list.filter(m=>!m.soyVendedor && m.esCompraDirecta);
   const vendo = list.filter(m=>m.soyVendedor);
   const seccion = (titulo, icon, items) => `
     <div class="match-section-title"><i class="fa-solid ${icon}"></i> ${esc(titulo)} <span class="match-section-count">${items.length}</span></div>
     ${items.length ? items.map(m=>matchCardHTML(m)).join('') : `<p style="color:var(--paper-dim);font-size:13px;margin:0 0 24px;">Nada por acá todavía.</p>`}
   `;
   let secciones = '';
-  if (matchesVistaFiltro !== 'vendo') secciones += seccion('Lo que busco para mis clientes', 'fa-magnifying-glass', busco);
-  if (matchesVistaFiltro !== 'busco') secciones += seccion('Lo que quieren de mi stock', 'fa-car', vendo);
+  if (matchesVistaFiltro === 'todos' || matchesVistaFiltro === 'busco') secciones += seccion('Lo que busco para mis clientes', 'fa-magnifying-glass', busco);
+  if (matchesVistaFiltro === 'todos' || matchesVistaFiltro === 'directa') secciones += seccion('Busco para compra directa', 'fa-bolt', directa);
+  if (matchesVistaFiltro === 'todos' || matchesVistaFiltro === 'vendo') secciones += seccion('Lo que quieren de mi stock', 'fa-car', vendo);
   return secciones;
 }
 
@@ -7581,10 +7586,17 @@ async function eliminarNotificacionUna(event, id){
   showApp('notificaciones');
 }
 
-// Arma el mensaje de WhatsApp usando la plantilla configurable de Mi Perfil (con fallback si no cargó ninguna)
+// Arma el mensaje de WhatsApp usando la plantilla configurable de Mi Perfil (con fallback si no cargó ninguna).
+// Incluye quién escribe (nombre de contacto + agencia) para que del otro lado sepan con quién están hablando.
 function construirMensajeWhatsappVehiculo(agenciaNombre, vehTxt){
-  const tpl = currentAgencia?.whatsapp_template || 'Hola {agencia}, vi el {vehiculo} en Red de Autos y me interesa. ¿Podés darme más info?';
-  return tpl.replace(/\{agencia\}/g, agenciaNombre || 'la agencia').replace(/\{vehiculo\}/g, vehTxt || 'vehículo');
+  const tpl = currentAgencia?.whatsapp_template || 'Hola {agencia}, te escribe {miNombre} de {miAgencia}. Vi el {vehiculo} en Red de Autos y me interesa. ¿Podés darme más info?';
+  const miNombre = currentAgencia?.contacto?.trim() || 'el equipo';
+  const miAgencia = currentAgencia?.nombre || 'mi agencia';
+  return tpl
+    .replace(/\{agencia\}/g, agenciaNombre || 'la agencia')
+    .replace(/\{vehiculo\}/g, vehTxt || 'vehículo')
+    .replace(/\{miNombre\}/g, miNombre)
+    .replace(/\{miAgencia\}/g, miAgencia);
 }
 
 function registrarClicReal(tipoObjeto, objetoId, tipoEvento){
@@ -9216,12 +9228,14 @@ notificaciones: ()=>{
     { key: 'oportunidades', label: 'Oportunidades', icon: 'fa-solid fa-gem' },
   ];
   const lista = notifCategoriaFiltro ? notificacionesReal.filter(n => n.categoria === notifCategoriaFiltro) : notificacionesReal;
+  const hayNoLeidaEnCategoria = (key) => notificacionesReal.some(n => !n.leido && n.categoria === key);
+  const hayNoLeidaGeneral = notificacionesReal.some(n => !n.leido);
   return `
   <div class="main-head"><div><h1>Notificaciones</h1><p class="sub">Todo lo que pasó en tu actividad dentro de la red</p></div>
   <div style="display:flex;gap:10px;"><button class="btn" onclick="marcarTodasNotifLeidasReal()"><i class="fa-solid fa-check-double"></i> Marcar todas como leídas</button><button class="btn" onclick="limpiarNotificacionesReal()"><i class="fa-solid fa-trash"></i> Limpiar notificaciones</button></div></div>
   <div class="view-toggle">
-    <button class="view-toggle-btn ${!notifCategoriaFiltro?'active':''}" onclick="cambiarNotifCategoriaFiltro(null)">Todas</button>
-    ${categorias.map(c=>`<button class="view-toggle-btn ${notifCategoriaFiltro===c.key?'active':''}" onclick="cambiarNotifCategoriaFiltro('${c.key}')"><i class="${c.icon}"></i> ${c.label}</button>`).join('')}
+    <button class="view-toggle-btn ${!notifCategoriaFiltro?'active':''}" onclick="cambiarNotifCategoriaFiltro(null)">Todas${(notifCategoriaFiltro && hayNoLeidaGeneral)?'<span class="notif-dot"></span>':''}</button>
+    ${categorias.map(c=>`<button class="view-toggle-btn ${notifCategoriaFiltro===c.key?'active':''}" onclick="cambiarNotifCategoriaFiltro('${c.key}')"><i class="${c.icon}"></i> ${c.label}${(notifCategoriaFiltro!==c.key && hayNoLeidaEnCategoria(c.key))?'<span class="notif-dot"></span>':''}</button>`).join('')}
   </div>
   ${lista.length ? lista.map(n=>{
     const esCaida = n.tipo === 'match_cerrado' && (n.titulo||'').toLowerCase().includes('caída');
@@ -9772,8 +9786,8 @@ perfil: ()=>`
     <div style="border-top:1px solid var(--line);margin:26px 0;"></div>
 
     <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Mensaje de WhatsApp precargado</p>
-    <p style="font-size:13px;color:var(--paper-dim);margin:0 0 12px;line-height:1.55;max-width:640px;">El texto que se completa automáticamente cuando contactás a otra agencia por un vehículo que te interesa (en Explorar la Red y Oportunidades Exclusivas). Usá <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{agencia}</code> y <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{vehiculo}</code> para que se completen solos.</p>
-    <textarea id="cfg-whatsapp-msg" rows="3" style="max-width:640px;">${currentAgencia?.whatsapp_template ? currentAgencia.whatsapp_template.replace(/</g,'&lt;') : 'Hola {agencia}, vi el {vehiculo} en Red de Autos y me interesa. ¿Podés darme más info?'}</textarea>
+    <p style="font-size:13px;color:var(--paper-dim);margin:0 0 12px;line-height:1.55;max-width:640px;">El texto que se completa automáticamente cuando contactás a otra agencia por un vehículo que te interesa (en Explorar la Red y Oportunidades Exclusivas). Usá <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{agencia}</code>, <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{vehiculo}</code>, <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{miNombre}</code> y <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{miAgencia}</code> para que se completen solos — estos dos últimos toman el "Nombre de contacto" y el nombre de tu agencia de más arriba en esta misma página, así la otra agencia sabe quién le escribe.</p>
+    <textarea id="cfg-whatsapp-msg" rows="3" style="max-width:640px;">${currentAgencia?.whatsapp_template ? currentAgencia.whatsapp_template.replace(/</g,'&lt;') : 'Hola {agencia}, te escribe {miNombre} de {miAgencia}. Vi el {vehiculo} en Red de Autos y me interesa. ¿Podés darme más info?'}</textarea>
 
     <div style="border-top:1px solid var(--line);margin:26px 0;"></div>
 
