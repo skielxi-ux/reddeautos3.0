@@ -490,8 +490,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .match-vehicle-hero .stock-thumb{background:var(--ink-3);padding:3px;}
   .match-vehicle-hero .stock-thumb img{width:100%;height:100%;object-fit:contain;border-radius:1px;}
   /* Toggle para elegir qué sección de matches ver — evita que se junten "busco" y "vendo" */
+  /* Mismo padding/tamaño que .view-toggle-btn (Pipeline / Operaciones...) para que las dos filas
+     de badges queden con el mismo alto y se vean como un mismo sistema, una al lado de la otra. */
   .match-filter-toggle{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 20px;}
-  .match-filter-btn{font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:20px;border:1px solid var(--line);background:#FFFFFF;color:var(--paper-dim);cursor:pointer;display:inline-flex;align-items:center;gap:7px;line-height:1.2;white-space:nowrap;appearance:none;-webkit-appearance:none;transition:all .15s ease;}
+  .match-filter-btn{font-family:var(--font-body);font-size:12.5px;font-weight:700;padding:9px 18px;border-radius:20px;border:1px solid var(--line-strong);background:#FFFFFF;color:var(--paper-dim);cursor:pointer;display:inline-flex;align-items:center;gap:7px;line-height:1.2;white-space:nowrap;appearance:none;-webkit-appearance:none;transition:all .15s ease;}
   .match-filter-btn:hover{border-color:var(--red);color:var(--ink);}
   .match-filter-btn.active{background:var(--red);border-color:var(--red);color:#FFFFFF;}
   .match-filter-count{background:rgba(28,43,54,.1);color:inherit;font-size:11px;font-weight:800;padding:1px 7px;border-radius:10px;}
@@ -846,6 +848,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .notif-date{font-size:10.5px;color:var(--paper-dim);margin-top:6px;}
 
   .view-toggle{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;align-items:center;}
+  .view-toggle-divider{width:1px;align-self:stretch;background:var(--line-strong);margin:0 2px;}
   .view-toggle-btn{padding:9px 18px;border-radius:20px;border:1px solid var(--line-strong);font-size:12.5px;font-weight:700;color:var(--paper-dim);cursor:pointer;background:#FFFFFF;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px;line-height:1.2;white-space:nowrap;appearance:none;-webkit-appearance:none;}
   .view-toggle-btn:hover{border-color:var(--red);color:var(--red);}
   .view-toggle-btn.active{background:var(--red);color:#FFFFFF;border-color:var(--red);}
@@ -1234,9 +1237,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .lp-feature-text h2,.lp-scale h2,.lp-why-head h2,.lp-faq-head h2,.lp-steps-title{font-size:26px;}
   }
 
-  .dolar-banner{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:8px;background:var(--bg-soft,#f5f4f0);margin-bottom:12px;font-size:12px;}
-  .dolar-banner .dolar-valor{font-weight:600;font-size:13.5px;color:var(--ink);}
-  .dolar-banner .dolar-fuente{font-size:10.5px;color:var(--paper-dim);}
+  .dolar-banner{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:8px;background:#f0fdf4;border:1px solid #bbf7d0;margin-bottom:12px;font-size:12px;}
+  .dolar-banner .dolar-valor{font-weight:600;font-size:13.5px;color:#166534;}
+  .dolar-banner .dolar-fuente{font-size:10.5px;color:#166534;opacity:.75;}
   .agencyprofile-header{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
   .agencyprofile-fotos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px;}
   .agencyprofile-foto-item{width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--bg-soft,#f5f4f0);}
@@ -2547,7 +2550,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
     <div id="cm-campos-cliente">
       <div class="field"><label>Nombre del cliente</label><input id="cm-cliente-nombre" placeholder="Nombre y apellido"></div>
-      <div class="field"><label>Teléfono del cliente (opcional)</label><input id="cm-cliente-telefono" placeholder="Para tu propio registro, no se comparte"></div>
+      <div class="field"><label>Teléfono del cliente</label><input id="cm-cliente-telefono" placeholder="Para tu propio registro, no se comparte"></div>
     </div>
 
     <div class="modal-close-row">
@@ -4482,6 +4485,12 @@ function showConfirm(mensaje, onAceptar, titulo){
   const btn = document.getElementById('confirm-modal-btn');
   btn.onclick = () => { closeModal('confirm'); onAceptar(); };
   openModal('confirm');
+}
+// Cartel simple que hay que cerrar a mano (mismo modal que showConfirm, con un solo botón "Aceptar"
+// que solo cierra) — para avisos que sí o sí queremos que se lean, a diferencia del toast que se
+// esfuma solo.
+function showAlert(mensaje, titulo){
+  showConfirm(mensaje, () => {}, titulo);
 }
 async function toggleVehiculoEstado(id, estadoActual){
   const nuevo = estadoActual === 'activo' ? 'inactivo' : 'activo';
@@ -6536,11 +6545,24 @@ async function retrocederMatch(matchId){
 // Qué sección de matches mostrar: 'todos' (las dos, como antes) / 'busco' / 'vendo'. Se mantiene
 // entre renders (igual que el filtro de mes) para no perder la selección al hacer una acción.
 let matchesVistaFiltro = 'todos';
-function cambiarMatchesVistaFiltro(v){ matchesVistaFiltro = v; showApp(vistaMatchesActual()); }
+// Tocar el filtro ya activo lo desactiva y vuelve a 'todos' — reemplaza al botón "Ver todo" que
+// había antes (sacado para no repetir un badge más en la fila).
+function cambiarMatchesVistaFiltro(v){ matchesVistaFiltro = (matchesVistaFiltro === v) ? 'todos' : v; showApp(vistaMatchesActual()); }
+
+// Botones "Lo que busco / Lo que quieren" — se insertan en la MISMA fila que
+// "Pipeline / Operaciones concretadas / Operaciones caídas" (ver vistas 'matches' y 'manuales'),
+// para que todas las badges queden una al lado de la otra en una sola fila en vez de dos.
+// Sin badge "Ver todo": tocar un filtro ya activo lo apaga y muestra las dos secciones de nuevo.
+function matchFiltroBuscoVendoHTML(list){
+  const busco = list.filter(m=>!m.soyVendedor).length;
+  const vendo = list.filter(m=>m.soyVendedor).length;
+  return `
+    <button type="button" class="match-filter-btn ${matchesVistaFiltro==='busco'?'active':''}" onclick="cambiarMatchesVistaFiltro('busco')"><i class="fa-solid fa-magnifying-glass"></i> Lo que busco para mis clientes <span class="match-filter-count">${busco}</span></button>
+    <button type="button" class="match-filter-btn ${matchesVistaFiltro==='vendo'?'active':''}" onclick="cambiarMatchesVistaFiltro('vendo')"><i class="fa-solid fa-car"></i> Lo que quieren de mi stock <span class="match-filter-count">${vendo}</span></button>`;
+}
 
 // Agrupa una lista de matches en dos secciones: lo que busco para mis clientes / lo que quieren de
-// mi stock. Con muchos matches activos se mezclaban en una sola lista larga, así que arriba hay un
-// selector para ver una sección a la vez (o las dos juntas, como antes).
+// mi stock (según matchesVistaFiltro, elegido con los botones de matchFiltroBuscoVendoHTML).
 function renderMatchSections(list, emptyMsg){
   if (!list.length) return `<div class="card"><p style="color:var(--paper-dim);margin:0;">${emptyMsg}</p></div>`;
   const busco = list.filter(m=>!m.soyVendedor);
@@ -6549,16 +6571,10 @@ function renderMatchSections(list, emptyMsg){
     <div class="match-section-title"><i class="fa-solid ${icon}"></i> ${esc(titulo)} <span class="match-section-count">${items.length}</span></div>
     ${items.length ? items.map(m=>matchCardHTML(m)).join('') : `<p style="color:var(--paper-dim);font-size:13px;margin:0 0 24px;">Nada por acá todavía.</p>`}
   `;
-  const toggle = `
-    <div class="match-filter-toggle">
-      <button type="button" class="match-filter-btn ${matchesVistaFiltro==='todos'?'active':''}" onclick="cambiarMatchesVistaFiltro('todos')">Ver todo</button>
-      <button type="button" class="match-filter-btn ${matchesVistaFiltro==='busco'?'active':''}" onclick="cambiarMatchesVistaFiltro('busco')"><i class="fa-solid fa-magnifying-glass"></i> Lo que busco para mis clientes <span class="match-filter-count">${busco.length}</span></button>
-      <button type="button" class="match-filter-btn ${matchesVistaFiltro==='vendo'?'active':''}" onclick="cambiarMatchesVistaFiltro('vendo')"><i class="fa-solid fa-car"></i> Lo que quieren de mi stock <span class="match-filter-count">${vendo.length}</span></button>
-    </div>`;
   let secciones = '';
   if (matchesVistaFiltro !== 'vendo') secciones += seccion('Lo que busco para mis clientes', 'fa-magnifying-glass', busco);
   if (matchesVistaFiltro !== 'busco') secciones += seccion('Lo que quieren de mi stock', 'fa-car', vendo);
-  return toggle + secciones;
+  return secciones;
 }
 
 function matchCardHTML(m){
@@ -7074,6 +7090,9 @@ async function confirmarContactoManual(){
     nombreCliente = document.getElementById('cm-cliente-nombre').value.trim();
     if (!nombreCliente) { toast('Ingresá el nombre del cliente antes de continuar.'); return; }
     telefonoCliente = document.getElementById('cm-cliente-telefono').value.trim();
+    // Obligatorio: sin el teléfono no hay forma de escribirle al cliente más adelante desde el
+    // seguimiento en Matches Manuales (el botón "Informar cliente" lo necesita).
+    if (!telefonoCliente) { toast('Ingresá el teléfono del cliente: lo vas a necesitar para escribirle desde el seguimiento del match.'); return; }
   }
 
   const waHref = v.agencias?.telefono
@@ -7108,9 +7127,9 @@ async function confirmarContactoManual(){
 
     closeModal('contactomanual');
     window.open(waHref, '_blank');
-    toast(esDirecta
-      ? 'Contacto registrado en Matches Manuales.'
-      : 'Contacto registrado en Matches Manuales. Si el cliente sigue interesado, aceptá la comisión desde ahí para seguir con la operación.');
+    // Cartel que hay que cerrar a mano (no un toast que se esfuma solo): así queda claro que el
+    // seguimiento de esta operación sigue en Matches Manuales, no acá en Explorar la Red.
+    showAlert(`Hiciste un match manual con la agencia ${v.agencias?.nombre || 'seleccionada'}. Continuá el seguimiento de la operación en la pestaña "Matches Manuales".`, '¡Match registrado!');
     await cargarMisMatches();
   } catch (e) {
     console.error('confirmarContactoManual:', e);
@@ -7210,8 +7229,10 @@ function registrarClicReal(tipoObjeto, objetoId, tipoEvento){
 }
 
 let _matchesFavoritasLoaded = false;
+// Ya no hay botón "Pipeline": es la vista por defecto. Tocar una de las otras tres la activa, y
+// tocar la que ya está activa vuelve a 'pipeline' (mismo patrón que el filtro busco/vendo).
 async function setMatchesTab(tab){
-  matchesTab = tab;
+  matchesTab = (matchesTab === tab) ? 'pipeline' : tab;
   if (tab === 'favoritas' && !_matchesFavoritasLoaded) {
     const mainEl = document.getElementById('main-content');
     const loaderTimeout = setTimeout(() => {
@@ -7605,7 +7626,7 @@ function renderDetailModalReal(v){
       ${mapHTML}
       <div class="propdetail-agency">Publicada por <strong>${esc(v.agencias?.nombre || 'Agencia')}</strong>${verificadaBadgeHTML(v.agencias?.verificada)}</div>
       <div class="propdetail-actions">
-        ${waHref ? `<button class="btn btn-solid btn-contact-lime" onclick="abrirContactoManual('${v.id}')"><i class="fa-brands fa-whatsapp"></i> Contactar Agencia</button>` : ''}
+        ${waHref ? `<button class="btn btn-solid btn-contact-lime" onclick="abrirContactoManual('${v.id}')"><i class="fa-brands fa-whatsapp"></i> Hacer Match</button>` : ''}
         <button class="btn" onclick="closeModal('propdetail')">Cerrar</button>
       </div>
     </div>
@@ -8184,6 +8205,33 @@ const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agos
 function cambiarPerfMes(v){ perfMes = Number(v); showApp('performance'); }
 function cambiarPerfAnio(v){ perfAnio = Number(v); showApp('performance'); }
 
+// Filtro de mes/año para Comisiones — filtra por fecha de cierre de la operación (cerradoAtRaw),
+// igual criterio que usa "Operaciones concretadas" en Mis Matches.
+let comisionesFiltroMes = 'todos';
+let comisionesFiltroAnio = new Date().getFullYear();
+function cambiarComisionesFiltroMes(v){ comisionesFiltroMes = v; showApp('comisiones'); }
+function cambiarComisionesFiltroAnio(v){ comisionesFiltroAnio = Number(v); showApp('comisiones'); }
+function enMesFiltroComisiones(fechaIso){
+  if (comisionesFiltroMes === 'todos') return true;
+  if (!fechaIso) return false;
+  const d = new Date(fechaIso);
+  return (d.getMonth() + 1) === Number(comisionesFiltroMes) && d.getFullYear() === comisionesFiltroAnio;
+}
+function comisionesFiltroBarHTML(){
+  const anioActual = new Date().getFullYear();
+  const anios = [anioActual - 1, anioActual, anioActual + 1];
+  return `
+  <div class="mes-anio-picker" style="margin-bottom:16px;">
+    <select onchange="cambiarComisionesFiltroMes(this.value)">
+      <option value="todos" ${comisionesFiltroMes==='todos'?'selected':''}>Todos los meses</option>
+      ${MESES_ES.map((m,i)=>`<option value="${i+1}" ${comisionesFiltroMes===String(i+1)?'selected':''}>${m}</option>`).join('')}
+    </select>
+    <select onchange="cambiarComisionesFiltroAnio(this.value)" ${comisionesFiltroMes==='todos'?'disabled':''}>
+      ${anios.map(a=>`<option value="${a}" ${comisionesFiltroAnio===a?'selected':''}>${a}</option>`).join('')}
+    </select>
+  </div>`;
+}
+
 let matchesFiltroMes = 'todos';
 let matchesFiltroAnio = new Date().getFullYear();
 let matchesListaOculta = false;
@@ -8222,7 +8270,8 @@ let matchesManualesTab = 'pipeline';
 let matchesManualesFiltroMes = 'todos';
 let matchesManualesFiltroAnio = new Date().getFullYear();
 let matchesManualesListaOculta = false;
-function setMatchesManualesTab(tab){ matchesManualesTab = tab; showApp('manuales'); }
+// Mismo criterio que setMatchesTab: sin botón "Pipeline", tocar la pestaña activa vuelve a 'pipeline'.
+function setMatchesManualesTab(tab){ matchesManualesTab = (matchesManualesTab === tab) ? 'pipeline' : tab; showApp('manuales'); }
 function cambiarMatchesManualesFiltroMes(v){ matchesManualesFiltroMes = v; showApp('manuales'); }
 function cambiarMatchesManualesFiltroAnio(v){ matchesManualesFiltroAnio = Number(v); showApp('manuales'); }
 function toggleMatchesManualesLista(){ matchesManualesListaOculta = !matchesManualesListaOculta; showApp('manuales'); }
@@ -8671,7 +8720,8 @@ performance: ()=>{
 },
 
 comisiones: ()=>{
-  const conComision = misMatchesReal.filter(m => m.estado === 'concretada' && m.comisionMonto);
+  const conComisionTodas = misMatchesReal.filter(m => m.estado === 'concretada' && m.comisionMonto);
+  const conComision = conComisionTodas.filter(m => enMesFiltroComisiones(m.cerradoAtRaw));
   const porPagar = conComision.filter(m => m.soyVendedor);
   const porCobrar = conComision.filter(m => !m.soyVendedor);
 
@@ -8709,6 +8759,7 @@ comisiones: ()=>{
 
   return `
   <div class="main-head"><div><h1>Comisiones</h1><p class="sub">Comisiones a pagar y a cobrar por tus operaciones concretadas</p></div></div>
+  ${comisionesFiltroBarHTML()}
   ${seccion('Por pagar', 'fa-arrow-up', 'var(--red)', porPagar)}
   ${seccion('Por cobrar', 'fa-arrow-down', '#3F7A46', porCobrar)}
   `;
@@ -9044,22 +9095,27 @@ busquedas: ()=>`
 
 matches: ()=>{
   let body;
+  let filtroBuscoVendoHTML = '';
   const misMatchesAutomaticos = misMatchesReal.filter(m=>m.origen!=='manual');
   const pendientes = misMatchesAutomaticos.filter(m=>m.estado==='pendiente');
   const concretadas = misMatchesAutomaticos.filter(m=>m.estado==='concretada');
   const caidas = misMatchesAutomaticos.filter(m=>m.estado==='cancelada');
   if(matchesTab==='favoritas'){
+    // Sin selector busco/vendo acá: es una lista de vehículos favoritos, no de matches.
     const favs = redStock.filter(v=>misIntereses.includes(v.id));
     body = favs.length
       ? `<div class="listing-grid" id="favoritas-grid">${favs.map(v=>listingCardReal(v)).join('')}</div>`
       : `<div class="card"><p style="color:var(--paper-dim);margin:0;">Todavía no marcaste vehículos como favoritos. Usá el ícono de corazón en <a style="color:var(--red-dark);cursor:pointer;" onclick="showApp('explorar')">Explorar la Red</a>.</p></div>`;
   } else if(matchesTab==='concretadas'){
     const concretadasFiltradas = concretadas.filter(m => enMesFiltroMatches(m.cerradoAtRaw));
+    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(concretadasFiltradas);
     body = matchesFiltroBarHTML() + (matchesListaOculta ? '' : renderMatchSections(concretadasFiltradas, 'No hay operaciones concretadas para el período seleccionado.'));
   } else if(matchesTab==='caidas'){
     const caidasFiltradas = caidas.filter(m => enMesFiltroMatches(m.cerradoAtRaw));
+    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(caidasFiltradas);
     body = matchesFiltroBarHTML() + (matchesListaOculta ? '' : renderMatchSections(caidasFiltradas, 'No hay operaciones caídas para el período seleccionado.'));
   } else {
+    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(pendientes);
     body = renderMatchSections(pendientes, 'Todavía no hay matches. Cargá vehículos en <a style="color:var(--red-dark);cursor:pointer;" onclick="showApp(\'vehículos\')">Mi Stock</a> o clientes en <a style="color:var(--red-dark);cursor:pointer;" onclick="showApp(\'clientes\')">Mis Clientes</a> para empezar a cruzar contra la red.');
   }
   return `
@@ -9072,10 +9128,10 @@ matches: ()=>{
   </div>
   <div class="main-head"><div><h1>Mis Matches</h1><p class="sub">${pendientes.length} pendiente${pendientes.length===1?'':'s'} · ${concretadas.length} concretada${concretadas.length===1?'':'s'} · ${caidas.length} caída${caidas.length===1?'':'s'}</p></div></div>
   <div class="view-toggle">
-    <button class="view-toggle-btn ${matchesTab==='pipeline'?'active':''}" onclick="setMatchesTab('pipeline')"><i class="fa-solid fa-timeline"></i> Pipeline</button>
     <button class="view-toggle-btn ${matchesTab==='favoritas'?'active':''}" onclick="setMatchesTab('favoritas')"><i class="fa-solid fa-heart"></i> Vehículos que me interesan</button>
     <button class="view-toggle-btn ${matchesTab==='concretadas'?'active':''}" onclick="setMatchesTab('concretadas')"><i class="fa-solid fa-circle-check"></i> Operaciones concretadas</button>
     <button class="view-toggle-btn ${matchesTab==='caidas'?'active':''}" onclick="setMatchesTab('caidas')"><i class="fa-solid fa-circle-xmark"></i> Operaciones caídas</button>
+    ${filtroBuscoVendoHTML ? `<span class="view-toggle-divider"></span>${filtroBuscoVendoHTML}` : ''}
   </div>
   ${body}
 `;
@@ -9083,25 +9139,29 @@ matches: ()=>{
 
 manuales: ()=>{
   let body;
+  let filtroBuscoVendoHTML = '';
   const misMatchesManuales = misMatchesReal.filter(m=>m.origen==='manual');
   const pendientes = misMatchesManuales.filter(m=>m.estado==='pendiente');
   const concretadas = misMatchesManuales.filter(m=>m.estado==='concretada');
   const caidas = misMatchesManuales.filter(m=>m.estado==='cancelada');
   if(matchesManualesTab==='concretadas'){
     const concretadasFiltradas = concretadas.filter(m => enMesFiltroMatchesManuales(m.cerradoAtRaw));
+    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(concretadasFiltradas);
     body = matchesManualesFiltroBarHTML() + (matchesManualesListaOculta ? '' : renderMatchSections(concretadasFiltradas, 'No hay operaciones concretadas para el período seleccionado.'));
   } else if(matchesManualesTab==='caidas'){
     const caidasFiltradas = caidas.filter(m => enMesFiltroMatchesManuales(m.cerradoAtRaw));
+    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(caidasFiltradas);
     body = matchesManualesFiltroBarHTML() + (matchesManualesListaOculta ? '' : renderMatchSections(caidasFiltradas, 'No hay operaciones caídas para el período seleccionado.'));
   } else {
+    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(pendientes);
     body = renderMatchSections(pendientes, 'Todavía no hay matches manuales. Se crean solos cuando contactás o te contactan por WhatsApp desde una card de Explorar la Red o Gremio.');
   }
   return `
   <div class="main-head"><div><h1>Matches Manuales</h1><p class="sub">Contactos directos por WhatsApp desde Explorar la Red y Gremio — ${pendientes.length} pendiente${pendientes.length===1?'':'s'} · ${concretadas.length} concretada${concretadas.length===1?'':'s'} · ${caidas.length} caída${caidas.length===1?'':'s'}</p></div></div>
   <div class="view-toggle">
-    <button class="view-toggle-btn ${matchesManualesTab==='pipeline'?'active':''}" onclick="setMatchesManualesTab('pipeline')"><i class="fa-solid fa-timeline"></i> Pipeline</button>
     <button class="view-toggle-btn ${matchesManualesTab==='concretadas'?'active':''}" onclick="setMatchesManualesTab('concretadas')"><i class="fa-solid fa-circle-check"></i> Operaciones concretadas</button>
     <button class="view-toggle-btn ${matchesManualesTab==='caidas'?'active':''}" onclick="setMatchesManualesTab('caidas')"><i class="fa-solid fa-circle-xmark"></i> Operaciones caídas</button>
+    ${filtroBuscoVendoHTML ? `<span class="view-toggle-divider"></span>${filtroBuscoVendoHTML}` : ''}
   </div>
   ${body}
 `;
