@@ -1322,6 +1322,25 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .usr-pestana-chip.checked .usr-chip-box{background:var(--red);border-color:var(--red);color:#FFFFFF;}
   .usr-pestana-chip input{position:absolute;opacity:0;width:0;height:0;pointer-events:none;}
 
+  .usr-perm-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:2px 0 18px;}
+  @media (max-width:780px){ .usr-perm-grid{grid-template-columns:1fr;} }
+  .usr-perm-card{border:1px solid var(--line);border-radius:12px;padding:18px 20px;background:#FFFFFF;}
+  .usr-perm-card-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .usr-perm-card-icon{width:30px;height:30px;border-radius:8px;background:var(--ink-3);display:flex;align-items:center;justify-content:center;color:var(--paper-dim);font-size:13px;flex-shrink:0;}
+  .usr-perm-card-title{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--paper-dim);}
+  .usr-perm-card-link{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--red-dark);cursor:pointer;background:none;border:none;font-family:var(--font-body);padding:0;}
+  .usr-perm-card-link:hover{opacity:.7;}
+  .usr-perm-list{display:flex;flex-direction:column;gap:2px;}
+  .usr-perm-item{position:relative;display:flex;align-items:center;gap:10px;margin:0;font-family:var(--font-body);font-size:13.5px;font-weight:400;letter-spacing:normal;text-transform:none;color:var(--ink);cursor:pointer;padding:5px 0;user-select:none;}
+  .usr-perm-item input{position:absolute;opacity:0;width:0;height:0;pointer-events:none;}
+  .usr-perm-checkbox{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line-strong);background:#FFFFFF;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:transparent;transition:all .15s ease;}
+  .usr-perm-item.checked .usr-perm-checkbox{background:var(--red);border-color:var(--red);color:#FFFFFF;}
+  .usr-perm-progress-wrap{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
+  .usr-perm-progress-track{flex:1;height:6px;border-radius:4px;background:var(--ink-3);overflow:hidden;}
+  .usr-perm-progress-fill{height:100%;background:var(--red);border-radius:4px;transition:width .2s ease;}
+  .usr-perm-progress-num{font-family:var(--font-mono);font-size:12px;color:var(--paper-dim);flex-shrink:0;}
+  .usr-perm-summary{font-size:12.5px;color:var(--paper-dim);margin-left:14px;}
+
   .usr-form-disabled{opacity:.5;pointer-events:none;}
   .usr-quota-full-msg{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;line-height:1.6;color:#C62828;background:#fdf1f1;border:1px solid #f3caca;border-radius:10px;padding:12px 16px;margin-bottom:18px;}
   .usr-quota-full-msg i{margin-top:2px;flex-shrink:0;}
@@ -1372,7 +1391,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <button class="btn btn-on-dark" onclick="scrollToSection('como-funciona')">Cómo funciona</button>
       </div>
     </div>
-    <div class="hero-dark-car"><img src="assets/img-hero-car.png?v=2" alt="Vehículo de la red" loading="lazy"></div>
+    <div class="hero-dark-car"><img src="assets/img-hero-car.png?v=3" alt="Vehículo de la red" loading="lazy"></div>
   </div>
 
   <!-- ============ 1. Cómo funciona — tres pasos ============ -->
@@ -1525,9 +1544,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <h3 class="font-display font-semibold text-[20px] text-ink">Plan Pro</h3>
         <div class="mt-4 font-mono text-[30px] text-red-dark">$190.000<span class="text-[13px] font-body font-normal text-slate-400"> /mes</span></div>
         <ul class="mt-6 space-y-3 text-[13.5px] text-slate-500 flex-1">
-          <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>15 vehículos como máximo en Marketplace</span></li>
-          <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>10 búsquedas</span></li>
+          <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Vehículos ilimitados en Marketplace</span></li>
+          <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Búsquedas ilimitadas</span></li>
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Carga de vehículos de forma independiente</span></li>
+          <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Hasta 4 usuarios</span></li>
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Matches automáticos con toda la red</span></li>
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Contacto interno con todas las agencias</span></li>
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Contacto con proveedores internos</span></li>
@@ -1544,6 +1564,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Vehículos destacados en Marketplace</span></li>
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Búsquedas ilimitadas</span></li>
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Equipo de RDA carga tus primeros 15 vehículos</span></li>
+          <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Hasta 10 usuarios</span></li>
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Matches automáticos con toda la red</span></li>
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Contacto interno con todas las agencias</span></li>
           <li class="flex gap-2.5"><i class="fa-solid fa-check text-red mt-0.5"></i><span>Contacto con proveedores internos</span></li>
@@ -2739,6 +2760,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 /* ---------------- esc(): blindaje contra XSS almacenado ----------------
    Todo texto que viene de la base y se inserta en HTML pasa por acá. Sin esto,
@@ -4905,6 +4927,17 @@ const NAV_TABS_PARA_PERMISOS = [
   { key: 'soporte', label: 'Soporte' },
 ];
 
+// Mismas 18 pestañas de NAV_TABS_PARA_PERMISOS, agrupadas por tema para el panel
+// de "Pestañas visibles" de Usuarios (una tarjeta por grupo, con su propio Todas/Ninguna).
+const NAV_TABS_GRUPOS_PERMISOS = [
+  { label: 'Analítica', icon: 'fa-chart-line', keys: ['performance'] },
+  { label: 'La Red', icon: 'fa-globe', keys: ['explorar', 'redbusca', 'exclusiva'] },
+  { label: 'Búsquedas y Matches', icon: 'fa-magnifying-glass', keys: ['busquedas', 'matches', 'manuales'] },
+  { label: 'Stock y Clientes', icon: 'fa-car', keys: ['vehículos', 'clientes', 'leadsexternos', 'asociadas'] },
+  { label: 'Operaciones', icon: 'fa-sack-dollar', keys: ['comisiones', 'proveedores', 'notificaciones'] },
+  { label: 'Cuenta y Soporte', icon: 'fa-user-gear', keys: ['perfil', 'faqapp', 'precios', 'soporte'] },
+];
+
 let misUsuariosInvitados = [];
 
 async function cargarUsuariosInvitados(){
@@ -4928,6 +4961,43 @@ function toggleUsrPestanaChip(key){
   if (!cb || !chip) return;
   cb.checked = !cb.checked;
   chip.classList.toggle('checked', cb.checked);
+  _actualizarUsrPermisosUI();
+}
+
+// Tilda/destilda de un solo click todas las pestañas de una tarjeta de categoría.
+// Si ya estaban todas tildadas, las destilda (y el link pasa a decir "Todas");
+// si no, las tilda todas (y el link pasa a decir "Ninguna").
+function toggleUsrCategoria(catIdx){
+  const grupo = NAV_TABS_GRUPOS_PERMISOS[catIdx];
+  if (!grupo) return;
+  const todasMarcadas = grupo.keys.every(k => document.getElementById('usr-pestana-' + k)?.checked);
+  const nuevoValor = !todasMarcadas;
+  grupo.keys.forEach(k => {
+    const cb = document.getElementById('usr-pestana-' + k);
+    const chip = document.getElementById('usr-chip-' + k);
+    if (cb) cb.checked = nuevoValor;
+    if (chip) chip.classList.toggle('checked', nuevoValor);
+  });
+  _actualizarUsrPermisosUI();
+}
+
+// Recalcula la barra de progreso y el link Todas/Ninguna de cada tarjeta, y el
+// contador total de "con acceso a N secciones" al pie del formulario de invitación.
+function _actualizarUsrPermisosUI(){
+  let totalMarcadas = 0;
+  NAV_TABS_GRUPOS_PERMISOS.forEach((grupo, idx) => {
+    const marcadas = grupo.keys.filter(k => document.getElementById('usr-pestana-' + k)?.checked).length;
+    totalMarcadas += marcadas;
+    const total = grupo.keys.length;
+    const barra = document.getElementById('usr-cat-bar-' + idx);
+    const num = document.getElementById('usr-cat-num-' + idx);
+    const link = document.getElementById('usr-cat-link-' + idx);
+    if (barra) barra.style.width = (total ? (marcadas / total * 100) : 0) + '%';
+    if (num) num.textContent = marcadas + '/' + total;
+    if (link) link.textContent = (total > 0 && marcadas === total) ? 'Ninguna' : 'Todas';
+  });
+  const resumen = document.getElementById('usr-total-secciones');
+  if (resumen) resumen.textContent = `con acceso a ${totalMarcadas} ${totalMarcadas === 1 ? 'sección' : 'secciones'}`;
 }
 
 async function invitarUsuario(){
@@ -6135,6 +6205,139 @@ function adminFiltroFechaBarHTML(view){
     </select>
   </div>`;
 }
+
+/* ---------------- buscador por nombre de concesionaria — Pagos / Operaciones / Matches ---------------- */
+let adminPagosBuscarQuery = '';
+let adminOperacionesBuscarQuery = '';
+let adminMatchesBuscarQuery = '';
+
+function adminBuscarConcesionariaInputHTML(id, value, onInputFn){
+  return `<input id="${id}" placeholder="Buscar por nombre de concesionaria..." value="${esc(value)}" oninput="${onInputFn}(this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid #E2E1ED;font-family:var(--font-body);font-size:13.5px;margin-bottom:16px;">`;
+}
+
+function adminPagosFilasBase(){
+  const activas = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
+  return activas.map(a => ({ a, ...estadoPagoAgencia(a) }))
+    .filter(f => enMesFiltroAdmin('pagos', f.vencimiento))
+    .sort((x,y)=>x.vencimiento - y.vencimiento);
+}
+function adminPagosFilas(){
+  const q = (adminPagosBuscarQuery || '').trim().toLowerCase();
+  const base = adminPagosFilasBase();
+  return q ? base.filter(f => (f.a.name || '').toLowerCase().includes(q)) : base;
+}
+function adminPagosTablaHTML(){
+  const filas = adminPagosFilas();
+  return `
+    <table>
+      <thead><tr><th>Agencia</th><th>Plan</th><th>Próximo vencimiento</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+        ${filas.length ? filas.map(f => `<tr>
+          <td style="color:var(--red);font-weight:700;">${esc(f.a.name)}</td>
+          <td>${f.a.plan}</td>
+          <td class="mono">${fmtFechaCorta(f.vencimiento)}</td>
+          <td>${adminStatusPill(f.estado)}</td>
+          <td style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${f.estado === 'Pagado'
+              ? `<button class="btn btn-sm btn-eliminar-pastel" onclick="marcarPagoPendienteAgencia('${f.a.id}')"><i class="fa-solid fa-rotate-left"></i> Marcar pendiente</button>`
+              : `<button class="btn btn-sm whatsapp-btn" onclick="marcarPagoAgencia('${f.a.id}')"><i class="fa-solid fa-check"></i> Marcar pagado</button>`
+            }
+          </td>
+        </tr>`).join('') : `<tr><td colspan="5" class="empty-row">${adminPagosBuscarQuery ? 'Ninguna concesionaria coincide con la búsqueda.' : 'No hay agencias activas.'}</td></tr>`}
+      </tbody>
+    </table>`;
+}
+function renderAdminPagosTabla(){
+  const wrap = document.getElementById('admin-pagos-tabla-wrap');
+  if (wrap) wrap.innerHTML = adminPagosTablaHTML();
+}
+function onAdminPagosBuscarInput(value){
+  adminPagosBuscarQuery = value;
+  renderAdminPagosTabla();
+}
+
+function adminOperacionesFilasBase(){
+  return ADMIN_MATCHES.filter(m => (m.estado === 'concretada' || m.estado === 'cancelada') && enMesFiltroAdmin('operaciones', m.created_at))
+    .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+}
+function adminOperacionesFilas(){
+  const q = (adminOperacionesBuscarQuery || '').trim().toLowerCase();
+  const base = adminOperacionesFilasBase();
+  if (!q) return base;
+  return base.filter(o => (o.vend?.nombre || '').toLowerCase().includes(q) || (o.comp?.nombre || '').toLowerCase().includes(q));
+}
+function adminOperacionesTablaHTML(){
+  const ops = adminOperacionesFilas();
+  return `
+    <table>
+      <thead><tr><th>Vehículo</th><th>Agencia vendedora</th><th>Agencia compradora</th><th>Cliente</th><th>Comisión</th><th>Estado</th><th>Fecha</th></tr></thead>
+      <tbody>
+        ${ops.length ? ops.map(o=>{
+          const vehTxt = [o.veh?.marca, o.veh?.modelo, o.veh?.anio].filter(Boolean).join(' ') || '—';
+          const comisionTxt = o.estado === 'concretada' && o.comision_monto
+            ? `${fmtMoney(o.comision_monto, o.comision_moneda||'ARS')}${o.comision_estado ? ` (${ {pendiente:'pendiente', pagada:'pagada', parcial:'parcial'}[o.comision_estado] || o.comision_estado })` : ''}`
+            : '—';
+          return `<tr>
+            <td>${esc(vehTxt)}</td>
+            <td>${esc(o.vend?.nombre || '—')}</td>
+            <td>${esc(o.comp?.nombre || '—')}</td>
+            <td>${esc(o.bus?.cliente_nombre || '—')}</td>
+            <td class="mono">${comisionTxt}</td>
+            <td>${adminStatusPill(o.estado==='concretada'?'Resuelta':'Desestimada', o.estado==='concretada'?'Concretada':'Caída')}${o.estado==='cancelada' && o.motivo_cancelacion ? `<div style="font-size:11px;color:var(--paper-dim);margin-top:3px;">${esc(o.motivo_cancelacion)}</div>` : ''}</td>
+            <td>${o.created_at ? new Date(o.created_at).toLocaleDateString('es-AR') : '—'}</td>
+          </tr>`;
+        }).join('') : `<tr><td colspan="7" class="empty-row">${adminOperacionesBuscarQuery ? 'Ninguna concesionaria coincide con la búsqueda.' : 'Todavía no hay operaciones cerradas en la red.'}</td></tr>`}
+      </tbody>
+    </table>`;
+}
+function renderAdminOperacionesTabla(){
+  const wrap = document.getElementById('admin-operaciones-tabla-wrap');
+  if (wrap) wrap.innerHTML = adminOperacionesTablaHTML();
+}
+function onAdminOperacionesBuscarInput(value){
+  adminOperacionesBuscarQuery = value;
+  renderAdminOperacionesTabla();
+}
+
+function adminMatchesFilasBase(){
+  return ADMIN_MATCHES.filter(m => enMesFiltroAdmin('matches', m.created_at)).map(m => {
+    let etapa = 'propuesta';
+    if (m.estado === 'concretada') etapa = 'concretada';
+    else if (m.estado === 'cancelada') etapa = 'cancelada';
+    else if (m.visita_agendada_at) etapa = 'visita';
+    else if (m.comision_aceptada_at) etapa = 'contactado';
+    return { ...m, etapa };
+  });
+}
+function adminMatchesFilas(){
+  const q = (adminMatchesBuscarQuery || '').trim().toLowerCase();
+  const base = adminMatchesFilasBase();
+  if (!q) return base;
+  return base.filter(m => (m.vend?.nombre || '').toLowerCase().includes(q) || (m.comp?.nombre || '').toLowerCase().includes(q));
+}
+function adminMatchesTablaHTML(){
+  const ETAPA_LABELS = { propuesta: 'Comisión propuesta', contactado: 'Agencia contactada', visita: 'Visita agendada', concretada: 'Concretada', cancelada: 'Caída' };
+  const conEtapa = adminMatchesFilas().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  return `
+    <table>
+      <thead><tr><th>Vehículo</th><th>Agencia vendedora</th><th>Agencia compradora</th><th>Cliente</th><th>Etapa</th><th>Fecha</th></tr></thead>
+      <tbody>
+        ${conEtapa.length ? conEtapa.map(m=>{
+          const vehTxt = [m.veh?.marca, m.veh?.modelo, m.veh?.anio].filter(Boolean).join(' ') || '—';
+          return `<tr><td>${esc(vehTxt)}</td><td>${esc(m.vend?.nombre || '—')}</td><td>${esc(m.comp?.nombre || '—')}</td><td>${esc(m.bus?.cliente_nombre || '—')}</td><td>${adminStatusPill(m.etapa==='cancelada'?'Suspendida':m.etapa==='concretada'?'Verificada':'Pendiente', ETAPA_LABELS[m.etapa])}</td><td>${m.created_at ? new Date(m.created_at).toLocaleDateString('es-AR') : '—'}</td></tr>`;
+        }).join('') : `<tr><td colspan="6" class="empty-row">${adminMatchesBuscarQuery ? 'Ninguna concesionaria coincide con la búsqueda.' : 'Todavía no hay matches en la red.'}</td></tr>`}
+      </tbody>
+    </table>`;
+}
+function renderAdminMatchesTabla(){
+  const wrap = document.getElementById('admin-matches-tabla-wrap');
+  if (wrap) wrap.innerHTML = adminMatchesTablaHTML();
+}
+function onAdminMatchesBuscarInput(value){
+  adminMatchesBuscarQuery = value;
+  renderAdminMatchesTabla();
+}
+
 const adminRenderers = {
   dashboard: ()=>{
     const verifiedCount = ADMIN_AGENCIES.filter(a=>a.status==='Activo').length;
@@ -6308,10 +6511,9 @@ const adminRenderers = {
     </table>
   `,
   operaciones: ()=>{
-    const ops = ADMIN_MATCHES.filter(m => (m.estado === 'concretada' || m.estado === 'cancelada') && enMesFiltroAdmin('operaciones', m.created_at))
-      .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-    const concretadas = ops.filter(o => o.estado === 'concretada');
-    const canceladas = ops.filter(o => o.estado === 'cancelada');
+    const opsBase = adminOperacionesFilasBase();
+    const concretadas = opsBase.filter(o => o.estado === 'concretada');
+    const canceladas = opsBase.filter(o => o.estado === 'cancelada');
     // Antes esto recalculaba la comisión desde el % del vehículo × precio, ignorando por
     // completo el monto y la moneda real que la agencia compradora había cargado al cerrar
     // la operación (comision_monto/comision_moneda). Como resultado, nunca aparecía nada en
@@ -6327,26 +6529,8 @@ const adminRenderers = {
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-circle-xmark"></i>Caídas</div><div class="val kpi-red">${canceladas.length}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-hand-holding-dollar"></i>Comisiones generadas</div><div class="val mono" style="font-size:16px;">${comisionesTxt}</div></div>
     </div>
-    <table>
-      <thead><tr><th>Vehículo</th><th>Agencia vendedora</th><th>Agencia compradora</th><th>Cliente</th><th>Comisión</th><th>Estado</th><th>Fecha</th></tr></thead>
-      <tbody>
-        ${ops.length ? ops.map(o=>{
-          const vehTxt = [o.veh?.marca, o.veh?.modelo, o.veh?.anio].filter(Boolean).join(' ') || '—';
-          const comisionTxt = o.estado === 'concretada' && o.comision_monto
-            ? `${fmtMoney(o.comision_monto, o.comision_moneda||'ARS')}${o.comision_estado ? ` (${ {pendiente:'pendiente', pagada:'pagada', parcial:'parcial'}[o.comision_estado] || o.comision_estado })` : ''}`
-            : '—';
-          return `<tr>
-            <td>${esc(vehTxt)}</td>
-            <td>${esc(o.vend?.nombre || '—')}</td>
-            <td>${esc(o.comp?.nombre || '—')}</td>
-            <td>${esc(o.bus?.cliente_nombre || '—')}</td>
-            <td class="mono">${comisionTxt}</td>
-            <td>${adminStatusPill(o.estado==='concretada'?'Resuelta':'Desestimada', o.estado==='concretada'?'Concretada':'Caída')}${o.estado==='cancelada' && o.motivo_cancelacion ? `<div style="font-size:11px;color:var(--paper-dim);margin-top:3px;">${esc(o.motivo_cancelacion)}</div>` : ''}</td>
-            <td>${o.created_at ? new Date(o.created_at).toLocaleDateString('es-AR') : '—'}</td>
-          </tr>`;
-        }).join('') : `<tr><td colspan="7" class="empty-row">Todavía no hay operaciones cerradas en la red.</td></tr>`}
-      </tbody>
-    </table>
+    ${adminBuscarConcesionariaInputHTML('admin-operaciones-search-input', adminOperacionesBuscarQuery, 'onAdminOperacionesBuscarInput')}
+    <div id="admin-operaciones-tabla-wrap">${adminOperacionesTablaHTML()}</div>
   `;
   },
   matches: ()=>{
@@ -6354,20 +6538,12 @@ const adminRenderers = {
     // a Supabase) con nombres de campo que no existían en el esquema real (.status, .claimedAt,
     // matchFlowData(), AGENCY.name). Por eso siempre aparecía vacía. La reescribo sobre
     // ADMIN_MATCHES, que es la misma fuente de datos que ya usa correctamente "Operaciones".
-    const conEtapa = ADMIN_MATCHES.filter(m => enMesFiltroAdmin('matches', m.created_at)).map(m => {
-      let etapa = 'propuesta';
-      if (m.estado === 'concretada') etapa = 'concretada';
-      else if (m.estado === 'cancelada') etapa = 'cancelada';
-      else if (m.visita_agendada_at) etapa = 'visita';
-      else if (m.comision_aceptada_at) etapa = 'contactado';
-      return { ...m, etapa };
-    });
-    const total = conEtapa.length;
-    const enSeguimiento = conEtapa.filter(m => m.etapa === 'contactado' || m.etapa === 'visita').length;
-    const concretadas = conEtapa.filter(m => m.etapa === 'concretada').length;
-    const canceladas = conEtapa.filter(m => m.etapa === 'cancelada').length;
+    const conEtapaBase = adminMatchesFilasBase();
+    const total = conEtapaBase.length;
+    const enSeguimiento = conEtapaBase.filter(m => m.etapa === 'contactado' || m.etapa === 'visita').length;
+    const concretadas = conEtapaBase.filter(m => m.etapa === 'concretada').length;
+    const canceladas = conEtapaBase.filter(m => m.etapa === 'cancelada').length;
     const tasaCierre = total ? Math.round(concretadas/total*100) : 0;
-    const ETAPA_LABELS = { propuesta: 'Comisión propuesta', contactado: 'Agencia contactada', visita: 'Visita agendada', concretada: 'Concretada', cancelada: 'Caída' };
     return `
     <div class="main-head"><div><h1>Matches</h1><p class="sub">Todos los cruces detectados en la red, en cualquier etapa del pipeline</p></div></div>
     ${adminFiltroFechaBarHTML('matches')}
@@ -6380,15 +6556,8 @@ const adminRenderers = {
     <div class="kpi-grid" style="grid-template-columns:1fr;margin-bottom:22px;">
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-percent"></i>Tasa de cierre</div><div class="val">${tasaCierre}%</div></div>
     </div>
-    <table>
-      <thead><tr><th>Vehículo</th><th>Agencia vendedora</th><th>Agencia compradora</th><th>Cliente</th><th>Etapa</th><th>Fecha</th></tr></thead>
-      <tbody>
-        ${total ? conEtapa.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).map(m=>{
-          const vehTxt = [m.veh?.marca, m.veh?.modelo, m.veh?.anio].filter(Boolean).join(' ') || '—';
-          return `<tr><td>${esc(vehTxt)}</td><td>${esc(m.vend?.nombre || '—')}</td><td>${esc(m.comp?.nombre || '—')}</td><td>${esc(m.bus?.cliente_nombre || '—')}</td><td>${adminStatusPill(m.etapa==='cancelada'?'Suspendida':m.etapa==='concretada'?'Verificada':'Pendiente', ETAPA_LABELS[m.etapa])}</td><td>${m.created_at ? new Date(m.created_at).toLocaleDateString('es-AR') : '—'}</td></tr>`;
-        }).join('') : `<tr><td colspan="6" class="empty-row">Todavía no hay matches en la red.</td></tr>`}
-      </tbody>
-    </table>
+    ${adminBuscarConcesionariaInputHTML('admin-matches-search-input', adminMatchesBuscarQuery, 'onAdminMatchesBuscarInput')}
+    <div id="admin-matches-tabla-wrap">${adminMatchesTablaHTML()}</div>
   `;
   },
   ingresos: ()=>{
@@ -6418,10 +6587,7 @@ const adminRenderers = {
   `;
   },
   pagos: ()=>{
-    const activas = ADMIN_AGENCIES.filter(a=>a.status==='Activo');
-    const filas = activas.map(a => ({ a, ...estadoPagoAgencia(a) }))
-      .filter(f => enMesFiltroAdmin('pagos', f.vencimiento))
-      .sort((x,y)=>x.vencimiento - y.vencimiento);
+    const filas = adminPagosFilasBase();
     const vencidas = filas.filter(f=>f.estado==='Vencido').length;
     const pendientes = filas.filter(f=>f.estado==='Pendiente').length;
     const pagadas = filas.filter(f=>f.estado==='Pagado').length;
@@ -6433,23 +6599,8 @@ const adminRenderers = {
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-clock"></i>Pendientes</div><div class="val">${pendientes}</div></div>
       <div class="kpi"><div class="lbl"><i class="fa-solid fa-triangle-exclamation"></i>Vencidas</div><div class="val kpi-red">${vencidas}</div></div>
     </div>
-    <table>
-      <thead><tr><th>Agencia</th><th>Plan</th><th>Próximo vencimiento</th><th>Estado</th><th></th></tr></thead>
-      <tbody>
-        ${filas.length ? filas.map(f => `<tr>
-          <td style="color:var(--red);font-weight:700;">${esc(f.a.name)}</td>
-          <td>${f.a.plan}</td>
-          <td class="mono">${fmtFechaCorta(f.vencimiento)}</td>
-          <td>${adminStatusPill(f.estado)}</td>
-          <td style="display:flex;gap:8px;flex-wrap:wrap;">
-            ${f.estado === 'Pagado'
-              ? `<button class="btn btn-sm btn-eliminar-pastel" onclick="marcarPagoPendienteAgencia('${f.a.id}')"><i class="fa-solid fa-rotate-left"></i> Marcar pendiente</button>`
-              : `<button class="btn btn-sm whatsapp-btn" onclick="marcarPagoAgencia('${f.a.id}')"><i class="fa-solid fa-check"></i> Marcar pagado</button>`
-            }
-          </td>
-        </tr>`).join('') : `<tr><td colspan="5" class="empty-row">No hay agencias activas.</td></tr>`}
-      </tbody>
-    </table>
+    ${adminBuscarConcesionariaInputHTML('admin-pagos-search-input', adminPagosBuscarQuery, 'onAdminPagosBuscarInput')}
+    <div id="admin-pagos-tabla-wrap">${adminPagosTablaHTML()}</div>
     <p style="font-size:12.5px;color:var(--ink);margin-top:14px;display:flex;align-items:flex-start;gap:8px;"><i class="fa-solid fa-bell" style="margin-top:2px;color:var(--red);"></i><span>El vencimiento se calcula solo, siempre el mismo día del mes en que se dio de alta cada agencia (ej. alta el 11/09 → vence el 11/10, luego el 11/11, y así cada mes). Al marcar "Pagado" queda cubierto el período vigente; al llegar el próximo vencimiento vuelve a aparecer como Pendiente automáticamente.</span></p>
   `;
   },
@@ -8715,6 +8866,10 @@ const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agos
 function cambiarPerfMes(v){ perfMes = Number(v); showApp('performance'); }
 function cambiarPerfAnio(v){ perfAnio = Number(v); showApp('performance'); }
 
+// Snapshot de los datos ya calculados en el último render de Performance (mes/año elegidos),
+// para que "Importar informe" arme el PDF sin tener que recalcular todo de nuevo.
+let _perfInformeData = null;
+
 // Filtro de mes/año para Comisiones — filtra por fecha de cierre de la operación (cerradoAtRaw),
 // igual criterio que usa "Operaciones concretadas" en Mis Matches.
 let comisionesFiltroMes = 'todos';
@@ -8882,6 +9037,176 @@ function generarComprobantePagoPDF(m, fechaIso){
   doc.save(`comprobante-comision-${m.id}.pdf`);
 }
 
+// Dibuja un gráfico de Chart.js en un canvas fuera de pantalla (pero con tamaño real, así
+// se renderiza bien) y devuelve un dataURL PNG listo para pegar en el PDF con doc.addImage.
+function _crearChartComoImagenPNG(config){
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 700;
+    canvas.height = 360;
+    canvas.style.position = 'fixed';
+    canvas.style.left = '-9999px';
+    canvas.style.top = '0';
+    document.body.appendChild(canvas);
+    const chart = new Chart(canvas, { ...config, options: { ...config.options, animation: false, responsive: false } });
+    // Con animation:false Chart.js ya dibuja de forma sincrónica, pero esperamos dos frames
+    // para asegurarnos de que el canvas esté pintado antes de leerlo con toDataURL.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const dataUrl = canvas.toDataURL('image/png', 1.0);
+      chart.destroy();
+      document.body.removeChild(canvas);
+      resolve(dataUrl);
+    }));
+  });
+}
+
+// Informe de Performance en PDF, con gráficos — exclusivo Plan Premium.
+// Usa el snapshot armado por el último render de la vista Performance (_perfInformeData),
+// así el informe refleja exactamente el mes/año que la agencia tiene seleccionado en pantalla.
+async function exportarInformePerformance(){
+  if (currentAgencia?.plan !== 'premium') { toast('Importar informe es una función de Plan Premium.'); return; }
+  if (!_perfInformeData) { toast('Esperá a que cargue Performance antes de exportar.'); return; }
+  if (!window.jspdf) { toast('No se pudo generar el PDF: falta la librería jsPDF.'); return; }
+  if (typeof Chart === 'undefined') { toast('No se pudo generar el PDF: falta la librería de gráficos.'); return; }
+
+  const d = _perfInformeData;
+  const boton = document.getElementById('perf-export-btn');
+  const botonHTMLOriginal = boton ? boton.innerHTML : '';
+  if (boton) { boton.disabled = true; boton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando...'; }
+
+  try {
+    const chartEmbudo = await _crearChartComoImagenPNG({
+      type: 'bar',
+      data: {
+        labels: ['Búsquedas', 'Matches', 'Contactados', 'Concretadas', 'Caídas'],
+        datasets: [{
+          data: [d.busquedasCargadas, d.matches, d.contactados, d.concretadas, d.caidas],
+          backgroundColor: ['#8A94A6', '#8A94A6', '#8A94A6', '#3F7A46', '#C62828'],
+          borderRadius: 4,
+        }],
+      },
+      options: {
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: `Embudo del mes — ${d.mes} ${d.anio}`, font: { size: 16 } },
+        },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+      },
+    });
+
+    let chartRoi = null;
+    if (d.costoPlan) {
+      chartRoi = await _crearChartComoImagenPNG({
+        type: 'bar',
+        data: {
+          labels: ['Comisiones cobradas', 'Costo del plan'],
+          datasets: [{
+            data: [Math.round(d.comisionesEnPesos), Math.round(d.costoPlan)],
+            backgroundColor: ['#3F7A46', '#C62828'],
+            borderRadius: 4,
+          }],
+        },
+        options: {
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Retorno del plan (comisiones vs. costo, en pesos)', font: { size: 16 } },
+          },
+          scales: { y: { beginAtZero: true } },
+        },
+      });
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 25;
+
+    doc.setFontSize(18);
+    doc.setTextColor(30);
+    doc.text('Informe de Performance', 20, y);
+    y += 8;
+    doc.setFontSize(11);
+    doc.setTextColor(120);
+    doc.text(`${d.agencia || 'Red de Autos'}  ·  ${d.mes} ${d.anio}`, 20, y);
+    y += 7;
+    doc.setDrawColor(210);
+    doc.line(20, y, 190, y);
+    y += 10;
+
+    doc.setFontSize(13);
+    doc.setTextColor(30);
+    doc.setFont(undefined, 'bold');
+    doc.text('El mes en tres números', 20, y);
+    y += 8;
+    doc.setFontSize(10.5);
+    const filas = [
+      ['Generé (comisiones cobradas):', perfMoneda(d.comisiones)],
+      ['Unidades propias vendidas:', String(d.unidadesPropiasVendidas)],
+      ['Dejé sobre la mesa:', `${d.sinContactar + d.busquedasSinMatch}  (${d.sinContactar} sin contactar · ${d.busquedasSinMatch} clientes sin cubrir)`],
+      ['Me costó (abono del plan):', d.costoPlan ? fmtMoney(d.costoPlan, 'ARS') : 'Sin plan asignado'],
+      ['Retorno:', d.retorno !== null ? `${d.retorno.toFixed(1)}x` : '—'],
+      ['Tasa de conversión:', `${d.tasaConversion}%`],
+    ];
+    filas.forEach(([label, value]) => {
+      doc.setFont(undefined, 'bold');
+      doc.text(label, 20, y);
+      doc.setFont(undefined, 'normal');
+      doc.text(String(value), 95, y);
+      y += 7;
+    });
+    y += 3;
+
+    doc.setFont(undefined, 'bold');
+    doc.text('Veredicto del mes', 20, y);
+    y += 6;
+    doc.setFont(undefined, 'normal');
+    const veredictoLines = doc.splitTextToSize(d.veredictoTexto, 170);
+    doc.text(veredictoLines, 20, y);
+    y += veredictoLines.length * 6 + 8;
+
+    if (y > 190) { doc.addPage(); y = 25; }
+    doc.addImage(chartEmbudo, 'PNG', 20, y, 170, 87);
+    y += 95;
+
+    if (chartRoi) {
+      if (y > 190) { doc.addPage(); y = 25; }
+      doc.addImage(chartRoi, 'PNG', 20, y, 170, 87);
+      y += 95;
+    }
+
+    if (y > 235) { doc.addPage(); y = 25; }
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.text('Cerraste operaciones con', 20, y);
+    y += 7;
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    const cerroConLines = doc.splitTextToSize(d.cerroCon.length ? d.cerroCon.join(', ') : 'Ninguna este mes.', 170);
+    doc.text(cerroConLines, 20, y);
+    y += cerroConLines.length * 6 + 10;
+
+    if (y > 260) { doc.addPage(); y = 25; }
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.text('Se te cayeron operaciones con', 20, y);
+    y += 7;
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    const cayoConLines = doc.splitTextToSize(d.cayoCon.length ? d.cayoCon.join(', ') : 'Ninguna este mes.', 170);
+    doc.text(cayoConLines, 20, y);
+
+    doc.setFontSize(9);
+    doc.setTextColor(150);
+    doc.text(`Generado automáticamente por Red de Autos el ${new Date().toLocaleString('es-AR')}.`, 20, 287);
+
+    doc.save(`informe-performance-${d.mes.toLowerCase()}-${d.anio}.pdf`);
+  } catch (err) {
+    console.error('exportarInformePerformance:', err);
+    toast('No se pudo generar el informe.');
+  } finally {
+    if (boton) { boton.disabled = false; boton.innerHTML = botonHTMLOriginal; }
+  }
+}
+
 const renderers = {
 
 performance: ()=>{
@@ -8981,6 +9306,31 @@ performance: ()=>{
     veredicto = `<i class="fa-solid fa-circle-check"></i> Cerraste <strong>${concretadas.length}</strong> ${concretadas.length === 1 ? 'operación' : 'operaciones'} en ${esc(nombreMes)}${unidadesPropiasVendidas ? ` y sacaste <strong>${unidadesPropiasVendidas}</strong> ${unidadesPropiasVendidas === 1 ? 'unidad' : 'unidades'} de la playa` : ''}.`;
   }
 
+  // Snapshot para "Importar informe" (Plan Premium): mismos datos que ya se calcularon
+  // arriba para pintar esta vista, así el PDF sale exacto a lo que la agencia está viendo.
+  _perfInformeData = {
+    mes: nombreMes,
+    anio: perfAnio,
+    agencia: currentAgencia?.nombre || '',
+    busquedasCargadas: misBusquedasReal.filter(b => enMes(b.createdAtRaw)).length,
+    matches: generadosEsteMes.length,
+    contactados: contactadosEsteMes.length,
+    concretadas: concretadas.length,
+    caidas: caidas.length,
+    tasaConversion,
+    comisiones: { ARS: comisiones.ARS, USD: comisiones.USD },
+    ventas: { ARS: ventas.ARS, USD: ventas.USD },
+    unidadesPropiasVendidas,
+    costoPlan,
+    comisionesEnPesos,
+    retorno,
+    sinContactar: sinContactar.length,
+    busquedasSinMatch: busquedasSinMatch.length,
+    veredictoTexto: veredicto.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim(),
+    cerroCon: [...new Set(concretadas.map(m => m.otraAgencia).filter(Boolean))],
+    cayoCon: [...new Set(caidas.map(m => m.otraAgencia).filter(Boolean))],
+  };
+
   const paso = (etiqueta, valor) => `
     <div class="kpi" style="flex:1;min-width:132px;text-align:center;padding:14px 10px;">
       <div class="lbl" style="justify-content:center;margin-bottom:8px;">${esc(etiqueta)}</div>
@@ -8994,6 +9344,7 @@ performance: ()=>{
       <h1>Performance</h1>
       <p class="sub">Lo que la red te devolvió este mes, lo que quedó sin usar y lo que te costó</p>
     </div>
+    ${currentAgencia?.plan === 'premium' ? `<button id="perf-export-btn" class="btn btn-solid" onclick="exportarInformePerformance()"><i class="fa-solid fa-file-arrow-down"></i> Importar informe</button>` : ''}
   </div>
 
   <!-- ============ EL MES EN TRES NÚMEROS ============ -->
@@ -9997,17 +10348,38 @@ usuarios: ()=>{
         </div>
       </div>
       <p style="font-weight:700;font-size:13px;color:var(--ink);margin:16px 0 2px;">Pestañas visibles para esta persona</p>
-      <p style="font-size:12px;color:var(--paper-dim);margin:0 0 8px;">Empiezan todas tildadas — destildá las que no quieras que vea. El Dashboard siempre queda visible, y "Usuarios" es solo para vos.</p>
-      <div class="usr-pestanas-grid" id="usr-pestanas-grid">
-        ${NAV_TABS_PARA_PERMISOS.map(t => `
-          <label class="usr-pestana-chip checked" id="usr-chip-${t.key}" onclick="event.preventDefault();toggleUsrPestanaChip('${t.key}')">
-            <input type="checkbox" id="usr-pestana-${t.key}" checked onclick="event.stopPropagation();">
-            <span class="usr-chip-box"><i class="fa-solid fa-check"></i></span>
-            ${esc(t.label)}
-          </label>
+      <p style="font-size:12px;color:var(--paper-dim);margin:0 0 14px;">Empiezan todas destildadas — tildá las que quieras que vea. El Dashboard siempre queda visible, y "Usuarios" es solo para vos.</p>
+      <div class="usr-perm-grid" id="usr-pestanas-grid">
+        ${NAV_TABS_GRUPOS_PERMISOS.map((grupo, idx) => `
+          <div class="usr-perm-card">
+            <div class="usr-perm-card-head">
+              <div class="usr-perm-card-icon"><i class="fa-solid ${grupo.icon}"></i></div>
+              <span class="usr-perm-card-title">${esc(grupo.label)}</span>
+              <button type="button" class="usr-perm-card-link" id="usr-cat-link-${idx}" onclick="toggleUsrCategoria(${idx})">Todas</button>
+            </div>
+            <div class="usr-perm-list">
+              ${grupo.keys.map(key => {
+                const tab = NAV_TABS_PARA_PERMISOS.find(t => t.key === key);
+                if (!tab) return '';
+                return `
+                <label class="usr-perm-item" id="usr-chip-${key}" onclick="event.preventDefault();toggleUsrPestanaChip('${key}')">
+                  <input type="checkbox" id="usr-pestana-${key}" onclick="event.stopPropagation();">
+                  <span class="usr-perm-checkbox"><i class="fa-solid fa-check"></i></span>
+                  ${esc(tab.label)}
+                </label>`;
+              }).join('')}
+            </div>
+            <div class="usr-perm-progress-wrap">
+              <div class="usr-perm-progress-track"><div class="usr-perm-progress-fill" id="usr-cat-bar-${idx}" style="width:0%;"></div></div>
+              <span class="usr-perm-progress-num" id="usr-cat-num-${idx}">0/${grupo.keys.length}</span>
+            </div>
+          </div>
         `).join('')}
       </div>
-      <button class="btn btn-solid" onclick="invitarUsuario()"><i class="fa-solid fa-user-plus"></i> Invitar usuario</button>
+      <div style="display:flex;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-solid" onclick="invitarUsuario()"><i class="fa-solid fa-user-plus"></i> Invitar usuario</button>
+        <span class="usr-perm-summary" id="usr-total-secciones">con acceso a 0 secciones</span>
+      </div>
     </div>
   </div>
 `;},
@@ -10062,9 +10434,10 @@ precios: ()=>`
     <div class="plan-card ${currentAgencia?.plan!=='premium'?'featured':''}">
       <h3>Plan Pro</h3><div class="price">$190.000<span> /mes</span></div>
       <ul>
-        <li>15 vehículos como máximo en Marketplace</li>
-        <li>10 búsquedas</li>
+        <li>Vehículos ilimitados en Marketplace</li>
+        <li>Búsquedas ilimitadas</li>
         <li>Carga de vehículos de forma independiente</li>
+        <li>Hasta 4 usuarios</li>
         <li>Matches automáticos con toda la red</li>
         <li>Contacto interno con todas las agencias</li>
         <li>Contacto con proveedores internos</li>
@@ -10078,6 +10451,7 @@ precios: ()=>`
         <li>Vehículos destacados en Marketplace</li>
         <li>Búsquedas ilimitadas</li>
         <li>Equipo de RDA carga tus primeros 15 vehículos</li>
+        <li>Hasta 10 usuarios</li>
         <li>Matches automáticos con toda la red</li>
         <li>Contacto interno con todas las agencias</li>
         <li>Contacto con proveedores internos</li>
