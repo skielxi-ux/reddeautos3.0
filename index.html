@@ -2279,7 +2279,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 <div id="modal-agendarvisita" class="modal-backdrop hidden">
   <div class="modal">
     <h3>Agendar visita</h3>
-    <p class="sub">Proponele a la otra agencia al menos 3 días estimativos para que tu cliente visite el vehículo. Ellos van a confirmar cuál les queda mejor.</p>
+    <p class="sub" id="agendarvisita-sub">Proponele a la otra agencia al menos 3 días estimativos para que tu cliente visite el vehículo. Ellos van a confirmar cuál les queda mejor.</p>
     <div id="agendarvisita-fechas"></div>
     <button type="button" class="btn" style="align-self:flex-start;margin-top:4px;" onclick="agregarFechaVisitaInput()"><i class="fa-solid fa-plus"></i> Agregar otro día</button>
     <p id="agendarvisita-hint" style="color:var(--red);font-size:12.5px;margin:8px 0 0;"></p>
@@ -6767,6 +6767,13 @@ async function informarClienteMatch(matchId){
 let _agendarVisitaMatchId = null;
 function abrirAgendarVisitaModal(matchId){
   _agendarVisitaMatchId = matchId;
+  const m = misMatchesReal.find(x=>x.id===matchId);
+  const sub = document.getElementById('agendarvisita-sub');
+  if (sub) {
+    sub.textContent = (m && m.esCompraDirecta)
+      ? 'Proponele a la otra agencia al menos 3 días estimativos para ir a ver el vehículo vos mismo. Ellos van a confirmar cuál les queda mejor.'
+      : 'Proponele a la otra agencia al menos 3 días estimativos para que tu cliente visite el vehículo. Ellos van a confirmar cuál les queda mejor.';
+  }
   const cont = document.getElementById('agendarvisita-fechas');
   cont.innerHTML = '';
   agregarFechaVisitaInput();
@@ -7235,8 +7242,18 @@ async function confirmarCerrarMatch(){
         : (() => { const { monto, moneda } = calcularComisionAutomatica(mCerrado); return `Se concretó la operación entre ${mCerrado.clienteNombre} y ${vendedorNombre} por el ${mCerrado.vehiculo}. Comisión a cobrar: ${fmtMoney(monto, moneda)}. ¡Excelente trabajo en equipo!`; })(),
       mCerrado.id
     );
+    // En compra directa (a diferencia de un match con cliente) quien cierra la operación es la
+    // propia agencia vendedora, así que también le queda su propia notificación como confirmación.
+    if (mCerrado.esCompraDirecta) {
+      crearNotificacion(currentAgencia.id, 'match_cerrado', `¡Venta confirmada!`, `Confirmaste la venta directa del ${mCerrado.vehiculo} a ${compradorNombre}.`, mCerrado.id);
+    }
   } else if (mCerrado) {
     crearNotificacion(mCerrado.otraAgenciaId, 'match_cerrado', 'Operación caída', `El match de ${mCerrado.vehiculo} se marcó como caído.`, mCerrado.id);
+    // En compra directa, cualquiera de las dos agencias puede marcar la caída — avisale también a
+    // quien la marcó, así le queda registrada en sus propias notificaciones.
+    if (mCerrado.esCompraDirecta) {
+      crearNotificacion(currentAgencia.id, 'match_cerrado', 'Operación caída', `Marcaste como caído el match de ${mCerrado.vehiculo} con ${mCerrado.otraAgencia}.`, mCerrado.id);
+    }
   }
 
   closeModal('cerrarmatch');
