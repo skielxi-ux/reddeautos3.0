@@ -240,6 +240,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .agency-detail-swiper .swiper-slide{min-height:280px;}
   .agency-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
   .pill.pill-brick{color:#FFFFFF;background:var(--brick);border-color:var(--brick);}
+  .pill.pill-red-pastel{color:#991B1B;background:#FEF2F2;border-color:#FECACA;}
 
   /* ---------- key motif ---------- */
   .key-mark{width:22px;height:22px;flex-shrink:0;}
@@ -380,6 +381,14 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   .two-col{display:grid;grid-template-columns:1.3fr .9fr;gap:20px;}
 
+  .comisiones-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+  @media (max-width:900px){ .comisiones-cols{grid-template-columns:1fr;} }
+  .comisiones-col-head{display:flex;align-items:center;gap:8px;margin:0 0 12px;}
+  .comisiones-col-head strong{font-size:15px;}
+  .comisiones-col-head .comisiones-col-total{margin-left:auto;font-family:var(--font-mono);font-size:12.5px;color:var(--paper-dim);}
+  .comisiones-cols table{font-size:12.5px;}
+  .comisiones-cols th{white-space:nowrap;}
+
   table{width:100%;border-collapse:collapse;font-size:13px;}
   th{text-align:left;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--paper-dim);padding:8px 10px;border-bottom:1px solid var(--line-strong);}
   td{padding:11px 10px;border-bottom:1px solid var(--line);}
@@ -406,6 +415,49 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .select-wrap select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(91,79,224,.15);}
   .select-wrap i{position:absolute;right:14px;font-size:11px;color:var(--paper-dim);pointer-events:none;}
   .btn i{margin-right:6px;}
+
+  /* ---- panel de búsqueda (Explorar la Red / La Red está buscando) ---- */
+  .search-panel{background:#FFFFFF;border:1px solid var(--line);border-radius:14px;margin-bottom:18px;overflow:hidden;}
+  .search-panel-row{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;padding:20px 22px 18px;}
+  .search-panel-row .filter-field{flex:1 1 150px;min-width:130px;gap:6px;}
+  .search-panel-row .filter-field label,
+  .search-panel-more .filter-field label{
+    font-family:var(--font-mono);font-size:10.5px;font-weight:700;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--paper-dim);margin:0;
+  }
+  .search-panel-row .select-wrap{width:100%;}
+  .search-panel-row .select-wrap select{width:100%;}
+  .search-panel-apply{flex:0 0 auto;border-radius:10px;padding:12px 22px;white-space:nowrap;}
+  .search-panel-toggle{
+    display:flex;align-items:center;gap:7px;width:fit-content;
+    margin:0 22px 18px;font-size:13px;font-weight:700;color:var(--red-dark);
+    cursor:pointer;user-select:none;background:none;border:none;font-family:var(--font-body);padding:0;
+  }
+  .search-panel-toggle:hover{opacity:.8;}
+  .search-panel-toggle i{font-size:11px;}
+  .search-panel-more{
+    background:var(--ink-3);border-top:1px solid var(--line);
+    padding:18px 22px;display:flex;gap:20px;flex-wrap:wrap;
+  }
+  .search-panel-more .filter-field{flex:1 1 150px;min-width:140px;gap:6px;}
+  .search-panel-more .filter-field .range-inputs{display:flex;align-items:center;gap:8px;}
+  .search-panel-more input,.search-panel-more .select-wrap select{
+    border:1px solid var(--line-strong);border-radius:10px;
+    background:#FFFFFF;font-weight:600;
+  }
+  .search-panel-more .select-wrap{width:100%;}
+  .search-panel-more .select-wrap select{width:100%;}
+  .search-panel-footer{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+    padding:14px 22px;border-top:1px solid var(--line);
+  }
+  .search-panel-footer .search-panel-count{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .search-panel-footer a{
+    cursor:pointer;color:var(--paper-dim);font-weight:700;font-size:13px;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .search-panel-footer a.is-clearable:hover{color:var(--red-dark);}
+  .search-panel-footer .no-filters{color:var(--paper-dim);font-weight:700;font-size:13px;cursor:default;}
 
   .prop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
   .prop-card{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
@@ -3065,6 +3117,14 @@ let exploreFilterMoneda = 'Todas';
 let exploreSort = 'relevancia';
 let exploreAgencyFilter = null;
 let exploreSoloMiStock = false;
+let exploreMostrarMasFiltros = true;
+
+function toggleExploreMasFiltros(){ exploreMostrarMasFiltros = !exploreMostrarMasFiltros; showApp('explorar'); }
+function _exploreHayFiltros(){
+  return exploreFilterMarca!=='Todas' || exploreFilterModelo!=='Todos los modelos' || exploreFilterCiudad!=='Todas las ciudades' ||
+    !!exploreFilterAnioDesde || !!exploreFilterAnioHasta || !!exploreFilterPrecioDesde || !!exploreFilterPrecioHasta ||
+    !!exploreFilterKmMax || exploreFilterMoneda!=='Todas';
+}
 
 function _exploreFiltrados(){
   return redStock.filter(v => {
@@ -8388,6 +8448,13 @@ let rbFilterModelo = 'Todos los modelos';
 let rbFilterCiudad = 'Todas las ciudades';
 let rbFilterUrgencia = 'Todas';
 let rbFilterPresupuestoMax = '';
+let rbMostrarMasFiltros = true;
+
+function toggleRbMasFiltros(){ rbMostrarMasFiltros = !rbMostrarMasFiltros; showApp('redbusca'); }
+function _rbHayFiltros(){
+  return rbFilterMarca!=='Todas' || rbFilterModelo!=='Todos los modelos' || rbFilterCiudad!=='Todas las ciudades' ||
+    rbFilterUrgencia!=='Todas' || !!rbFilterPresupuestoMax;
+}
 
 function onRedBuscaMarcaChange(){
   rbFilterMarca = document.getElementById('rb-filter-marca').value;
@@ -8975,7 +9042,7 @@ performance: ()=>{
       </div>
     </div>
 
-    <div style="margin-top:18px;padding:14px 16px;border-radius:10px;background:#F5F4F0;border:1px solid var(--line);font-size:13.5px;line-height:1.6;color:var(--ink);">
+    <div style="margin-top:18px;padding:14px 16px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;font-size:13.5px;line-height:1.6;color:#166534;">
       ${veredicto}
     </div>
     ${hayUsdSinCotizar ? `<p class="sub" style="margin:10px 0 0;font-size:11.5px;">El retorno no incluye las comisiones en dólares: no se pudo leer la cotización. Se muestran por separado arriba.</p>` : ''}
@@ -9130,13 +9197,13 @@ performance: ()=>{
       <div style="flex:1;min-width:220px;">
         <strong style="font-size:13px;">Cerraste operaciones con</strong>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-          ${concretadas.length ? concretadas.map(m => `<span class="pill pill-sage">${esc(m.otraAgencia)}</span>`).join('') : '<p class="sub" style="margin:0;">Ninguna este mes.</p>'}
+          ${concretadas.length ? [...new Set(concretadas.map(m => m.otraAgencia))].map(nombre => `<span class="pill pill-sage">${esc(nombre)}</span>`).join('') : '<p class="sub" style="margin:0;">Ninguna este mes.</p>'}
         </div>
       </div>
       <div style="flex:1;min-width:220px;">
         <strong style="font-size:13px;">Se te cayeron operaciones con</strong>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-          ${caidas.length ? caidas.map(m => `<span class="pill pill-brick">${esc(m.otraAgencia)}</span>`).join('') : '<p class="sub" style="margin:0;">Ninguna este mes.</p>'}
+          ${caidas.length ? [...new Set(caidas.map(m => m.otraAgencia))].map(nombre => `<span class="pill pill-red-pastel">${esc(nombre)}</span>`).join('') : '<p class="sub" style="margin:0;">Ninguna este mes.</p>'}
         </div>
       </div>
     </div>` : ''}
@@ -9171,12 +9238,14 @@ comisiones: ()=>{
   const filaHTML = (m) => `
     <tr>
       <td>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="stock-thumb" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;"><i class="fa-solid fa-car"></i></div>
-          <span>${esc(m.otraAgencia)}</span>
+        <div style="display:flex;align-items:center;gap:9px;">
+          <div class="stock-thumb" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;"><i class="fa-solid fa-car"></i></div>
+          <div>
+            <div style="font-weight:700;">${esc(m.otraAgencia)}</div>
+            <div style="color:var(--paper-dim);font-size:11.5px;">${esc(m.vehiculo)}</div>
+          </div>
         </div>
       </td>
-      <td>${esc(m.vehiculo)}</td>
       <td>${esc(m.comisionVehiculo || '—')}<br><span class="mono" style="color:var(--paper-dim);font-size:12px;">${esc(fmtMoney(m.comisionMonto, m.comisionMoneda))}</span></td>
       <td>
         ${m.comisionEstado === 'pagada'
@@ -9188,23 +9257,38 @@ comisiones: ()=>{
       </td>
     </tr>`;
 
-  const seccion = (titulo, icon, color, items) => `
-    <div style="display:flex;align-items:center;gap:8px;margin:24px 0 10px;">
-      <i class="fa-solid ${icon}" style="color:${color};"></i>
-      <strong>${esc(titulo)}</strong>
+  const totalMonto = (items) => {
+    const ars = items.filter(m=>(m.comisionMoneda||'ARS')==='ARS').reduce((s,m)=>s+Number(m.comisionMonto||0),0);
+    const usd = items.filter(m=>m.comisionMoneda==='USD').reduce((s,m)=>s+Number(m.comisionMonto||0),0);
+    if (!ars && !usd) return null;
+    return [ars ? fmtMoney(ars,'ARS') : null, usd ? fmtMoney(usd,'USD') : null].filter(Boolean).join(' + ');
+  };
+
+  const seccion = (titulo, icon, color, items) => {
+    const total = totalMonto(items);
+    return `
+    <div>
+      <div class="comisiones-col-head">
+        <i class="fa-solid ${icon}" style="color:${color};"></i>
+        <strong>${esc(titulo)}</strong>
+        ${total ? `<span class="comisiones-col-total">${esc(total)}</span>` : ''}
+      </div>
+      ${items.length ? `
+      <table>
+        <thead><tr><th>Agencia / Vehículo</th><th>Comisión</th><th>Estado de cobro</th></tr></thead>
+        <tbody>${items.map(filaHTML).join('')}</tbody>
+      </table>` : `<div class="card"><p style="color:var(--paper-dim);margin:0;">No tenés comisiones ${titulo.toLowerCase()} por ahora.</p></div>`}
     </div>
-    ${items.length ? `
-    <table>
-      <thead><tr><th>Agencia</th><th>Vehículo</th><th>Comisión</th><th>Estado de cobro</th></tr></thead>
-      <tbody>${items.map(filaHTML).join('')}</tbody>
-    </table>` : `<div class="card"><p style="color:var(--paper-dim);margin:0;">No tenés comisiones ${titulo.toLowerCase()} por ahora.</p></div>`}
-  `;
+    `;
+  };
 
   return `
   <div class="main-head"><div><h1>Comisiones</h1><p class="sub">Comisiones a pagar y a cobrar por tus operaciones concretadas</p></div></div>
   ${comisionesFiltroBarHTML()}
-  ${seccion('Por pagar', 'fa-arrow-up', 'var(--red)', porPagar)}
-  ${seccion('Por cobrar', 'fa-arrow-down', '#3F7A46', porCobrar)}
+  <div class="comisiones-cols">
+    ${seccion('Por pagar', 'fa-arrow-up', 'var(--red)', porPagar)}
+    ${seccion('Por cobrar', 'fa-arrow-down', '#3F7A46', porCobrar)}
+  </div>
   `;
 },
 
@@ -9363,8 +9447,8 @@ explorar: ()=>`
     </div>
   </div>
   ${exploreAgencyFilter ? `<div class="agency-filter-chip">Mostrando vehículos de <strong>${exploreAgencyFilter}</strong><button onclick="clearAgencyFilter()">Ver todas <i class="fa-solid fa-xmark"></i></button></div>` : ''}
-  <div class="toolbar" style="flex-wrap:wrap;row-gap:12px;">
-    <div class="filters" style="flex-wrap:wrap;row-gap:12px;">
+  <div class="search-panel">
+    <div class="search-panel-row">
       <div class="filter-field">
         <label>Marca</label>
         <div class="select-wrap">
@@ -9407,45 +9491,49 @@ explorar: ()=>`
           <i class="fa-solid fa-chevron-down"></i>
         </div>
       </div>
+      <button class="btn btn-solid search-panel-apply" onclick="showApp('explorar')"><i class="fa-solid fa-filter"></i> Aplicar filtros</button>
     </div>
-    <button class="btn btn-solid" onclick="showApp('explorar')"><i class="fa-solid fa-filter"></i> Aplicar filtros</button>
+    <button type="button" class="search-panel-toggle" onclick="toggleExploreMasFiltros()">
+      <i class="fa-solid fa-chevron-${exploreMostrarMasFiltros?'up':'down'}"></i> ${exploreMostrarMasFiltros?'Menos':'Más'} filtros
+    </button>
+    ${exploreMostrarMasFiltros ? `
+    <div class="search-panel-more">
+      <div class="filter-field"><label>Año</label>
+        <div class="range-inputs">
+          <input type="number" value="${exploreFilterAnioDesde}" placeholder="Desde" onchange="onExploreAnioDesdeChange(this.value)">
+          <span style="color:var(--paper-dim);">–</span>
+          <input type="number" value="${exploreFilterAnioHasta}" placeholder="Hasta" onchange="onExploreAnioHastaChange(this.value)">
+        </div>
+      </div>
+      <div class="filter-field"><label>Precio</label>
+        <div class="range-inputs">
+          <input type="number" value="${exploreFilterPrecioDesde}" placeholder="Desde" onchange="onExplorePrecioDesdeChange(this.value)">
+          <span style="color:var(--paper-dim);">–</span>
+          <input type="number" value="${exploreFilterPrecioHasta}" placeholder="Hasta" onchange="onExplorePrecioHastaChange(this.value)">
+        </div>
+      </div>
+      <div class="filter-field"><label>Km máximo</label>
+        <input type="number" value="${exploreFilterKmMax}" placeholder="Ej: 80.000" onchange="onExploreKmMaxChange(this.value)">
+      </div>
+      <div class="filter-field"><label>Moneda</label>
+        <div class="select-wrap">
+          <select onchange="onExploreMonedaChange(this.value)">
+            <option ${exploreFilterMoneda==='Todas'?'selected':''}>Todas</option>
+            <option ${exploreFilterMoneda==='ARS'?'selected':''}>ARS</option>
+            <option ${exploreFilterMoneda==='USD'?'selected':''}>USD</option>
+          </select>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+      </div>
+    </div>` : ''}
+    <div class="search-panel-footer">
+      <span class="search-panel-count">${_exploreFiltrados().length} vehículo${_exploreFiltrados().length===1?'':'s'} disponible${_exploreFiltrados().length===1?'':'s'} en la red</span>
+      ${_exploreHayFiltros() ? `<a class="is-clearable" onclick="limpiarTodosLosFiltros()">Limpiar filtros <i class="fa-solid fa-xmark"></i></a>` : `<span class="no-filters">Sin filtros</span>`}
+    </div>
   </div>
-  <div class="toolbar" style="flex-wrap:wrap;row-gap:12px;margin-top:10px;">
-    <div class="filter-field"><label>Año</label>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="number" value="${exploreFilterAnioDesde}" placeholder="Desde" onchange="onExploreAnioDesdeChange(this.value)">
-        <span style="color:var(--paper-dim);">–</span>
-        <input type="number" value="${exploreFilterAnioHasta}" placeholder="Hasta" onchange="onExploreAnioHastaChange(this.value)">
-      </div>
-    </div>
-    <div class="filter-field"><label>Precio</label>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="number" value="${exploreFilterPrecioDesde}" placeholder="Desde" onchange="onExplorePrecioDesdeChange(this.value)">
-        <span style="color:var(--paper-dim);">–</span>
-        <input type="number" value="${exploreFilterPrecioHasta}" placeholder="Hasta" onchange="onExplorePrecioHastaChange(this.value)">
-      </div>
-    </div>
-    <div class="filter-field"><label>Km máximo</label>
-      <input type="number" value="${exploreFilterKmMax}" placeholder="Ej: 80.000" onchange="onExploreKmMaxChange(this.value)">
-    </div>
-    <div class="filter-field"><label>Moneda</label>
-      <div class="select-wrap">
-        <select onchange="onExploreMonedaChange(this.value)">
-          <option ${exploreFilterMoneda==='Todas'?'selected':''}>Todas</option>
-          <option ${exploreFilterMoneda==='ARS'?'selected':''}>ARS</option>
-          <option ${exploreFilterMoneda==='USD'?'selected':''}>USD</option>
-        </select>
-        <i class="fa-solid fa-chevron-down"></i>
-      </div>
-    </div>
-  </div>
-  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin:16px 0 14px;">
-    <div style="display:flex;gap:10px;">
-      <button class="btn ${!exploreSoloMiStock?'btn-solid':''}" onclick="setExploreSoloMiStock(false)"><i class="fa-solid fa-globe"></i> Ver toda la red</button>
-      <button class="btn ${exploreSoloMiStock?'btn-solid':''}" onclick="setExploreSoloMiStock(true)"><i class="fa-solid fa-warehouse"></i> Ver mi stock</button>
-    </div>
-    ${(exploreFilterAnioDesde||exploreFilterAnioHasta||exploreFilterPrecioDesde||exploreFilterPrecioHasta||exploreFilterKmMax||exploreFilterMoneda!=='Todas') ? `<a style="cursor:pointer;color:var(--paper-dim);font-weight:600;font-size:13px;" onclick="limpiarTodosLosFiltros()">Limpiar filtros <i class="fa-solid fa-xmark"></i></a>` : ''}
-    <span class="mono" style="color:var(--paper-dim);font-size:13px;">${_exploreFiltrados().length} resultado${_exploreFiltrados().length===1?'':'s'}</span>
+  <div style="display:flex;gap:10px;margin:0 0 16px;">
+    <button class="btn ${!exploreSoloMiStock?'btn-solid':''}" onclick="setExploreSoloMiStock(false)"><i class="fa-solid fa-globe"></i> Ver toda la red</button>
+    <button class="btn ${exploreSoloMiStock?'btn-solid':''}" onclick="setExploreSoloMiStock(true)"><i class="fa-solid fa-warehouse"></i> Ver mi stock</button>
   </div>
   <div class="listing-grid">
     ${sortProps(_exploreFiltrados(), exploreSort).map(v=>listingCardReal(v)).join('') || `<div class="card"><p style="color:var(--paper-dim);margin:0;">No hay vehículos que coincidan con estos filtros.</p></div>`}
@@ -9460,8 +9548,8 @@ redbusca: ()=>`
       <p>Vehículos que buscan las agencias de la red</p>
     </div>
   </div>
-  <div class="toolbar" style="flex-wrap:wrap;row-gap:12px;">
-    <div class="filters" style="flex-wrap:wrap;row-gap:12px;">
+  <div class="search-panel">
+    <div class="search-panel-row">
       <div class="filter-field">
         <label>Marca</label>
         <div class="select-wrap">
@@ -9504,15 +9592,21 @@ redbusca: ()=>`
           <i class="fa-solid fa-chevron-down"></i>
         </div>
       </div>
+      <button class="btn btn-solid search-panel-apply" onclick="showApp('redbusca')"><i class="fa-solid fa-filter"></i> Aplicar filtros</button>
     </div>
-    <button class="btn btn-solid" onclick="showApp('redbusca')"><i class="fa-solid fa-filter"></i> Aplicar filtros</button>
-  </div>
-  <div class="toolbar" style="flex-wrap:wrap;row-gap:12px;margin-top:10px;">
-    <div class="filter-field"><label>Presupuesto máximo</label>
-      <input type="number" value="${rbFilterPresupuestoMax}" placeholder="Ej: 20000" onchange="onRbPresupuestoChange(this.value)">
+    <button type="button" class="search-panel-toggle" onclick="toggleRbMasFiltros()">
+      <i class="fa-solid fa-chevron-${rbMostrarMasFiltros?'up':'down'}"></i> ${rbMostrarMasFiltros?'Menos':'Más'} filtros
+    </button>
+    ${rbMostrarMasFiltros ? `
+    <div class="search-panel-more">
+      <div class="filter-field"><label>Presupuesto máximo</label>
+        <input type="number" value="${rbFilterPresupuestoMax}" placeholder="Ej: 20000" onchange="onRbPresupuestoChange(this.value)">
+      </div>
+    </div>` : ''}
+    <div class="search-panel-footer">
+      <span class="search-panel-count">${_redBuscaFiltradas().length} búsqueda${_redBuscaFiltradas().length===1?'':'s'} activa${_redBuscaFiltradas().length===1?'':'s'} en la red</span>
+      ${_rbHayFiltros() ? `<a class="is-clearable" onclick="limpiarRbFiltros()">Limpiar filtros <i class="fa-solid fa-xmark"></i></a>` : `<span class="no-filters">Sin filtros</span>`}
     </div>
-    ${rbFilterUrgencia!=='Todas'||rbFilterPresupuestoMax ? `<a style="cursor:pointer;color:var(--paper-dim);font-weight:600;font-size:13px;align-self:center;" onclick="limpiarRbFiltros()">Limpiar filtros <i class="fa-solid fa-xmark"></i></a>` : ''}
-    <span class="mono" style="color:var(--paper-dim);font-size:13px;align-self:center;margin-left:auto;">${_redBuscaFiltradas().length} resultado${_redBuscaFiltradas().length===1?'':'s'}</span>
   </div>
   <table>
     <thead><tr><th>Vehículo</th><th>Agencia</th><th>Presupuesto</th><th>Urgencia</th><th></th></tr></thead>
