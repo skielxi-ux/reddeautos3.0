@@ -3360,14 +3360,17 @@ async function submitReport(){
   if(!reportTargetAgencyId){ toast('No se pudo identificar la agencia denunciada.'); return; }
   if(!currentAgencia){ toast('Sesión no iniciada.'); return; }
   const comment = document.getElementById('report-comentario').value.trim() || null;
-  const { error } = await supa.from('denuncias').insert({
+  const { data: denunciaData, error } = await supa.from('denuncias').insert({
     agencia_denunciante_id: currentAgencia.id,
     agencia_denunciada_id: reportTargetAgencyId,
     motivo: selected.value,
     descripcion: comment || selected.value,
     estado: 'pendiente',
-  });
+  }).select('id').single();
   if (error) { toast('Error al enviar la denuncia: ' + (error.message || 'error desconocido')); console.error('submitReport:', error); return; }
+  if (denunciaData?.id) {
+    crearNotificacion(reportTargetAgencyId, 'denuncia_recibida', 'Recibiste una denuncia', 'El equipo de Red de Autos va a revisar una denuncia recibida sobre tu agencia.', denunciaData.id);
+  }
   closeModal('denunciar');
   reportTargetAgencyId = null;
   toast('Denuncia enviada al equipo de Red de Autos sobre '+agency);
@@ -5443,6 +5446,9 @@ async function toggleSuspenderAgencia(id, estaPausada){
   const nuevoEstado = estaPausada ? 'activo' : 'suspendido';
   const { error } = await supa.from('agencias').update({ estado: nuevoEstado }).eq('id', id);
   if (error) { toast('Error al actualizar la agencia.'); console.error('toggleSuspenderAgencia:', error); return; }
+  if (!estaPausada) {
+    crearNotificacion(id, 'cuenta_pausada', 'Tu cuenta fue pausada', 'Un administrador de Red de Autos pausó tu cuenta. Comunicate con el equipo para reactivarla.', null);
+  }
   toast(estaPausada ? 'Agencia reactivada' : 'Agencia suspendida');
   await showAdmin('concesionarias');
 }
@@ -5494,12 +5500,16 @@ async function aprobarSolicitudPlan(id, agenciaId, planNuevo){
   if (e1) { toast('Error al cambiar el plan.'); console.error('aprobarSolicitudPlan:', e1); return; }
   const { error: e2 } = await supa.from('solicitudes_plan').update({ estado: 'aprobada' }).eq('id', id);
   if (e2) console.error('aprobarSolicitudPlan (solicitud):', e2);
+  crearNotificacion(agenciaId, 'plan_cambiado', '¡Tu plan fue actualizado!', `Tu solicitud de cambio de plan fue aprobada. Ahora estás en el plan ${planNuevo}.`, null);
   toast('Plan actualizado');
   await showAdmin('solicitudes');
 }
-async function rechazarSolicitudPlan(id){
+async function rechazarSolicitudPlan(id, agenciaId){
   const { error } = await supa.from('solicitudes_plan').update({ estado: 'rechazada' }).eq('id', id);
   if (error) { toast('Error al rechazar la solicitud.'); console.error('rechazarSolicitudPlan:', error); return; }
+  if (agenciaId) {
+    crearNotificacion(agenciaId, 'plan_cambiado', 'Tu solicitud de cambio de plan fue rechazada', 'Comunicate con el equipo de Red de Autos si tenés dudas sobre tu plan actual.', null);
+  }
   toast('Solicitud rechazada');
   await showAdmin('solicitudes');
 }
@@ -5855,8 +5865,16 @@ async function guardarDescuentoProveedorAdmin(){
   const btn = document.getElementById('descuentoadmin-submit-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
   try {
+    const proveedorPrevio = ADMIN_PROVEEDORES.find(x => x.id === id);
+    const esNuevoDescuentoActivo = payload.descuento_activo && !proveedorPrevio?.descuento_activo;
     const { error } = await supa.from('proveedores').update(payload).eq('id', id);
     if (error) throw error;
+    if (esNuevoDescuentoActivo) {
+      const { data: agenciasActivas } = await supa.from('agencias').select('id').eq('estado', 'activo');
+      await Promise.all((agenciasActivas || []).map(a =>
+        crearNotificacion(a.id, 'proveedor_descuento', `¡Nuevo descuento de ${proveedorPrevio.nombre}!`, payload.descuento_texto, id)
+      ));
+    }
     toast('Descuento guardado');
     closeModal('descuentoadmin');
     await showAdmin('proveedores-admin');
@@ -6153,7 +6171,7 @@ const adminRenderers = {
         <div style="font-size:12.5px;color:var(--paper-dim);margin-top:2px;">Pide pasar de ${s.plan_actual==='premium'?'Premium':'Pro'} a ${s.plan_solicitado==='premium'?'Premium':'Pro'} · ${formatDateTime(s.created_at)}</div>
         <div style="display:flex;gap:8px;margin-top:12px;">
           <button class="btn btn-sm whatsapp-btn" onclick="aprobarSolicitudPlan('${s.id}','${s.agencia_id}','${s.plan_solicitado}')"><i class="fa-solid fa-check"></i> Aprobar</button>
-          <button class="btn btn-sm btn-eliminar-pastel" onclick="rechazarSolicitudPlan('${s.id}')"><i class="fa-solid fa-xmark"></i> Rechazar</button>
+          <button class="btn btn-sm btn-eliminar-pastel" onclick="rechazarSolicitudPlan('${s.id}','${s.agencia_id}')"><i class="fa-solid fa-xmark"></i> Rechazar</button>
         </div>
       </div>
     `).join('') : `<div class="card" style="margin-bottom:24px;"><p style="color:var(--paper-dim);margin:0;">No hay solicitudes de cambio de plan pendientes.</p></div>`}
@@ -6465,8 +6483,9 @@ async function runMatchEngine(){
         nuevos.push({ vehiculo_id: v.id, busqueda_id: b.id, agencia_vendedora: currentAgencia.id, agencia_compradora: b.agencia_id, estado: 'pendiente' });
         const vehTxt = [v.marca, v.modelo, v.anio].filter(Boolean).join(' ');
         const tituloGremio = v.es_gremio ? '¡Oportunidad Gremio!' : 'Nuevo match';
-        notifsNuevoMatch.push({ agencia_id: currentAgencia.id, tipo: 'match_nuevo', titulo: tituloGremio, texto: `Tu ${vehTxt} coincide con una búsqueda de otra agencia.`, referencia_id: v.id });
-        notifsNuevoMatch.push({ agencia_id: b.agencia_id, tipo: 'match_nuevo', titulo: tituloGremio, texto: v.es_gremio ? `Un colega tiene un ${vehTxt} a precio gremio que coincide con tu búsqueda.` : `Encontramos un ${vehTxt} que coincide con tu búsqueda.`, referencia_id: v.id });
+        const categoriaGremio = v.es_gremio ? 'oportunidades' : 'matches';
+        notifsNuevoMatch.push({ agencia_id: currentAgencia.id, tipo: 'match_nuevo', titulo: tituloGremio, texto: `Tu ${vehTxt} coincide con una búsqueda de otra agencia.`, referencia_id: v.id, categoria: categoriaGremio });
+        notifsNuevoMatch.push({ agencia_id: b.agencia_id, tipo: 'match_nuevo', titulo: tituloGremio, texto: v.es_gremio ? `Un colega tiene un ${vehTxt} a precio gremio que coincide con tu búsqueda.` : `Encontramos un ${vehTxt} que coincide con tu búsqueda.`, referencia_id: v.id, categoria: categoriaGremio });
       }
     }
   }
@@ -6480,8 +6499,9 @@ async function runMatchEngine(){
         nuevos.push({ vehiculo_id: v.id, busqueda_id: b.id, agencia_vendedora: v.agencia_id, agencia_compradora: currentAgencia.id, estado: 'pendiente' });
         const vehTxt = [v.marca, v.modelo, v.anio].filter(Boolean).join(' ');
         const tituloGremio = v.es_gremio ? '¡Oportunidad Gremio!' : 'Nuevo match';
-        notifsNuevoMatch.push({ agencia_id: v.agencia_id, tipo: 'match_nuevo', titulo: tituloGremio, texto: `Tu ${vehTxt} coincide con una búsqueda de otra agencia.`, referencia_id: v.id });
-        notifsNuevoMatch.push({ agencia_id: currentAgencia.id, tipo: 'match_nuevo', titulo: tituloGremio, texto: v.es_gremio ? `Un colega tiene un ${vehTxt} a precio gremio que coincide con tu búsqueda.` : `Encontramos un ${vehTxt} que coincide con tu búsqueda.`, referencia_id: v.id });
+        const categoriaGremio = v.es_gremio ? 'oportunidades' : 'matches';
+        notifsNuevoMatch.push({ agencia_id: v.agencia_id, tipo: 'match_nuevo', titulo: tituloGremio, texto: `Tu ${vehTxt} coincide con una búsqueda de otra agencia.`, referencia_id: v.id, categoria: categoriaGremio });
+        notifsNuevoMatch.push({ agencia_id: currentAgencia.id, tipo: 'match_nuevo', titulo: tituloGremio, texto: v.es_gremio ? `Un colega tiene un ${vehTxt} a precio gremio que coincide con tu búsqueda.` : `Encontramos un ${vehTxt} que coincide con tu búsqueda.`, referencia_id: v.id, categoria: categoriaGremio });
       }
     }
   }
@@ -6496,7 +6516,7 @@ async function runMatchEngine(){
     // Una llamada RPC por notificación (crear_notificacion valida contra la fila de match recién
     // insertada), en vez de un insert masivo directo a la tabla.
     await Promise.all(notifsNuevoMatch.map(n =>
-      crearNotificacion(n.agencia_id, n.tipo, n.titulo, n.texto, n.referencia_id)
+      crearNotificacion(n.agencia_id, n.tipo, n.titulo, n.texto, n.referencia_id, n.categoria)
     ));
   }
 }
@@ -6679,7 +6699,7 @@ async function aceptarComisionMatch(matchId){
   if (!data || !data.length) {
     toast('No se pudo aceptar la comisión: el match ya no está pendiente o ya estaba aceptada.');
   } else {
-    crearNotificacion(m.otraAgenciaId, 'match_etapa', '¡Comisión aceptada!', `${currentAgencia?.nombre || 'La agencia'} aceptó la comisión propuesta (${m.comisionVehiculo || '—'}) para ${m.vehiculo}. Ya pueden coordinar por WhatsApp.`, m.id);
+    crearNotificacion(m.otraAgenciaId, 'match_etapa', '¡Comisión aceptada!', `${currentAgencia?.nombre || 'La agencia'} aceptó la comisión propuesta (${m.comisionVehiculo || '—'}) para ${m.vehiculo}. Ya pueden coordinar por WhatsApp.`, m.id, 'comisiones');
     toast('Comisión aceptada. Ya podés contactar a la otra agencia.');
   }
   await showApp(vistaMatchesActual());
@@ -7180,15 +7200,18 @@ async function confirmarCerrarMatch(){
 
     // Notificación de felicitaciones a quien hizo la búsqueda (agencia compradora — la que cobra
     // comisión). Quien cierra la operación siempre es el vendedor (tiene el vehículo), así que
-    // el comprador acá es "la otra agencia".
+    // el comprador acá es "la otra agencia". En compra directa no hay cliente ni comisión de por
+    // medio (la agencia compradora se queda el auto para su propio stock), así que el mensaje no
+    // debe mencionar ninguna comisión a cobrar.
     const compradorNombre = mCerrado.otraAgencia;
     const vendedorNombre = currentAgencia?.nombre || 'la agencia';
-    const { monto, moneda } = calcularComisionAutomatica(mCerrado);
     crearNotificacion(
       mCerrado.otraAgenciaId,
       'match_cerrado',
-      `¡Felicitaciones, ${compradorNombre}!`,
-      `Se concretó la operación entre ${mCerrado.clienteNombre} y ${vendedorNombre} por el ${mCerrado.vehiculo}. Comisión a cobrar: ${fmtMoney(monto, moneda)}. ¡Excelente trabajo en equipo!`,
+      mCerrado.esCompraDirecta ? `¡Compra confirmada, ${compradorNombre}!` : `¡Felicitaciones, ${compradorNombre}!`,
+      mCerrado.esCompraDirecta
+        ? `Se concretó la compra directa del ${mCerrado.vehiculo} a ${vendedorNombre}.`
+        : (() => { const { monto, moneda } = calcularComisionAutomatica(mCerrado); return `Se concretó la operación entre ${mCerrado.clienteNombre} y ${vendedorNombre} por el ${mCerrado.vehiculo}. Comisión a cobrar: ${fmtMoney(monto, moneda)}. ¡Excelente trabajo en equipo!`; })(),
       mCerrado.id
     );
   } else if (mCerrado) {
@@ -7351,7 +7374,24 @@ async function toggleFavoriteReal(vehiculoId){
 // Crea una notificación real para una agencia vía RPC (crear_notificacion), que valida del
 // lado del servidor que el evento sea real (match/vehículo/ticket que vincula a esas agencias)
 // antes de insertar. Nunca interrumpe el flujo si falla (fire-and-forget).
-async function crearNotificacion(agenciaId, tipo, titulo, texto, referenciaId){
+// Categoría por defecto de cada tipo de notificación (para las badges de filtro en "Notificaciones").
+// Algunos tipos pueden pisar esta categoría por defecto pasando un 6to argumento explícito
+// (p.ej. "comisión aceptada" es un match_etapa pero va a la categoría Comisiones).
+const NOTIF_CATEGORIA_POR_TIPO = {
+  match_nuevo: 'matches',
+  match_etapa: 'matches',
+  match_cerrado: 'matches',
+  whatsapp_recibido: 'matches',
+  me_interesa: 'mi_stock',
+  calificacion_recibida: 'cuenta',
+  comision_pagada: 'comisiones',
+  ticket_respondido: 'cuenta',
+  proveedor_descuento: 'proveedores',
+  denuncia_recibida: 'cuenta',
+  cuenta_pausada: 'cuenta',
+  plan_cambiado: 'cuenta',
+};
+async function crearNotificacion(agenciaId, tipo, titulo, texto, referenciaId, categoria){
   if (!agenciaId) return;
   try {
     const { error } = await supa.rpc('crear_notificacion', {
@@ -7360,6 +7400,7 @@ async function crearNotificacion(agenciaId, tipo, titulo, texto, referenciaId){
       p_titulo: titulo,
       p_texto: texto || null,
       p_referencia_id: referenciaId || null,
+      p_categoria: categoria || NOTIF_CATEGORIA_POR_TIPO[tipo] || null,
     });
     if (error) console.warn('crearNotificacion:', error);
   } catch (e) { console.warn('crearNotificacion:', e); }
@@ -7461,6 +7502,12 @@ async function confirmarContactoManual(){
 }
 
 let notificacionesReal = [];
+let notifCategoriaFiltro = null; // null = "Todas"; si no, una de las 6 categorías del filtro por badges
+function cambiarNotifCategoriaFiltro(cat){
+  // Toggle-off: tocar la misma badge activa vuelve a "Todas"
+  notifCategoriaFiltro = (notifCategoriaFiltro === cat) ? null : cat;
+  showApp('notificaciones');
+}
 async function cargarNotificacionesReal(){
   notificacionesReal = [];
   if (!currentAgencia) { actualizarNotifDotReal(); actualizarMatchDot(); return; }
@@ -9155,11 +9202,28 @@ notificaciones: ()=>{
     ticket_respondido: { icon: 'fa-solid fa-headset', color: '#5B3FBF' },
     calificacion_recibida: { icon: 'fa-solid fa-star', color: '#FBBC04' },
     comision_pagada: { icon: 'fa-solid fa-sack-dollar', color: '#3F7A46' },
+    proveedor_descuento: { icon: 'fa-solid fa-tags', color: '#C2790A' },
+    denuncia_recibida: { icon: 'fa-solid fa-flag', color: '#C0392B' },
+    cuenta_pausada: { icon: 'fa-solid fa-circle-pause', color: '#C0392B' },
+    plan_cambiado: { icon: 'fa-solid fa-crown', color: '#5B3FBF' },
   };
+  const categorias = [
+    { key: 'matches', label: 'Matches', icon: 'fa-solid fa-link' },
+    { key: 'cuenta', label: 'Cuenta', icon: 'fa-solid fa-user-shield' },
+    { key: 'proveedores', label: 'Proveedores', icon: 'fa-solid fa-tags' },
+    { key: 'comisiones', label: 'Comisiones', icon: 'fa-solid fa-sack-dollar' },
+    { key: 'mi_stock', label: 'Mi Stock', icon: 'fa-solid fa-heart' },
+    { key: 'oportunidades', label: 'Oportunidades', icon: 'fa-solid fa-gem' },
+  ];
+  const lista = notifCategoriaFiltro ? notificacionesReal.filter(n => n.categoria === notifCategoriaFiltro) : notificacionesReal;
   return `
   <div class="main-head"><div><h1>Notificaciones</h1><p class="sub">Todo lo que pasó en tu actividad dentro de la red</p></div>
   <div style="display:flex;gap:10px;"><button class="btn" onclick="marcarTodasNotifLeidasReal()"><i class="fa-solid fa-check-double"></i> Marcar todas como leídas</button><button class="btn" onclick="limpiarNotificacionesReal()"><i class="fa-solid fa-trash"></i> Limpiar notificaciones</button></div></div>
-  ${notificacionesReal.length ? notificacionesReal.map(n=>{
+  <div class="view-toggle">
+    <button class="view-toggle-btn ${!notifCategoriaFiltro?'active':''}" onclick="cambiarNotifCategoriaFiltro(null)">Todas</button>
+    ${categorias.map(c=>`<button class="view-toggle-btn ${notifCategoriaFiltro===c.key?'active':''}" onclick="cambiarNotifCategoriaFiltro('${c.key}')"><i class="${c.icon}"></i> ${c.label}</button>`).join('')}
+  </div>
+  ${lista.length ? lista.map(n=>{
     const esCaida = n.tipo === 'match_cerrado' && (n.titulo||'').toLowerCase().includes('caída');
 const meta = esCaida ? { icon: 'fa-solid fa-xmark', color: '#C0392B' } : (iconMap[n.tipo] || { icon: 'fa-solid fa-bell', color: 'var(--red)' });
     return `
@@ -9172,7 +9236,7 @@ const meta = esCaida ? { icon: 'fa-solid fa-xmark', color: '#C0392B' } : (iconMa
       </div>
       <button class="btn btn-sm" onclick="eliminarNotificacionUna(event, '${n.id}')" style="margin-left:auto;flex-shrink:0;" title="Eliminar esta notificación"><i class="fa-solid fa-trash"></i></button>
     </div>
-  `;}).join('') : `<div class="card"><p style="color:var(--paper-dim);margin:0;">No tenés notificaciones todavía. Van a ir apareciendo acá a medida que uses la red: matches nuevos, contactos por WhatsApp, "me interesa" en tu stock y cierres de operaciones.</p></div>`}
+  `;}).join('') : `<div class="card"><p style="color:var(--paper-dim);margin:0;">${notifCategoriaFiltro ? 'No tenés notificaciones en esta categoría.' : 'No tenés notificaciones todavía. Van a ir apareciendo acá a medida que uses la red: matches nuevos, contactos por WhatsApp, "me interesa" en tu stock y cierres de operaciones.'}</p></div>`}
   `;},
 
 dashboard: ()=>`
