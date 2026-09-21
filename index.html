@@ -2381,6 +2381,7 @@
     <h3 id="newstock-modal-title">Agregar vehículo</h3>
     <p class="sub">Cargá los datos del vehículo para publicarlo en tu stock y en la red.</p>
 
+    <div class="field"><label>Condición</label><select id="st-condicion"><option value="Usado">Usado</option><option value="OKM">OKM (0km)</option></select></div>
     <div class="row-2">
       <div class="field"><label>Marca</label><select id="st-marca" onchange="onStockMarcaChange()"><option value="">Elegí una marca</option></select></div>
       <div class="field"><label>Modelo</label><select id="st-modelo"><option value="">Elegí primero la marca</option></select></div>
@@ -3228,6 +3229,10 @@ function sortProps(list, sortKey){
   if(sortKey==='precio_asc') arr.sort((a,b)=>a.precio-b.precio);
   else if(sortKey==='precio_desc') arr.sort((a,b)=>b.precio-a.precio);
   else if(sortKey==='reciente') arr.reverse();
+  else if(sortKey==='km_asc') arr.sort((a,b)=>(a.km??Infinity)-(b.km??Infinity));
+  else if(sortKey==='anio_asc') arr.sort((a,b)=>(a.anio??Infinity)-(b.anio??Infinity));
+  else if(sortKey==='anio_desc') arr.sort((a,b)=>(b.anio??-Infinity)-(a.anio??-Infinity));
+  else if(sortKey==='chinos') arr.sort((a,b)=>(MARCAS_CHINAS.includes(b.marca)?1:0)-(MARCAS_CHINAS.includes(a.marca)?1:0));
 
   // Por encima de cualquier orden elegido: las agencias con plan premium
   // siempre van primero, y entre ellas, la que tiene más stock cargado
@@ -3938,6 +3943,7 @@ const MODELS_BY_MARCA = {
   'Volvo': ['XC40','XC60','XC90','S60','EX30'],
 };
 const MARCAS_AUTOS = Object.keys(MODELS_BY_MARCA);
+const MARCAS_CHINAS = ['Baic','BYD','Changan','Chery','GWM','JAC','Jetour','JMC','JMEV','MG'];
 function populateSearchMarcaOptions(){
   const sel = document.getElementById('s-marca');
   if(sel.options.length > 1) return;
@@ -4038,6 +4044,7 @@ function openNewStockModal(){
   stockPhotos = [];
   document.getElementById('newstock-modal-title').textContent = 'Agregar vehículo';
   document.getElementById('newstock-submit-btn').textContent = 'Guardar vehículo';
+  document.getElementById('st-condicion').value = 'Usado';
   populateStockMarcaOptions();
   document.getElementById('st-marca').value = '';
   onStockMarcaChange();
@@ -4060,6 +4067,7 @@ function openEditStockModal(id){
   stockPhotos = Array.isArray(p.fotos) ? [...p.fotos] : [];
   document.getElementById('newstock-modal-title').textContent = 'Editar vehículo';
   document.getElementById('newstock-submit-btn').textContent = 'Guardar cambios';
+  document.getElementById('st-condicion').value = p.condicion || 'Usado';
   populateStockMarcaOptions();
   document.getElementById('st-marca').value = p.marca || '';
   onStockMarcaChange(p.modelo || '');
@@ -4097,6 +4105,7 @@ async function submitNewStock(){
 
     const data = {
       marca, modelo,
+      condicion: document.getElementById('st-condicion').value,
       anio: parseInt(document.getElementById('st-anio').value) || null,
       km: parseInt(document.getElementById('st-km').value) || null,
       transmision: document.getElementById('st-transmision').value,
@@ -4137,8 +4146,9 @@ async function submitNewStock(){
 /* ---------------- Importar stock desde Excel ---------------- */
 // Mismas columnas que el formulario de "Agregar vehículo" (ver submitNewStock), salvo las fotos:
 // esas se siguen cargando a mano, una por una, después de importar.
-const IMPORT_STOCK_HEADERS = ['Marca','Modelo','Año','Kilometraje','Transmisión','Combustible','Color','Precio','Moneda','Comisión','Descripción'];
+const IMPORT_STOCK_HEADERS = ['Marca','Modelo','Año','Kilometraje','Condición','Transmisión','Combustible','Color','Precio','Moneda','Comisión','Descripción'];
 const IMPORT_TRANSMISIONES = ['Manual','Automática'];
+const IMPORT_CONDICIONES = ['Usado','OKM'];
 const IMPORT_COMBUSTIBLES = ['Nafta','Diesel','GNC','Nafta + GNC','EV (Eléctrico 100%)','HEV (Híbrido autorrecargable)','PHEV (Híbrido enchufable)'];
 const IMPORT_MONEDAS = ['USD','ARS'];
 const IMPORT_COMISIONES = ['1%','1,5%','2%','2,5%','3%'];
@@ -4154,18 +4164,18 @@ function openImportStockModal(){
 }
 
 function descargarPlantillaStock(){
-  const ejemplo = ['Toyota','Corolla',2021,45000,'Automática','Nafta','Gris',18000,'USD','3%','Único dueño, service oficial al día, impecable'];
+  const ejemplo = ['Toyota','Corolla',2021,45000,'Usado','Automática','Nafta','Gris',18000,'USD','3%','Único dueño, service oficial al día, impecable'];
   const wsDatos = XLSX.utils.aoa_to_sheet([IMPORT_STOCK_HEADERS, ejemplo]);
   wsDatos['!cols'] = IMPORT_STOCK_HEADERS.map(()=>({wch:18}));
 
   // Segunda hoja con los valores exactos que acepta cada columna, para no adivinar.
-  const maxLen = Math.max(MARCAS_AUTOS.length, IMPORT_TRANSMISIONES.length, IMPORT_COMBUSTIBLES.length, IMPORT_MONEDAS.length, IMPORT_COMISIONES.length);
-  const filasValores = [['Marcas disponibles','Transmisión','Combustible','Moneda','Comisión']];
+  const maxLen = Math.max(MARCAS_AUTOS.length, IMPORT_CONDICIONES.length, IMPORT_TRANSMISIONES.length, IMPORT_COMBUSTIBLES.length, IMPORT_MONEDAS.length, IMPORT_COMISIONES.length);
+  const filasValores = [['Marcas disponibles','Condición','Transmisión','Combustible','Moneda','Comisión']];
   for (let i = 0; i < maxLen; i++) {
-    filasValores.push([MARCAS_AUTOS[i]||'', IMPORT_TRANSMISIONES[i]||'', IMPORT_COMBUSTIBLES[i]||'', IMPORT_MONEDAS[i]||'', IMPORT_COMISIONES[i]||'']);
+    filasValores.push([MARCAS_AUTOS[i]||'', IMPORT_CONDICIONES[i]||'', IMPORT_TRANSMISIONES[i]||'', IMPORT_COMBUSTIBLES[i]||'', IMPORT_MONEDAS[i]||'', IMPORT_COMISIONES[i]||'']);
   }
   const wsValores = XLSX.utils.aoa_to_sheet(filasValores);
-  wsValores['!cols'] = [{wch:18},{wch:14},{wch:26},{wch:10},{wch:10}];
+  wsValores['!cols'] = [{wch:18},{wch:10},{wch:14},{wch:26},{wch:10},{wch:10}];
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, wsDatos, 'Vehículos');
@@ -4206,6 +4216,10 @@ function _validarFilaImportStock(fila, i){
     if (!Number.isFinite(km) || km < 0) errores.push(`Kilometraje "${fila['Kilometraje']}" inválido`);
   }
 
+  let condicion = _matchOpcion(fila['Condición'], IMPORT_CONDICIONES);
+  if (!fila['Condición']) { condicion = 'Usado'; avisos.push('Sin condición indicada, se usó "Usado" por defecto'); }
+  else if (!condicion) { errores.push(`Condición "${fila['Condición']}" no reconocida (usá Usado u OKM)`); }
+
   const transmision = _matchOpcion(fila['Transmisión'], IMPORT_TRANSMISIONES);
   if (!fila['Transmisión']) errores.push('Falta la transmisión');
   else if (!transmision) errores.push(`Transmisión "${fila['Transmisión']}" no reconocida (usá Manual o Automática)`);
@@ -4238,6 +4252,7 @@ function _validarFilaImportStock(fila, i){
     data: {
       marca: marca || String(fila['Marca']||'').trim(),
       modelo, anio: Number.isFinite(anio) ? anio : null, km,
+      condicion: condicion || 'Usado',
       transmision: transmision || '', combustible: combustible || '', color,
       precio: Number.isFinite(precio) ? precio : 0,
       moneda: moneda || '', comision, descripcion,
@@ -4320,6 +4335,7 @@ async function confirmarImportStock(){
   try {
     const payload = validas.map(r => ({
       marca: r.data.marca, modelo: r.data.modelo, anio: r.data.anio, km: r.data.km,
+      condicion: r.data.condicion,
       transmision: r.data.transmision, combustible: r.data.combustible, color: r.data.color,
       precio: r.data.precio, moneda: r.data.moneda, comision: r.data.comision,
       descripcion: r.data.descripcion, fotos: [],
@@ -4667,7 +4683,7 @@ function listingCardReal(v, esAdminView=false){
           <div class="listing-price">${esc(fmtMoney(v.precio, v.moneda))}</div>
           ${esPropio ? '' : `<button class="listing-heart ${isFav?'is-fav':''}" data-vid="${v.id}" onclick="toggleFavoriteReal('${v.id}')">${isFav ? '<i class="fa-solid fa-heart"></i>' : icoHeart}</button>`}
         </div>
-        <div class="listing-title">${esc(v.marca||'')} ${esc(v.modelo||'')} ${v.anio||''}</div>
+        <div class="listing-title">${esc(v.marca||'')} ${esc(v.modelo||'')} ${v.anio||''} ${v.condicion === 'OKM' ? `<span class="pill pill-sage" style="font-size:9.5px;padding:2px 7px;vertical-align:middle;margin-left:4px;">OKM</span>` : ''}</div>
         <div class="listing-addr">${esc(agCiudad)}</div>
         <div class="listing-commission"><i class="fa-solid fa-hand-holding-dollar"></i> Comisión: <strong>${esc(v.comision||'—')}</strong></div>
         <div style="display:flex;align-items:center;gap:8px;margin:10px 0;">
@@ -8241,6 +8257,7 @@ function renderDetailModalReal(v){
         ${heartBtn}
       </div>
       <div class="propdetail-grid">
+        <div><span class="lbl"><i class="fa-solid fa-certificate"></i>Condición</span><span class="val">${esc(v.condicion || 'Usado')}</span></div>
         <div><span class="lbl"><i class="fa-solid fa-gauge-high"></i>Kilometraje</span><span class="val">${v.km ? v.km.toLocaleString('es-AR')+' km' : '—'}</span></div>
         <div><span class="lbl"><i class="fa-solid fa-gears"></i>Transmisión</span><span class="val">${esc(v.transmision||'—')}</span></div>
         <div><span class="lbl"><i class="fa-solid fa-gas-pump"></i>Combustible</span><span class="val">${esc(v.combustible||'—')}</span></div>
@@ -9840,6 +9857,10 @@ explorar: ()=>`
             <option value="precio_asc" ${exploreSort==='precio_asc'?'selected':''}>Precio: menor a mayor</option>
             <option value="precio_desc" ${exploreSort==='precio_desc'?'selected':''}>Precio: mayor a menor</option>
             <option value="reciente" ${exploreSort==='reciente'?'selected':''}>Más reciente</option>
+            <option value="km_asc" ${exploreSort==='km_asc'?'selected':''}>Menos Km</option>
+            <option value="anio_desc" ${exploreSort==='anio_desc'?'selected':''}>Año: más nuevo</option>
+            <option value="anio_asc" ${exploreSort==='anio_asc'?'selected':''}>Año: más antiguo</option>
+            <option value="chinos" ${exploreSort==='chinos'?'selected':''}>Chinos</option>
           </select>
           <i class="fa-solid fa-chevron-down"></i>
         </div>
@@ -10095,7 +10116,7 @@ vehículos: ()=>`
               ${foto ? `<img src="${foto}" alt="${esc(v.marca||'')} ${esc(v.modelo||'')}">` : `<i class="fa-solid fa-car"></i>`}
               ${v.fotos && v.fotos.length ? `<span class="stock-thumb-badge">${v.fotos.length}</span>` : ''}
             </div>
-            <span style="cursor:pointer;" onclick="openMiStockDetail('${v.id}')">${esc(v.marca||'')} ${esc(v.modelo||'')} ${v.anio||''}</span>
+            <span style="cursor:pointer;" onclick="openMiStockDetail('${v.id}')">${esc(v.marca||'')} ${esc(v.modelo||'')} ${v.anio||''} ${v.condicion === 'OKM' ? `<span class="pill pill-sage" style="font-size:9.5px;padding:2px 7px;">OKM</span>` : ''}</span>
           </div>
         </td>
         <td class="mono">${esc(fmtMoney(v.precio, v.moneda))}</td>
