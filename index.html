@@ -702,32 +702,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .faq-c-item.faq-c-open .faq-c-a{display:block;}
   .faq-c-a p{margin:0;color:var(--paper-dim);font-size:13.5px;line-height:1.65;}
 
-  /* ---- diagrama "Matches Manuales" (Agencia A / auto / Agencia B) ---- */
-  .lp-manualmatch{padding:70px 48px 64px;text-align:center;background:#FFFFFF;}
-  .lp-manualmatch-emoji{font-size:30px;margin-bottom:16px;line-height:1;}
-  .lp-manualmatch-connector{display:flex;align-items:center;justify-content:center;max-width:680px;margin:0 auto 6px;}
-  .lp-manualmatch-connector-line{flex:1;height:2px;border-radius:2px;}
-  .lp-manualmatch-connector-line.a{background:var(--red);}
-  .lp-manualmatch-connector-line.b{background:var(--ink);}
-  .lp-manualmatch-label{font-family:var(--font-display);font-weight:700;font-size:14.5px;line-height:1.45;
-    color:var(--ink);padding:0 22px;max-width:280px;}
-  .lp-manualmatch-grid{display:grid;grid-template-columns:1fr 240px 1fr;align-items:center;gap:20px;
-    max-width:1000px;margin:34px auto 0;}
-  .lp-manualmatch-badge{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-    color:#FFFFFF;font-family:var(--font-mono);font-weight:800;font-size:22px;margin:0 auto 14px;}
-  .lp-manualmatch-badge.a{background:var(--red);}
-  .lp-manualmatch-badge.b{background:var(--ink);}
-  .lp-manualmatch-card h4{font-family:var(--font-display);font-weight:800;font-size:15.5px;color:var(--ink);
-    margin:0 0 8px;letter-spacing:.02em;}
-  .lp-manualmatch-card p{font-size:13.5px;line-height:1.6;color:var(--paper-dim);margin:0 auto;max-width:230px;}
-  .lp-manualmatch-car img{width:100%;max-width:280px;height:auto;display:block;margin:0 auto;
-    filter:drop-shadow(0 18px 18px rgba(28,43,54,.18));}
-  @media (max-width:780px){
-    .lp-manualmatch-grid{grid-template-columns:1fr;}
-    .lp-manualmatch-car{order:-1;margin-bottom:10px;}
-  }
-
-
   .lp-photo-swiper{width:100%;--swiper-theme-color:var(--red);}
   .lp-photo-slide{position:relative;height:440px;background-size:cover;background-position:center;
     display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;}
@@ -1266,6 +1240,29 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     100%{transform:translateX(0);opacity:.5;}
   }
 
+  /* ---------------- Usuarios (sub-cuentas) ---------------- */
+  .usr-quota-card{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 20px;background:var(--bg-soft,#f5f4f0);border:1px solid var(--border);border-radius:12px;margin-bottom:22px;}
+  .usr-quota-txt{font-size:14px;color:var(--ink);font-weight:600;}
+  .usr-quota-sub{font-size:12.5px;color:var(--paper-dim);margin-top:2px;font-weight:400;}
+  .usr-quota-bar{width:160px;height:7px;border-radius:5px;background:var(--border);overflow:hidden;}
+  .usr-quota-bar-fill{height:100%;background:var(--sage);border-radius:5px;}
+  .usr-table{width:100%;border-collapse:collapse;margin-bottom:26px;}
+  .usr-table th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--paper-dim);padding:8px 10px;border-bottom:1px solid var(--border);}
+  .usr-table td{padding:10px;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:middle;}
+  .usr-table tr:last-child td{border-bottom:none;}
+  .usr-estado-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;}
+  .usr-estado-pill.activo{background:#f0fdf4;color:#166534;}
+  .usr-estado-pill.pausado{background:#fef2f2;color:#991b1b;}
+  .usr-row-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .usr-empty{font-size:13.5px;color:var(--paper-dim);padding:14px 0;}
+  .usr-pestanas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:10px 0 18px;}
+  .usr-pestana-chip{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-size:12.5px;cursor:pointer;user-select:none;transition:border-color .15s,background .15s;}
+  .usr-pestana-chip:hover{border-color:var(--sage);}
+  .usr-pestana-chip.checked{background:#f0fdf4;border-color:var(--sage);color:#166534;font-weight:600;}
+  .usr-pestana-chip input{accent-color:var(--sage);}
+  .usr-form-disabled{opacity:.5;pointer-events:none;}
+  .usr-quota-full-msg{font-size:13px;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:9px;padding:10px 14px;margin-bottom:14px;}
+
 </style>
 </head>
 <body>
@@ -1368,29 +1365,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <div class="lp-feature-actions" style="margin-top:28px;">
         <button class="btn btn-solid" onclick="pedirAccesoWhatsapp('hero')">Unirme a la Red</button>
         <button class="btn" onclick="scrollToSection('precios')">Consultar planes</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============ 2.5. Diagrama Matches Manuales (Agencia A / auto / Agencia B) ============ -->
-  <div class="lp-manualmatch reveal">
-    <div class="lp-manualmatch-emoji">🔥</div>
-    <div class="lp-manualmatch-connector">
-      <span class="lp-manualmatch-connector-line a"></span>
-      <p class="lp-manualmatch-label">Hacés un Match Manual con la agencia que tiene el auto.</p>
-      <span class="lp-manualmatch-connector-line b"></span>
-    </div>
-    <div class="lp-manualmatch-grid">
-      <div class="lp-manualmatch-card">
-        <div class="lp-manualmatch-badge a">A</div>
-        <h4>Agencia A</h4>
-        <p>Tiene el vehículo en su stock cargado al sistema, con la comisión ya definida.</p>
-      </div>
-      <div class="lp-manualmatch-car"><img src="assets/img-hero-car.png" alt="Vehículo conectado por un Match Manual" loading="lazy"></div>
-      <div class="lp-manualmatch-card">
-        <div class="lp-manualmatch-badge b">B</div>
-        <h4>Agencia B</h4>
-        <p>Contactó directo por ese vehículo desde Explorar la Red — el match queda registrado al instante.</p>
       </div>
     </div>
   </div>
@@ -1993,6 +1967,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <div class="nav-group">
         <div class="nav-group-label">Cuenta</div>
         <div class="nav-item" data-view="perfil" onclick="showApp('perfil')"><i class="fa-solid fa-user-gear"></i> Mi Perfil</div>
+        <div class="nav-item" data-view="usuarios" onclick="showApp('usuarios')"><i class="fa-solid fa-users-gear"></i> Usuarios</div>
         <div class="nav-item" data-view="faqapp" onclick="showApp('faqapp')"><i class="fa-solid fa-circle-question"></i> FAQs</div>
         <div class="nav-item" data-view="precios" onclick="showApp('precios')"><i class="fa-solid fa-tag"></i> Precios</div>
         <div class="nav-item" data-view="soporte" onclick="showApp('soporte')"><i class="fa-solid fa-headset"></i> Soporte <span class="dot" id="soportedot"></span></div>
@@ -4784,6 +4759,146 @@ async function activarCodigoInvitacion(){
    salen de ahí. */
 
 let currentAgencia = null;
+let currentUsuarioInvitado = null; // fila de agencia_usuarios si quien entró es un sub-usuario invitado (no el dueño)
+
+/* ---------------- Usuarios (sub-cuentas del equipo) ---------------- */
+const NAV_TABS_PARA_PERMISOS = [
+  { key: 'performance', label: 'Performance' },
+  { key: 'explorar', label: 'Explorar la Red' },
+  { key: 'redbusca', label: 'La Red está buscando' },
+  { key: 'busquedas', label: 'Mis Búsquedas' },
+  { key: 'matches', label: 'Mis Matches' },
+  { key: 'manuales', label: 'Matches Manuales' },
+  { key: 'notificaciones', label: 'Notificaciones' },
+  { key: 'vehículos', label: 'Mi Stock' },
+  { key: 'clientes', label: 'Mis Clientes' },
+  { key: 'comisiones', label: 'Comisiones' },
+  { key: 'leadsexternos', label: 'Leads Externos' },
+  { key: 'exclusiva', label: 'Oportunidades Exclusivas' },
+  { key: 'asociadas', label: 'Agencias Asociadas' },
+  { key: 'proveedores', label: 'Proveedores' },
+  { key: 'perfil', label: 'Mi Perfil' },
+  { key: 'faqapp', label: 'FAQs' },
+  { key: 'precios', label: 'Precios' },
+  { key: 'soporte', label: 'Soporte' },
+];
+
+let misUsuariosInvitados = [];
+
+async function cargarUsuariosInvitados(){
+  misUsuariosInvitados = [];
+  if (!currentAgencia) return;
+  const { data, error } = await supa
+    .from('agencia_usuarios')
+    .select('*')
+    .eq('agencia_id', currentAgencia.id)
+    .order('created_at', { ascending: true });
+  if (!error && data) misUsuariosInvitados = data;
+}
+
+function usuariosInvitadosQuotaPlan(){
+  return currentAgencia?.plan === 'premium' ? 10 : 4;
+}
+
+function toggleUsrPestanaChip(key){
+  const cb = document.getElementById('usr-pestana-' + key);
+  const chip = document.getElementById('usr-chip-' + key);
+  if (!cb || !chip) return;
+  cb.checked = !cb.checked;
+  chip.classList.toggle('checked', cb.checked);
+}
+
+async function invitarUsuario(){
+  if (!currentAgencia) return;
+  const nombre = document.getElementById('usr-nombre')?.value.trim();
+  const email = document.getElementById('usr-email')?.value.trim().toLowerCase();
+  const password = document.getElementById('usr-password')?.value;
+  const puesto = document.getElementById('usr-puesto')?.value;
+  const pestanasVisibles = NAV_TABS_PARA_PERMISOS
+    .filter(t => document.getElementById('usr-pestana-' + t.key)?.checked)
+    .map(t => t.key);
+
+  if (!nombre || !email || !password) { toast('Completá nombre, email y contraseña provisoria.'); return; }
+  if (password.length < 6) { toast('La contraseña provisoria debe tener al menos 6 caracteres.'); return; }
+  if (misUsuariosInvitados.length >= usuariosInvitadosQuotaPlan()) { toast('Llegaste al límite de usuarios de tu plan.'); return; }
+
+  // signUp() de supabase-js cambia la sesión activa del navegador al usuario recién creado.
+  // Guardamos la sesión del dueño antes, y la restauramos apenas termina, para no perder
+  // su sesión logueada mientras crea la cuenta de un integrante del equipo.
+  const { data: { session: sesionDueno } } = await supa.auth.getSession();
+
+  const { data: signUp, error: eSignUp } = await supa.auth.signUp({ email, password });
+
+  if (sesionDueno) {
+    await supa.auth.setSession({ access_token: sesionDueno.access_token, refresh_token: sesionDueno.refresh_token });
+  }
+
+  if (eSignUp || !signUp?.user) {
+    toast(eSignUp?.message?.includes('already') ? 'Ese email ya está registrado.' : 'No se pudo crear el usuario.');
+    return;
+  }
+
+  const { error: eInsert } = await supa.from('agencia_usuarios').insert({
+    agencia_id: currentAgencia.id,
+    auth_user_id: signUp.user.id,
+    nombre, email, puesto,
+    pestanas_visibles: pestanasVisibles,
+    estado: 'activo',
+  });
+
+  if (eInsert) { toast('No se pudo vincular el usuario a tu agencia.'); return; }
+
+  toast('Usuario invitado. Ya puede entrar con su email y la contraseña provisoria.');
+  await cargarUsuariosInvitados();
+  showApp('usuarios');
+}
+
+async function pausarReanudarUsuarioInvitado(id, estadoActual){
+  const nuevoEstado = estadoActual === 'activo' ? 'pausado' : 'activo';
+  const { error } = await supa.from('agencia_usuarios').update({ estado: nuevoEstado }).eq('id', id);
+  if (error) { toast('No se pudo actualizar el usuario.'); return; }
+  await cargarUsuariosInvitados();
+  showApp('usuarios');
+}
+
+async function eliminarUsuarioInvitado(id){
+  showConfirm('¿Eliminar a este usuario del equipo? Va a dejar de poder entrar al sistema.', async () => {
+    const { error } = await supa.from('agencia_usuarios').delete().eq('id', id);
+    if (error) { toast('No se pudo eliminar el usuario.'); return; }
+    await cargarUsuariosInvitados();
+    showApp('usuarios');
+  }, 'Eliminar usuario');
+}
+
+// Resuelve la agencia a la que pertenece un auth_user_id, ya sea porque es el dueño
+// (agencias.auth_user_id) o porque es un usuario invitado activo (agencia_usuarios).
+// Devuelve { agencia, usuarioInvitado } — usuarioInvitado es null si es el dueño.
+async function resolverAgenciaParaAuthUser(authUserId){
+  const { data: propia } = await supa.from('agencias').select('*').eq('auth_user_id', authUserId).maybeSingle();
+  if (propia) return { agencia: propia, usuarioInvitado: null };
+
+  const { data: invitado } = await supa.from('agencia_usuarios').select('*').eq('auth_user_id', authUserId).maybeSingle();
+  if (invitado) {
+    const { data: agenciaDelInvitado } = await supa.from('agencias').select('*').eq('id', invitado.agencia_id).maybeSingle();
+    if (agenciaDelInvitado) return { agencia: agenciaDelInvitado, usuarioInvitado: invitado };
+  }
+  return { agencia: null, usuarioInvitado: null };
+}
+
+// Oculta del sidebar las pestañas que el usuario invitado no tiene permitido ver.
+// El dueño de la agencia (currentUsuarioInvitado null) siempre ve todo.
+function aplicarPermisosSidebar(){
+  const permitidas = currentUsuarioInvitado ? (currentUsuarioInvitado.pestanas_visibles || []) : null;
+  document.querySelectorAll('.nav-item[data-view]').forEach(el => {
+    const view = el.dataset.view;
+    if (view === 'dashboard') { el.style.display = ''; return; }
+    if (view === 'usuarios') { el.style.display = currentUsuarioInvitado ? 'none' : ''; return; }
+    if (!permitidas) { el.style.display = ''; return; }
+    el.style.display = permitidas.includes(view) ? '' : 'none';
+  });
+  const roleEl = document.querySelector('.sidebar-foot .agrole');
+  if (roleEl && currentUsuarioInvitado) roleEl.textContent = currentUsuarioInvitado.nombre + ' · ' + (currentUsuarioInvitado.puesto || 'Equipo');
+}
 
 async function enterApp(){
   const email = document.getElementById('loginEmail')?.value.trim();
@@ -4812,14 +4927,10 @@ async function enterApp(){
   // registradas probando emails.
   if (authError || !auth?.user) { fail('Email o contraseña incorrectos.'); return; }
 
-  // Paso 2: buscar la agencia vinculada a ese usuario.
-  const { data, error } = await supa
-    .from('agencias')
-    .select('*')
-    .eq('auth_user_id', auth.user.id)
-    .maybeSingle();
+  // Paso 2: buscar la agencia vinculada a ese usuario (dueño o usuario invitado del equipo).
+  const { agencia: data, usuarioInvitado } = await resolverAgenciaParaAuthUser(auth.user.id);
 
-  if (error || !data) {
+  if (!data) {
     await supa.auth.signOut();
     fail('Tu usuario no está vinculado a ninguna agencia. Contactá al equipo de Red de Autos.');
     return;
@@ -4831,14 +4942,22 @@ async function enterApp(){
     return;
   }
 
+  if (usuarioInvitado && usuarioInvitado.estado !== 'activo') {
+    await supa.auth.signOut();
+    fail('Tu acceso está pausado. Comunicate con el dueño de la agencia para reactivarlo.');
+    return;
+  }
+
   if (btn) { btn.disabled = false; btn.textContent = 'Ingresar al sistema'; }
   currentAgencia = data;
+  currentUsuarioInvitado = usuarioInvitado;
 
   document.querySelectorAll('.modal-backdrop').forEach(m=>m.classList.add('hidden'));
   document.getElementById('view-landing').style.display='none';
   document.getElementById('view-app').style.display='block';
   goStep(1);
   aplicarDatosAgenciaEnShell();
+  aplicarPermisosSidebar();
   cargarNotificacionesReal();
   cargarCotizacionDolar();
   showApp('dashboard');
@@ -4854,6 +4973,7 @@ function aplicarDatosAgenciaEnShell(){
 
 async function logout(){
   currentAgencia = null;
+  currentUsuarioInvitado = null;
   await supa.auth.signOut();
   document.getElementById('view-app').style.display='none';
   document.getElementById('view-landing').style.display='block';
@@ -8071,6 +8191,18 @@ function semaforoInfo(v){
 }
 
 async function showApp(view){
+  // Defensa extra: un usuario invitado no puede entrar a una vista que no tiene permitida
+  // (ni a 'usuarios', que es solo del dueño), aunque intente forzarla desde la consola.
+  if (currentUsuarioInvitado) {
+    const permitidas = currentUsuarioInvitado.pestanas_visibles || [];
+    if (view !== 'dashboard' && view !== 'usuarios' && !permitidas.includes(view)) {
+      toast('No tenés permiso para ver esa sección.');
+      view = 'dashboard';
+    } else if (view === 'usuarios') {
+      toast('Solo el dueño de la agencia puede ver Usuarios.');
+      view = 'dashboard';
+    }
+  }
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.view===view));
 
   // Traemos plan/estado frescos en cada navegación: si un admin aprobó un cambio de plan o
@@ -8146,6 +8278,8 @@ async function showApp(view){
     await marcarTicketNotifsLeidas();
   } else if (view === 'leadsexternos') {
     await cargarLeadsExternos();
+  } else if (view === 'usuarios') {
+    await cargarUsuariosInvitados();
   }
   clearTimeout(loaderTimeout);
   mainEl.innerHTML = renderers[view] ? renderers[view]() : '<p>Vista no encontrada.</p>';
@@ -9389,6 +9523,83 @@ perfil: ()=>`
   </div>
 `,
 
+usuarios: ()=>{
+  const quota = usuariosInvitadosQuotaPlan();
+  const usados = misUsuariosInvitados.length;
+  const quotaLlena = usados >= quota;
+  const pct = Math.min(100, Math.round((usados/quota)*100));
+  return `
+  <div class="main-head"><div><h1>Usuarios</h1><p class="sub">Invitá a tu equipo y elegí qué pestañas puede ver cada uno</p></div></div>
+
+  <div class="usr-quota-card">
+    <div>
+      <div class="usr-quota-txt">${usados} / ${quota} usuarios invitados</div>
+      <div class="usr-quota-sub">Plan ${currentAgencia?.plan==='premium' ? 'Premium' : 'Pro'} · ${currentAgencia?.plan==='premium' ? '10' : '4'} usuarios incluidos</div>
+    </div>
+    <div class="usr-quota-bar"><div class="usr-quota-bar-fill" style="width:${pct}%;"></div></div>
+  </div>
+
+  <div class="card">
+    <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 14px;">Equipo invitado</p>
+    ${misUsuariosInvitados.length === 0 ? `<p class="usr-empty">Todavía no invitaste a nadie.</p>` : `
+    <div style="overflow-x:auto;">
+    <table class="usr-table">
+      <thead><tr><th>Nombre</th><th>Email</th><th>Puesto</th><th>Estado</th><th>Pestañas visibles</th><th></th></tr></thead>
+      <tbody>
+        ${misUsuariosInvitados.map(u => `
+          <tr>
+            <td>${esc(u.nombre||'')}</td>
+            <td>${esc(u.email||'')}</td>
+            <td>${esc(u.puesto||'—')}</td>
+            <td><span class="usr-estado-pill ${u.estado}">${u.estado==='activo' ? 'Activo' : 'Pausado'}</span></td>
+            <td>${(u.pestanas_visibles||[]).length} pestaña${(u.pestanas_visibles||[]).length===1?'':'s'}</td>
+            <td>
+              <div class="usr-row-actions">
+                <button class="btn btn-sm" onclick="pausarReanudarUsuarioInvitado('${u.id}','${u.estado}')">${u.estado==='activo' ? 'Pausar' : 'Reanudar'}</button>
+                <button class="btn btn-sm btn-danger" onclick="eliminarUsuarioInvitado('${u.id}')"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    </div>
+    `}
+  </div>
+
+  <div class="card ${quotaLlena ? '' : ''}">
+    <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Invitar usuario</p>
+    <p style="font-size:13px;color:var(--paper-dim);margin:0 0 16px;">Le vas a poder dar una contraseña provisoria para que entre por primera vez.</p>
+    ${quotaLlena ? `<div class="usr-quota-full-msg"><i class="fa-solid fa-circle-exclamation"></i> Llegaste al límite de usuarios de tu plan (${quota}). Pasate a Premium desde Mi Perfil para invitar más.</div>` : ''}
+    <div class="${quotaLlena ? 'usr-form-disabled' : ''}">
+      <div class="row-3">
+        <div class="field"><label>Nombre</label><input id="usr-nombre" placeholder="Nombre y apellido"></div>
+        <div class="field"><label>Email</label><input id="usr-email" type="email" placeholder="usuario@agencia.com"></div>
+        <div class="field"><label>Contraseña provisoria</label><input id="usr-password" type="text" placeholder="Mín. 6 caracteres"></div>
+      </div>
+      <div class="field" style="max-width:340px;"><label>Puesto</label>
+        <select id="usr-puesto">
+          <option>Vendedor</option>
+          <option>Administrativo</option>
+          <option>Community Manager</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <p style="font-weight:700;font-size:13px;color:var(--ink);margin:14px 0 2px;">Pestañas que puede ver</p>
+      <p style="font-size:12px;color:var(--paper-dim);margin:0 0 4px;">El Dashboard siempre lo puede ver. La pestaña Usuarios es solo para vos.</p>
+      <div class="usr-pestanas-grid" id="usr-pestanas-grid">
+        ${NAV_TABS_PARA_PERMISOS.map(t => `
+          <label class="usr-pestana-chip" id="usr-chip-${t.key}" onclick="event.preventDefault();toggleUsrPestanaChip('${t.key}')">
+            <input type="checkbox" id="usr-pestana-${t.key}" onclick="event.stopPropagation();">
+            ${esc(t.label)}
+          </label>
+        `).join('')}
+      </div>
+      <button class="btn btn-solid" onclick="invitarUsuario()"><i class="fa-solid fa-user-plus"></i> Invitar usuario</button>
+    </div>
+  </div>
+`;},
+
 faqapp: ()=>`
   <div class="faq-centered-wrap">
     <div class="faq-centered-head">
@@ -9513,10 +9724,9 @@ soporte: ()=>`
       return;
     }
 
-    const { data, error } = await supa
-      .from('agencias').select('*').eq('auth_user_id', session.user.id).maybeSingle();
+    const { agencia: data, usuarioInvitado } = await resolverAgenciaParaAuthUser(session.user.id);
 
-    if (error || !data) { await supa.auth.signOut(); return; }
+    if (!data) { await supa.auth.signOut(); return; }
 
     if (data.estado !== 'activo') {
       await supa.auth.signOut();
@@ -9524,11 +9734,19 @@ soporte: ()=>`
       return;
     }
 
+    if (usuarioInvitado && usuarioInvitado.estado !== 'activo') {
+      await supa.auth.signOut();
+      toast('Tu acceso está pausado. Comunicate con el dueño de la agencia.');
+      return;
+    }
+
     currentAgencia = data;
+    currentUsuarioInvitado = usuarioInvitado;
     document.querySelectorAll('.modal-backdrop').forEach(m=>m.classList.add('hidden'));
     document.getElementById('view-landing').style.display = 'none';
     document.getElementById('view-app').style.display = 'block';
     aplicarDatosAgenciaEnShell();
+    aplicarPermisosSidebar();
     cargarNotificacionesReal();
     cargarCotizacionDolar();
     await showApp('dashboard');
