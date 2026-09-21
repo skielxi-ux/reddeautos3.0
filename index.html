@@ -513,8 +513,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .flow-connector{flex:1;height:3px;min-width:26px;margin:0 12px;position:relative;background:linear-gradient(to right,rgba(248,58,58,.12),var(--red));border-radius:2px;}
   .flow-connector::after{content:'';position:absolute;right:-3px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 0 3px var(--ink-2);}
   .match-actions{display:flex;gap:8px;flex-wrap:wrap;width:100%;align-items:flex-start;}
-  .match-actions-pair{display:flex;gap:10px;}
-  .match-actions-pair .btn{flex:1 1 0;}
+  .match-actions-pair{display:flex;gap:10px;align-items:center;}
+  /* Antes se estiraban a partes iguales del ancho disponible (se veían enormes); ahora miden
+     según su contenido, igual que cualquier otro botón .btn-sm del sitio. */
+  .match-actions-pair .btn{flex:0 0 auto;}
+  .propuesta-comision-row{display:flex;align-items:center;flex-wrap:wrap;gap:12px;width:100%;}
+  .propuesta-comision-txt{font-size:13px;color:var(--paper-dim);}
   /* Fila de acciones: botones a la izquierda, mensajes de estado/espera apilados a la derecha */
   .match-actions-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;width:100%;}
   .match-actions-row .match-actions{flex:1 1 200px;width:auto;}
@@ -6619,10 +6623,12 @@ function matchCardHTML(m){
     const comisionTxt = m.comisionVehiculo || 'sin comisión definida';
     if (!m.soyVendedor) {
       primaryActions = `
-        <div style="font-size:13px;color:var(--paper-dim);margin-bottom:2px;"><i class="fa-solid fa-hand-holding-dollar"></i> ${esc(m.otraAgencia)} propone una comisión de <strong style="color:var(--paper);">${esc(comisionTxt)}</strong></div>
-        <div class="match-actions-pair">
-          <button class="btn btn-sm whatsapp-btn" onclick="aceptarComisionMatch('${m.id}')"><i class="fa-solid fa-check"></i> Aceptar comisión</button>
-          <button class="btn btn-sm btn-eliminar-pastel" onclick="rechazarComisionMatch('${m.id}')"><i class="fa-solid fa-xmark"></i> Rechazar</button>
+        <div class="propuesta-comision-row">
+          <span class="propuesta-comision-txt"><i class="fa-solid fa-hand-holding-dollar"></i> ${esc(m.otraAgencia)} propone una comisión de <strong style="color:var(--paper);">${esc(comisionTxt)}</strong></span>
+          <div class="match-actions-pair">
+            <button class="btn btn-sm whatsapp-btn" onclick="aceptarComisionMatch('${m.id}')"><i class="fa-solid fa-check"></i> Aceptar comisión</button>
+            <button class="btn btn-sm btn-eliminar-pastel" onclick="rechazarComisionMatch('${m.id}')"><i class="fa-solid fa-xmark"></i> Rechazar</button>
+          </div>
         </div>`;
     } else {
       notas.push(`<div class="waiting-note"><i class="fa-solid fa-hourglass-half"></i> Esperando que ${esc(m.otraAgencia)} acepte la comisión propuesta (${esc(comisionTxt)})</div>`);
