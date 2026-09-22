@@ -7807,7 +7807,10 @@ async function abrirNotificacion(id){
   const n = notificacionesReal.find(x=>x.id===id);
   if (!n) return;
   await marcarNotifLeidaReal(id);
-  if (n.tipo === 'whatsapp_recibido' || n.tipo === 'me_interesa') { showApp('vehículos'); return; }
+  // "Te contactaron por WhatsApp" es siempre un match manual nuevo (contacto directo desde
+  // Explorar la Red o Gremio) — el registro vive en Matches Manuales, no en Mi Stock.
+  if (n.tipo === 'whatsapp_recibido') { showApp('manuales'); return; }
+  if (n.tipo === 'me_interesa') { showApp('vehículos'); return; }
   if (n.tipo && n.tipo.startsWith('match')) {
     const m = misMatchesReal.find(x => x.id === n.referencia_id);
     showApp(m?.origen === 'manual' ? 'manuales' : 'matches');
