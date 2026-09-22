@@ -103,6 +103,10 @@
   .search-pulse .ring:nth-child(2){animation-delay:.6s;}
   .search-pulse .ring:nth-child(3){animation-delay:1.2s;}
   .search-pulse i{position:relative;z-index:1;color:var(--red);font-size:11px;}
+  .segmented-control{display:inline-flex;border:1px solid var(--line-strong);border-radius:22px;padding:3px;background:#FFFFFF;gap:2px;}
+  .segmented-btn{font-family:var(--font-body);font-weight:600;font-size:13.5px;border:none;background:transparent;color:var(--paper-dim);padding:8px 18px;border-radius:19px;cursor:pointer;transition:all .15s ease;display:inline-flex;align-items:center;gap:7px;}
+  .segmented-btn:hover{color:var(--ink);}
+  .segmented-btn.active{background:var(--red);color:#FFFFFF;}
   .btn-tengoalgo{border-color:var(--red);}
   .btn-tengoalgo:hover{border-color:#73e7b7;}
   .btn-eliminar-pastel{background:#FFFFFF;color:#E2726B;border:1px solid #E2726B;}
@@ -282,6 +286,16 @@
 
   .footer{padding:40px 48px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--paper-dim);font-size:12.5px;font-family:var(--font-mono);}
 
+  /* ================= INSTRUCTIVO DEL SISTEMA ================= */
+  .instructivo-card{border:1px solid var(--line);border-radius:var(--radius);background:#FFFFFF;padding:28px 28px 8px;max-width:760px;}
+  .instructivo-step{position:relative;display:flex;gap:16px;padding-bottom:26px;padding-left:2px;}
+  .instructivo-step:not(:last-child)::before{content:'';position:absolute;left:19px;top:40px;bottom:-4px;width:2px;background:var(--line-strong);}
+  .instructivo-step-icon{flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--red);color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:15px;z-index:1;}
+  .instructivo-step-body h4{margin:2px 0 5px;font-size:15px;font-weight:700;color:var(--ink);}
+  .instructivo-step-body p{margin:0;font-size:13.5px;color:var(--paper-dim);line-height:1.55;}
+  .instructivo-poss{background:var(--ink-3);border-left:3px solid var(--red);border-radius:8px;padding:16px 18px;margin-bottom:16px;font-size:13.5px;line-height:1.65;color:var(--ink);}
+  .instructivo-poss strong{color:var(--red-dark);}
+
   /* ================= AUTH MODALS ================= */
   .modal-backdrop{
     position:fixed;inset:0;background:rgba(10,17,22,.72);
@@ -460,12 +474,13 @@
   .vehicle-title{font-size:19px;font-weight:900;color:var(--ink);margin:6px 0 4px;}
   .vehicle-agency-line{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 2px;}
   .vehicle-addr{font-size:13px;color:var(--paper-dim);margin-bottom:8px;}
-  .vehicle-commission{font-size:11.5px;color:#8ae5b0;margin-bottom:16px;display:flex;align-items:center;gap:6px;}
+  .vehicle-commission{font-size:11.5px;color:#1F6E4A;background:#E4EEFB;border-radius:20px;padding:5px 11px;margin-bottom:16px;display:inline-flex;align-items:center;gap:6px;width:fit-content;}
   .vehicle-commission strong{font-weight:700;}
+  .vehicle-commission i{color:#1F6E4A;}
   .vehicle-divider{border-top:1px solid var(--line);margin-bottom:13px;}
   .vehicle-specs{display:flex;gap:16px;flex-wrap:wrap;}
   .vehicle-spec{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);}
-  .vehicle-spec i{color:var(--red);flex-shrink:0;}
+  .vehicle-spec i{color:#6B7280;flex-shrink:0;}
 
   /* ---- avatares de cliente ---- */
   .avatar-circle{width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;background:var(--ink-3);color:var(--red);font-weight:700;font-size:13px;}
@@ -2283,6 +2298,7 @@
         <div class="nav-item" data-view="usuarios" onclick="showApp('usuarios')"><i class="fa-solid fa-users-gear"></i> Usuarios</div>
         <div class="nav-item" data-view="faqapp" onclick="showApp('faqapp')"><i class="fa-solid fa-circle-question"></i> FAQs</div>
         <div class="nav-item" data-view="precios" onclick="showApp('precios')"><i class="fa-solid fa-tag"></i> Precios</div>
+        <div class="nav-item" data-view="instructivo" onclick="showApp('instructivo')"><i class="fa-solid fa-book-open"></i> Instructivo del sistema</div>
         <div class="nav-item" data-view="soporte" onclick="showApp('soporte')"><i class="fa-solid fa-headset"></i> Soporte <span class="dot" id="soportedot"></span></div>
       </div>
 
@@ -5168,10 +5184,11 @@ const NAV_TABS_PARA_PERMISOS = [
   { key: 'perfil', label: 'Mi Perfil' },
   { key: 'faqapp', label: 'FAQs' },
   { key: 'precios', label: 'Precios' },
+  { key: 'instructivo', label: 'Instructivo del sistema' },
   { key: 'soporte', label: 'Soporte' },
 ];
 
-// Mismas 18 pestañas de NAV_TABS_PARA_PERMISOS, agrupadas por tema para el panel
+// Mismas 19 pestañas de NAV_TABS_PARA_PERMISOS, agrupadas por tema para el panel
 // de "Pestañas visibles" de Usuarios (una tarjeta por grupo, con su propio Todas/Ninguna).
 const NAV_TABS_GRUPOS_PERMISOS = [
   { label: 'Analítica', icon: 'fa-chart-line', keys: ['performance'] },
@@ -5179,7 +5196,7 @@ const NAV_TABS_GRUPOS_PERMISOS = [
   { label: 'Búsquedas y Matches', icon: 'fa-magnifying-glass', keys: ['busquedas', 'matches', 'manuales'] },
   { label: 'Stock y Clientes', icon: 'fa-car', keys: ['vehículos', 'clientes', 'leadsexternos', 'asociadas'] },
   { label: 'Operaciones', icon: 'fa-sack-dollar', keys: ['comisiones', 'proveedores', 'notificaciones'] },
-  { label: 'Cuenta y Soporte', icon: 'fa-user-gear', keys: ['perfil', 'faqapp', 'precios', 'soporte'] },
+  { label: 'Cuenta y Soporte', icon: 'fa-user-gear', keys: ['perfil', 'faqapp', 'precios', 'instructivo', 'soporte'] },
 ];
 
 let misUsuariosInvitados = [];
@@ -9093,6 +9110,7 @@ let rbFilterModelo = 'Todos los modelos';
 let rbFilterCiudad = 'Todas las ciudades';
 let rbFilterUrgencia = 'Todas';
 let rbFilterPresupuestoMax = '';
+let rbFilterPresupuestoMoneda = 'ARS';
 let rbMostrarMasFiltros = true;
 
 function toggleRbMasFiltros(){ rbMostrarMasFiltros = !rbMostrarMasFiltros; showApp('redbusca'); }
@@ -9122,23 +9140,32 @@ function applyRbMasFiltros(){
 }
 function onRbUrgenciaChange(v){ rbFilterUrgencia = v; showApp('redbusca'); }
 function onRbPresupuestoChange(v){ rbFilterPresupuestoMax = v; showApp('redbusca'); }
+function onRbPresupuestoMonedaChange(v){ rbFilterPresupuestoMoneda = v; showApp('redbusca'); }
 function limpiarRbFiltros(){
   rbFilterMarca = 'Todas';
   rbFilterModelo = 'Todos los modelos';
   rbFilterCiudad = 'Todas las ciudades';
   rbFilterUrgencia = 'Todas';
   rbFilterPresupuestoMax = '';
+  rbFilterPresupuestoMoneda = 'ARS';
   closeModal('rbmasfiltros');
   showApp('redbusca');
 }
 function _redBuscaFiltradas(){
   return redBusquedas.filter(b => {
     const c = b.clientes || {};
-    if (rbFilterMarca !== 'Todas' && c.marca !== rbFilterMarca) return false;
-    if (rbFilterModelo !== 'Todos los modelos' && c.modelo !== rbFilterModelo) return false;
+    const marca = b.marca || c.marca;
+    const modelo = b.modelo || c.modelo;
+    const urgencia = b.urgencia || c.urgencia;
+    const precioMax = b.precio_max || c.precio_max;
+    const moneda = b.moneda || c.moneda || 'ARS';
+    if (rbFilterMarca !== 'Todas' && marca !== rbFilterMarca) return false;
+    if (rbFilterModelo !== 'Todos los modelos' && modelo !== rbFilterModelo) return false;
     if (rbFilterCiudad !== 'Todas las ciudades' && b.agencias?.ciudad !== rbFilterCiudad) return false;
-    if (rbFilterUrgencia !== 'Todas' && c.urgencia !== rbFilterUrgencia) return false;
-    if (rbFilterPresupuestoMax && (!c.precio_max || c.precio_max > Number(rbFilterPresupuestoMax))) return false;
+    if (rbFilterUrgencia !== 'Todas' && urgencia !== rbFilterUrgencia) return false;
+    // Comparamos en la misma moneda que eligió el usuario en el filtro: un presupuesto en
+    // USD no debe descartar (ni confundirse con) búsquedas cargadas en ARS y viceversa.
+    if (rbFilterPresupuestoMax && (!precioMax || moneda !== rbFilterPresupuestoMoneda || precioMax > Number(rbFilterPresupuestoMax))) return false;
     return true;
   });
 }
@@ -9495,6 +9522,15 @@ async function registrarPagoComision(matchId){
     showApp('comisiones');
   });
 }
+// Vuelve a descargar el comprobante de una comisión que ya se marcó como pagada (columna
+// "Historial de pagos" de Comisiones), sin tener que volver a registrar el pago.
+function descargarComprobantePago(matchId){
+  const m = misMatchesReal.find(x=>x.id===matchId);
+  if (!m) return;
+  if (m.comisionEstado !== 'pagada') { toast('Todavía no se registró el pago de esta comisión.'); return; }
+  generarComprobantePagoPDF(m, m.comisionPagadaAt || new Date().toISOString());
+  toast('Comprobante descargado');
+}
 // Genera un PDF descargable con el detalle del pago de comisión, para que la agencia se lo pueda
 // adjuntar a la otra por WhatsApp, mail, etc.
 function generarComprobantePagoPDF(m, fechaIso){
@@ -9835,7 +9871,9 @@ performance: ()=>{
       <div class="lbl" style="justify-content:center;margin-bottom:8px;">${esc(etiqueta)}</div>
       <div class="val" style="font-size:26px;">${valor}</div>
     </div>`;
-  const flecha = `<div style="display:flex;align-items:center;color:var(--paper-dim);opacity:.45;"><i class="fa-solid fa-chevron-right"></i></div>`;
+  // Sin flechita entre los números: son 5 KPIs del mes, no pasos de un mismo camino que
+  // avanza (una operación "Concretada" no es "lo que sigue" después de "Caída").
+  const flecha = '';
 
   return `
   <div class="main-head">
@@ -9943,6 +9981,7 @@ performance: ()=>{
           <strong style="font-size:13.5px;">Oportunidades sin contactar (${sinContactar.length})</strong>
         </div>
         ${sinContactar.length ? `
+        <div style="border:1px solid #fdba8c;background:#fff7ed;border-radius:10px;padding:12px 14px;">
           <table>
             <tbody>
               ${sinContactar.slice(0, 5).map(m => {
@@ -9955,7 +9994,8 @@ performance: ()=>{
             </tbody>
           </table>
           <button class="btn btn-sm" onclick="showApp('matches')" style="margin-top:12px;">Ver todas las oportunidades</button>
-        ` : `<p class="sub" style="margin:0;">Todo contactado. Bien ahí.</p>`}
+        </div>
+        ` : `<p class="sub" style="margin:0;display:flex;align-items:center;gap:7px;"><i class="fa-solid fa-circle-check" style="color:var(--sage);"></i> Todo contactado. Bien ahí.</p>`}
       </div>
 
       <div style="flex:1;min-width:280px;">
@@ -9964,6 +10004,7 @@ performance: ()=>{
           <strong style="font-size:13.5px;">Clientes esperando una unidad (${busquedasSinMatch.length})</strong>
         </div>
         ${busquedasSinMatch.length ? `
+        <div style="border:1px solid #fdba8c;background:#fff7ed;border-radius:10px;padding:12px 14px;">
           <table>
             <tbody>
               ${busquedasSinMatch.slice(0, 5).map(b => {
@@ -9976,7 +10017,8 @@ performance: ()=>{
             </tbody>
           </table>
           <button class="btn btn-sm" onclick="showApp('busquedas')" style="margin-top:12px;">Ver todas las búsquedas</button>
-        ` : `<p class="sub" style="margin:0;">${busquedasActivas.length ? 'Todas tus búsquedas activas tienen al menos un match.' : 'No hay búsquedas activas cargadas.'}</p>`}
+        </div>
+        ` : `<p class="sub" style="margin:0;display:flex;align-items:center;gap:7px;"><i class="fa-solid fa-circle-check" style="color:var(--sage);"></i> ${busquedasActivas.length ? 'Todas tus búsquedas activas tienen al menos un match.' : 'No hay búsquedas activas cargadas.'}</p>`}
       </div>
     </div>
   </div>
@@ -10003,19 +10045,18 @@ performance: ()=>{
         <div class="lbl"><i class="fa-solid fa-calendar-day"></i>Antigüedad promedio</div>
         <div class="val">${antiguedadProm === null ? '—' : antiguedadProm + (antiguedadProm === 1 ? ' día' : ' días')}</div>
       </div>
-    </div>
-    ${topMirados.length ? `
-      <div style="margin-top:18px;">
-        <strong style="font-size:13px;">Lo que más mira la red</strong>
-        <table style="margin-top:10px;">
-          <tbody>
-            ${topMirados.map(x => `<tr>
-              <td>${esc([x.v.marca, x.v.modelo, x.v.anio].filter(Boolean).join(' ') || '—')}</td>
-              <td style="text-align:right;white-space:nowrap;" class="mono">${x.st.vistas} ${x.st.vistas === 1 ? 'vista' : 'vistas'} &middot; ${x.st.mensajes} ${x.st.mensajes === 1 ? 'contacto' : 'contactos'}</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
+      ${topMirados.length ? `
+      <div class="kpi">
+        <button class="kpi-info-btn" onclick="openKpiInfo('Lo que más mira la red','Las unidades de tu stock con más vistas y contactos recibidos de otras agencias. Te sirve para detectar qué autos generan más interés.')"><i class="fa-solid fa-circle-info"></i></button>
+        <div class="lbl"><i class="fa-solid fa-fire"></i>Lo que más mira la red</div>
+        <div class="val" style="font-size:16px;line-height:1.25;">${esc([topMirados[0].v.marca, topMirados[0].v.modelo, topMirados[0].v.anio].filter(Boolean).join(' ') || '—')}</div>
+        <p class="sub" style="margin:8px 0 0;font-size:12px;">${topMirados[0].st.vistas} ${topMirados[0].st.vistas === 1 ? 'vista' : 'vistas'} &middot; ${topMirados[0].st.mensajes} ${topMirados[0].st.mensajes === 1 ? 'contacto' : 'contactos'}</p>
+        ${topMirados.length > 1 ? `
+        <div style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px;">
+          ${topMirados.slice(1, 3).map(x => `<p class="sub mono" style="margin:2px 0;font-size:11px;">${esc([x.v.marca, x.v.modelo, x.v.anio].filter(Boolean).join(' ') || '—')} — ${x.st.vistas}v &middot; ${x.st.mensajes}c</p>`).join('')}
+        </div>` : ''}
       </div>` : ''}
+    </div>
   </div>
 
   <!-- ============ CONFIANZA ============ -->
@@ -10031,8 +10072,16 @@ performance: ()=>{
       <div class="kpi">
         <button class="kpi-info-btn" onclick="openKpiInfo('Comisiones pendientes','Por cobrar: operaciones cerradas donde vos pusiste el cliente y la contraparte todavía no registró el pago. Por pagar: operaciones donde vendiste tu unidad y le debés la comisión a la otra agencia. Deber comisiones es lo primero que rompe la confianza en una red entre competidores.')"><i class="fa-solid fa-circle-info"></i></button>
         <div class="lbl"><i class="fa-solid fa-hand-holding-dollar"></i>Comisiones pendientes</div>
-        <div class="val">${comisionesPorCobrar.length} / ${comisionesPorPagar.length}</div>
-        <p class="sub" style="margin:8px 0 0;font-size:12px;">por cobrar / por pagar</p>
+        <div style="display:flex;gap:18px;margin-top:2px;">
+          <div>
+            <div class="val" style="font-size:22px;color:var(--sage);">${comisionesPorCobrar.length}</div>
+            <p class="sub" style="margin:2px 0 0;font-size:11px;">por cobrar</p>
+          </div>
+          <div style="border-left:1px solid var(--line);padding-left:18px;">
+            <div class="val" style="font-size:22px;color:var(--brick);">${comisionesPorPagar.length}</div>
+            <p class="sub" style="margin:2px 0 0;font-size:11px;">por pagar</p>
+          </div>
+        </div>
       </div>
       <div class="kpi">
         <button class="kpi-info-btn" onclick="openKpiInfo('Operaciones caídas de tu lado','Operaciones del mes que se cayeron siendo vos la agencia que tenía el vehículo. Si el número crece, suele significar stock desactualizado: unidades publicadas que ya no están disponibles.')"><i class="fa-solid fa-circle-info"></i></button>
@@ -10099,7 +10148,8 @@ comisiones: ()=>{
       <td>${esc(m.comisionVehiculo || '—')}<br><span class="mono" style="color:var(--paper-dim);font-size:12px;">${esc(fmtMoney(m.comisionMonto, m.comisionMoneda))}</span></td>
       <td>
         ${m.comisionEstado === 'pagada'
-          ? `<span class="pill pill-sage">Pagada${m.comisionPagadaAt ? ' el ' + esc(fmtFechaHora(m.comisionPagadaAt)) : ''}</span>`
+          ? `<span class="pill pill-sage">Pagada${m.comisionPagadaAt ? ' el ' + esc(fmtFechaHora(m.comisionPagadaAt)) : ''}</span>
+             <button class="btn btn-sm" onclick="descargarComprobantePago('${m.id}')" title="Descargar comprobante en PDF" style="margin-left:8px;"><i class="fa-solid fa-file-arrow-down"></i></button>`
           : (m.soyVendedor
               ? `<span class="pill">Pendiente</span> <button class="btn btn-sm btn-solid" onclick="registrarPagoComision('${m.id}')" style="margin-left:8px;">Registrar pago</button>`
               : `<span class="pill">Pendiente</span>`)
@@ -10114,8 +10164,19 @@ comisiones: ()=>{
     return [ars ? fmtMoney(ars,'ARS') : null, usd ? fmtMoney(usd,'USD') : null].filter(Boolean).join(' + ');
   };
 
+  const tablaHTML = (items, vacioMsg) => items.length ? `
+      <table>
+        <thead><tr><th>Agencia / Vehículo</th><th>Comisión</th><th>Estado de cobro</th></tr></thead>
+        <tbody>${items.map(filaHTML).join('')}</tbody>
+      </table>` : `<p class="sub" style="margin:0;">${esc(vacioMsg)}</p>`;
+
+  // Separamos deuda activa de lo ya liquidado: el total que se muestra arriba de cada columna
+  // es SOLO lo pendiente (lo que hoy corresponde pagar/cobrar), para que no se mezcle con
+  // comisiones ya pagadas del período y el número no se preste a confusión.
   const seccion = (titulo, icon, color, items) => {
-    const total = totalMonto(items);
+    const pendientes = items.filter(m => m.comisionEstado !== 'pagada');
+    const pagadas = items.filter(m => m.comisionEstado === 'pagada');
+    const total = totalMonto(pendientes);
     return `
     <div>
       <div class="comisiones-col-head">
@@ -10123,11 +10184,14 @@ comisiones: ()=>{
         <strong>${esc(titulo)}</strong>
         ${total ? `<span class="comisiones-col-total">${esc(total)}</span>` : ''}
       </div>
-      ${items.length ? `
-      <table>
-        <thead><tr><th>Agencia / Vehículo</th><th>Comisión</th><th>Estado de cobro</th></tr></thead>
-        <tbody>${items.map(filaHTML).join('')}</tbody>
-      </table>` : `<div class="card"><p style="color:var(--paper-dim);margin:0;">No tenés comisiones ${titulo.toLowerCase()} por ahora.</p></div>`}
+      <div style="margin-bottom:22px;">
+        <strong style="font-size:12px;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.03em;display:block;margin-bottom:8px;">Pendientes de pago</strong>
+        ${tablaHTML(pendientes, `No tenés comisiones ${titulo.toLowerCase()} pendientes.`)}
+      </div>
+      <div>
+        <strong style="font-size:12px;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.03em;display:block;margin-bottom:8px;">Historial de pagos</strong>
+        ${tablaHTML(pagadas, 'Todavía no hay pagos registrados en este período.')}
+      </div>
     </div>
     `;
   };
@@ -10340,7 +10404,7 @@ explorar: ()=>`
             <option value="km_asc" ${exploreSort==='km_asc'?'selected':''}>Menos Km</option>
             <option value="anio_desc" ${exploreSort==='anio_desc'?'selected':''}>Año: más nuevo</option>
             <option value="anio_asc" ${exploreSort==='anio_asc'?'selected':''}>Año: más antiguo</option>
-            <option value="chinos" ${exploreSort==='chinos'?'selected':''}>Chinos</option>
+            <option value="chinos" ${exploreSort==='chinos'?'selected':''}>Marcas chinas</option>
           </select>
           <i class="fa-solid fa-chevron-down"></i>
         </div>
@@ -10385,9 +10449,9 @@ explorar: ()=>`
       ${_exploreHayFiltros() ? `<a class="is-clearable" onclick="limpiarTodosLosFiltros()">Limpiar filtros <i class="fa-solid fa-xmark"></i></a>` : `<span class="no-filters">Sin filtros</span>`}
     </div>
   </div>
-  <div style="display:flex;gap:10px;margin:0 0 16px;">
-    <button class="btn ${!exploreSoloMiStock?'btn-solid':''}" onclick="setExploreSoloMiStock(false)"><i class="fa-solid fa-globe"></i> Ver toda la red</button>
-    <button class="btn ${exploreSoloMiStock?'btn-solid':''}" onclick="setExploreSoloMiStock(true)"><i class="fa-solid fa-warehouse"></i> Ver mi stock</button>
+  <div class="segmented-control" style="margin:0 0 16px;">
+    <button class="segmented-btn ${!exploreSoloMiStock?'active':''}" onclick="setExploreSoloMiStock(false)"><i class="fa-solid fa-globe"></i> Ver toda la red</button>
+    <button class="segmented-btn ${exploreSoloMiStock?'active':''}" onclick="setExploreSoloMiStock(true)"><i class="fa-solid fa-warehouse"></i> Ver mi stock</button>
   </div>
   <div class="vehicle-grid">
     ${sortVehicles(_exploreFiltrados(), exploreSort).map(v=>vehicleCardReal(v)).join('') || `<div class="card"><p style="color:var(--paper-dim);margin:0;">No hay vehículos que coincidan con estos filtros.</p></div>`}
@@ -10454,7 +10518,13 @@ redbusca: ()=>`
     ${rbMostrarMasFiltros ? `
     <div class="search-panel-more">
       <div class="filter-field"><label>Presupuesto máximo</label>
-        <input type="number" value="${rbFilterPresupuestoMax}" placeholder="Ej: 20000" onchange="onRbPresupuestoChange(this.value)">
+        <div style="display:flex;gap:8px;">
+          <div class="segmented-control" style="flex-shrink:0;">
+            <button type="button" class="segmented-btn ${rbFilterPresupuestoMoneda==='ARS'?'active':''}" onclick="onRbPresupuestoMonedaChange('ARS')" style="padding:8px 14px;">ARS</button>
+            <button type="button" class="segmented-btn ${rbFilterPresupuestoMoneda==='USD'?'active':''}" onclick="onRbPresupuestoMonedaChange('USD')" style="padding:8px 14px;">USD</button>
+          </div>
+          <input type="number" value="${rbFilterPresupuestoMax}" placeholder="${rbFilterPresupuestoMoneda==='USD'?'Ej: 20.000 USD':'Ej: 20.000.000 ARS'}" onchange="onRbPresupuestoChange(this.value)" style="flex:1;">
+        </div>
       </div>
     </div>` : ''}
     <div class="search-panel-footer">
@@ -10472,12 +10542,13 @@ redbusca: ()=>`
         const anioDesde = b.anio_desde || c.anio_desde || null;
         const anioHasta = b.anio_hasta || c.anio_hasta || null;
         const precioMax = b.precio_max || c.precio_max || null;
+        const urgencia = b.urgencia || c.urgencia || null;
         const rango = (anioDesde||anioHasta) ? ` (${anioDesde||'—'}–${anioHasta||'—'})` : '';
         return `<tr>
           <td><a style="cursor:pointer;color:var(--red-dark);font-weight:600;" onclick="abrirDetalleBusquedaRed('${b.id}')"><span class="search-pulse"><span class="ring"></span><span class="ring"></span><span class="ring"></span><i class="fa-solid fa-magnifying-glass"></i></span>${esc(marca||'Cualquier marca')} ${esc(modelo||'')}${rango}</a></td>
           <td>${esc(b.agencias?.nombre||'—')}${b.agencias?.verificada ? `<i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:11px;margin-left:4px;" title="Agencia verificada por Red de Autos"></i>` : ''}</td>
-          <td class="mono">${esc(precioMax? fmtMoney(precioMax,b.moneda||'ARS') : '—')}</td>
-          <td><span class="pill ${esc(c.urgencia && c.urgencia.toLowerCase().includes('alta')?'pill-red':'')}">${esc(c.urgencia||'—')}</span></td>
+          <td class="mono">${esc(precioMax? fmtMoney(precioMax,b.moneda||c.moneda||'ARS') : '—')}</td>
+          <td><span class="pill ${esc(urgencia && urgencia.toLowerCase().includes('alta')?'pill-red':'')}">${esc(urgencia||'—')}</span></td>
           <td>${b.agencias?.telefono ? `<button class="btn btn-sm btn-contact-lime" onclick="avisarPotencialCliente('${b.id}')"><i class="fa-brands fa-whatsapp"></i> Tengo potencial cliente</button>` : ''}</td>
         </tr>`;
       }).join('') : `<tr><td colspan="5" class="empty-row">Ninguna agencia de la red tiene búsquedas activas por ahora.</td></tr>`}
@@ -10641,13 +10712,13 @@ exclusiva: ()=>{
   const alerta = redGremioReal.length ? `<div class="banner"><div class="banner-left"><i class="fa-solid fa-gem" style="font-size:22px;color:var(--red);"></i><div class="txt"><strong>${redGremioReal.length} oportunidad${redGremioReal.length===1?'':'es'} exclusiva${redGremioReal.length===1?'':'s'} disponible${redGremioReal.length===1?'':'s'} en la red</strong><span>Precios especiales que otras agencias comparten solo con colegas.</span></div></div></div>` : '';
   const listaMis = misGremioReal.length
     ? `<div class="vehicle-grid">${misGremioReal.map(v=>gremioCardHTML(v, true)).join('')}</div>`
-    : `<div class="card"><p style="color:var(--paper-dim);margin:0;">Todavía no publicaste ningún precio gremio. Usá "Publicar Precio Gremio" para ofrecerle un descuento especial al resto de la red sobre un auto que no se mueve.</p></div>`;
+    : `<div class="card"><p style="color:var(--paper-dim);margin:0;">Todavía no publicaste ninguna oportunidad. Usá "Publicar oportunidad" para ofrecerle un descuento especial al resto de la red sobre un auto que no se mueve.</p></div>`;
   const listaRed = redGremioReal.length
     ? `<div class="vehicle-grid">${redGremioReal.map(v=>gremioCardHTML(v, false)).join('')}</div>`
     : `<div class="card"><p style="color:var(--paper-dim);margin:0;">Ninguna otra agencia tiene publicado un precio gremio por el momento.</p></div>`;
   return `
   <div class="main-head"><div><h1>Oportunidades Exclusivas</h1><p class="sub">Precios especiales que solo se comparten dentro de la red</p></div>
-  <button class="btn btn-solid" onclick="openNewGremioModal()"><i class="fa-solid fa-plus"></i> Publicar Precio Gremio</button></div>
+  <button class="btn btn-solid" onclick="openNewGremioModal()"><i class="fa-solid fa-plus"></i> Publicar oportunidad</button></div>
   ${alerta}
   <div class="view-toggle">
     <button class="view-toggle-btn ${gremioTab==='mis'?'active':''}" onclick="setGremioTab('mis')"><i class="fa-solid fa-gem"></i> Mis publicaciones</button>
@@ -10983,6 +11054,60 @@ precios: ()=>`
       </ul>
       <button class="btn ${currentAgencia?.plan==='premium'?'btn-solid':''}" style="width:100%;" ${currentAgencia?.plan==='premium'?'disabled':`onclick="solicitarCambioPlan('premium')"`}>${currentAgencia?.plan==='premium'?'Plan actual':'Solicitar cambio'}</button>
     </div>
+  </div>
+`,
+
+instructivo: ()=>`
+  <div class="main-head"><div><h1>Instructivo del sistema</h1><p class="sub">Guía paso a paso para empezar a usar Red de Autos</p></div></div>
+  <div class="instructivo-card">
+    <div class="instructivo-step">
+      <div class="instructivo-step-icon"><i class="fa-solid fa-key"></i></div>
+      <div class="instructivo-step-body"><h4>1. Verificá tu cuenta</h4><p>Después de registrarte con tu código de invitación, tu cuenta queda pendiente de revisión por nuestro equipo. Te avisamos por mail cuando quede activa.</p></div>
+    </div>
+    <div class="instructivo-step">
+      <div class="instructivo-step-icon"><i class="fa-solid fa-user-gear"></i></div>
+      <div class="instructivo-step-body"><h4>2. Completá tu perfil</h4><p>Cargá el logo, la ciudad y la dirección de tu concesionaria en "Mi Perfil" para que el resto de la red te identifique.</p></div>
+    </div>
+    <div class="instructivo-step">
+      <div class="instructivo-step-icon"><i class="fa-solid fa-users-gear"></i></div>
+      <div class="instructivo-step-body"><h4>3. Invitá a tu equipo (opcional)</h4><p>Desde "Usuarios" podés sumar colaboradores y elegir qué pestañas ve cada uno.</p></div>
+    </div>
+    <div class="instructivo-step">
+      <div class="instructivo-step-icon"><i class="fa-solid fa-car"></i></div>
+      <div class="instructivo-step-body"><h4>4. Cargá tu primer vehículo</h4><p>Sumá tus vehículos en "Mi Stock" con fotos, precio y detalles. Así empieza a cruzarse contra el resto de la red.</p></div>
+    </div>
+    <div class="instructivo-step">
+      <div class="instructivo-step-icon"><i class="fa-solid fa-users"></i></div>
+      <div class="instructivo-step-body"><h4>5. Cargá una búsqueda de cliente</h4><p>Si tenés un cliente que busca un auto que no tenés, cargalo en "Mis Búsquedas" para que la red te avise si aparece.</p></div>
+    </div>
+    <div class="instructivo-step">
+      <div class="instructivo-step-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+      <div class="instructivo-step-body"><h4>6. Explorá la Red</h4><p>Mirá lo que publican otras agencias en "Explorar la Red" y filtrá por marca, modelo, año y precio.</p></div>
+    </div>
+    <div class="instructivo-step">
+      <div class="instructivo-step-icon"><i class="fa-solid fa-link"></i></div>
+      <div class="instructivo-step-body"><h4>7. Gestioná un match</h4><p>Cuando aparece una coincidencia, contactá a la otra agencia desde "Mis Matches" y hacé seguimiento hasta que se concrete o se caiga.</p></div>
+    </div>
+    <div class="instructivo-step">
+      <div class="instructivo-step-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+      <div class="instructivo-step-body"><h4>8. Registrá tus comisiones</h4><p>Llevá el control de lo cobrado y lo pendiente en "Comisiones", filtrando por mes.</p></div>
+    </div>
+    <div class="instructivo-step">
+      <div class="instructivo-step-icon"><i class="fa-solid fa-address-book"></i></div>
+      <div class="instructivo-step-body"><h4>9. Usá Leads Externos</h4><p>Cargá los contactos que te llegan de otras plataformas (MercadoLibre, OLX, redes) para no perderlos de vista.</p></div>
+    </div>
+    <div class="instructivo-step">
+      <div class="instructivo-step-icon"><i class="fa-solid fa-circle-question"></i></div>
+      <div class="instructivo-step-body"><h4>10. ¿Tenés dudas?</h4><p>Revisá las FAQs o escribinos desde "Soporte".</p></div>
+    </div>
+  </div>
+
+  <div class="main-head" style="margin-top:34px;"><div><h1 style="font-size:20px;">¿Cómo funciona un match?</h1><p class="sub">Dos formas en las que se cruza tu cliente con un vehículo de la red</p></div></div>
+  <div class="instructivo-poss">
+    <strong>Posibilidad A:</strong> Es posible que un cliente te visite y te pida un auto puntual: por ejemplo, un Toyota Corolla 2022 automático. En el caso que no tengas ese vehículo en stock, lo primero que debés hacer es dirigirte al marketplace interno del sistema que se llama "Explorar la Red". Ahí vas a poder ver todos los vehículos cargados por las demás agencias. En el caso que uno de esos cumpla con lo que busca tu cliente, contactás en forma directa a la otra agencia, generás un match manual (ya que vos iniciaste el contacto) que vas a poder ver en la pestaña "Matches Manuales" y continuar la operación en conjunto.
+  </div>
+  <div class="instructivo-poss">
+    <strong>Posibilidad B:</strong> Es posible que un cliente te visite y te pida un auto puntual: por ejemplo, un Fiat Cronos 2023 con GNC. En el caso que no tengas ese vehículo en stock, lo primero que debés hacer es dirigirte al marketplace interno del sistema que se llama "Explorar la Red". En el caso que en el marketplace interno no veas un vehículo que cumpla con las características que busca tu cliente, dirigite a la pestaña "Mis Búsquedas", cargá los datos y la búsqueda del cliente, y cuando otra agencia cargue en su stock un vehículo que tenga lo que ese cliente requiere, se te va a generar un match automático con la otra agencia para poder continuar la operación en conjunto. En este caso no hacés nada más, solo cargás la búsqueda y esperás el match.
   </div>
 `,
 
