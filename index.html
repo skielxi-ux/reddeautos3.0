@@ -609,9 +609,10 @@
   .mc-step-current-tag{font-size:10px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.02em;margin-top:2px;}
   .mc-notes{display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex:0 0 auto;}
 
-  .mc-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:#FAFAFB;border:1px solid #EDEDEF;border-radius:14px;padding:16px 18px;margin-top:20px;}
-  .mc-banner-primary{flex:1 1 260px;display:flex;flex-direction:column;gap:10px;}
-  .mc-banner-secondary{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto;}
+  .mc-banner{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;background:#FAFAFB;border:1px solid #EDEDEF;border-radius:14px;padding:16px 18px;margin-top:20px;}
+  .mc-banner-primary{flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-start;gap:10px;}
+  .mc-banner-primary .btn{width:auto;}
+  .mc-banner-secondary{display:flex;gap:10px;flex-wrap:wrap;}
   .avatar-circle svg{width:100%;height:100%;display:block;}
   .avatar-picker-trigger{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
   .client-type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;}
@@ -7339,7 +7340,7 @@ function renderMatchSections(list, emptyMsg){
 }
 
 function matchCardHTML(m){
-  const verVehiculoLink = m.vehiculoId ? `<span class="see-vehicle-link" onclick="openPropertyDetailReal('${m.vehiculoId}')">Ver vehículo</span>` : '';
+  const verVehiculoLink = m.vehiculoId ? `<span class="see-vehicle-link" onclick="abrirVehiculoDesdeMatch('${m.vehiculoId}', ${m.soyVendedor})">Ver vehículo</span>` : '';
   // La agencia que tiene el auto es mi propio nodo si soy la vendedora, o el de la otra agencia si soy la compradora.
   const verVehiculoMio = m.soyVendedor ? verVehiculoLink : '';
   const verVehiculoOtro = !m.soyVendedor ? verVehiculoLink : '';
@@ -7540,7 +7541,7 @@ function matchCardHTML(m){
         ${m.detalle ? `<p class="mc-vehicle-specs">${esc(m.detalle)}</p>` : ''}
         ${m.precio ? `<p class="mc-vehicle-price">${esc(m.precio)}</p>` : ''}
       </div>
-      ${m.vehiculoId ? `<button type="button" class="btn btn-sm mc-vehicle-cta" onclick="openPropertyDetailReal('${m.vehiculoId}')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver publicación</button>` : ''}
+      ${m.vehiculoId ? `<button type="button" class="btn btn-sm mc-vehicle-cta" onclick="abrirVehiculoDesdeMatch('${m.vehiculoId}', ${m.soyVendedor})"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver publicación</button>` : ''}
     </div>
 
     <div class="mc-section">
@@ -8450,6 +8451,29 @@ function openPropertyDetailReal(vehiculoId){
   const esPropio = currentAgencia && v.agencia_id === currentAgencia.id;
   if (!esPropio) registrarClicReal('vehiculo', v.id, 'vista');
   renderDetailModalReal(v);
+}
+// "Ver vehículo" / "Ver publicación" desde una tarjeta de match: redStock y misStock solo tienen
+// datos si ya visitaste Explorar la Red o Mi Stock en esta sesión, así que si el vehículo del
+// match no está cargado en memoria (caso típico: entrás directo a Mis Matches) lo traemos de
+// Supabase al toque en vez de dejar el botón sin reaccionar.
+async function abrirVehiculoDesdeMatch(vehiculoId, esPropio){
+  if (!vehiculoId) return;
+  if (esPropio) {
+    const propio = misStock.find(x => x.id === vehiculoId);
+    if (propio) { renderDetailModalReal({ ...propio, agencias: currentAgencia }); return; }
+  } else {
+    const ajeno = redStock.find(x => x.id === vehiculoId);
+    if (ajeno) { registrarClicReal('vehiculo', ajeno.id, 'vista'); renderDetailModalReal(ajeno); return; }
+  }
+  const { data, error } = await supa
+    .from('vehiculos')
+    .select('*, agencias!left(nombre, ciudad, telefono, lat, lon, verificada, direccion, horarios, contacto, logo_url)')
+    .eq('id', vehiculoId)
+    .maybeSingle();
+  if (error || !data) { toast('No se pudo cargar el vehículo. Puede que ya no esté disponible.'); console.error('abrirVehiculoDesdeMatch:', error); return; }
+  if (esPropio) { renderDetailModalReal({ ...data, agencias: currentAgencia }); return; }
+  registrarClicReal('vehiculo', data.id, 'vista');
+  renderDetailModalReal(data);
 }
 // Detalle de un vehículo de Mi Stock (propio) — mismo modal que Explorar la Red,
 // pero usando los datos de la propia agencia (misStock no trae el join a `agencias`).
