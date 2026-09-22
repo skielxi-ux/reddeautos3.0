@@ -569,7 +569,7 @@
 
   .mc-vehicle{display:flex;align-items:center;gap:16px;padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid #EFEFF1;flex-wrap:wrap;}
   .mc-vehicle-photo{width:96px;height:96px;border-radius:14px;overflow:hidden;background:var(--ink-3);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--paper-dim);font-size:26px;}
-  .mc-vehicle-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .mc-vehicle-photo img{width:100%;height:100%;object-fit:contain;display:block;}
   .mc-vehicle-info{flex:1;min-width:180px;}
   .mc-vehicle-title{font-size:19px;font-weight:800;color:var(--ink);line-height:1.2;margin:0 0 4px;}
   .mc-vehicle-specs{font-size:12.5px;color:var(--paper-dim);margin:0 0 6px;}
@@ -2611,6 +2611,7 @@
       <div class="field"><label>Año</label><input id="st-anio" type="number" placeholder="2020"></div>
       <div class="field"><label>Kilometraje</label><input id="st-km" type="number" placeholder="45000"></div>
     </div>
+    <div class="field"><label>Versión</label><input id="st-version" placeholder="Ej: XEI 1.8 CVT"></div>
     <div class="row-2">
       <div class="field"><label>Transmisión</label><select id="st-transmision"><option>Manual</option><option>Automática</option></select></div>
       <div class="field"><label>Combustible</label><select id="st-combustible"><option>Nafta</option><option>Diesel</option><option>GNC</option><option>Nafta + GNC</option><option>EV (Eléctrico 100%)</option><option>HEV (Híbrido autorrecargable)</option><option>PHEV (Híbrido enchufable)</option></select></div>
@@ -4141,7 +4142,7 @@ const MODELS_BY_MARCA = {
   'Hyundai': ['HB20','HB20S','Creta','Tucson','Santa Fe','i10','Elantra','Palisade','Staria'],
   'JAC': ['S2','S3','T40','T50','T60','E-JS1','JS2','JS4','JS6','JS8','T8','T9','X200','EV30X'],
   'Jeep': ['Renegade','Compass','Commander','Wrangler','Gladiator','Grand Cherokee'],
-  'Jetour': ['Dashing','T1','T2','X50'],
+  'Jetour': ['Dashing','T1','T2','X50','X70'],
   'JMC': ['Grande Avenue','Grand Avenue Dadao'],
   'JMEV': ['Easy 3'],
   'Kia': ['Picanto','Rio','Cerato','Sportage','Sorento','Soul','Seltos','Stonic','Carnival','K','K3 Cross','K3 Sedan','K4 Sedan','Tasman'],
@@ -4271,6 +4272,7 @@ function openNewStockModal(){
   onStockMarcaChange();
   document.getElementById('st-anio').value = '';
   document.getElementById('st-km').value = '';
+  document.getElementById('st-version').value = '';
   document.getElementById('st-transmision').value = 'Manual';
   document.getElementById('st-combustible').value = 'Nafta';
   document.getElementById('st-color').value = '';
@@ -4294,6 +4296,7 @@ function openEditStockModal(id){
   onStockMarcaChange(p.modelo || '');
   document.getElementById('st-anio').value = p.anio || '';
   document.getElementById('st-km').value = p.km || '';
+  document.getElementById('st-version').value = p.version || '';
   document.getElementById('st-transmision').value = p.transmision || 'Manual';
   document.getElementById('st-combustible').value = p.combustible || 'Nafta';
   document.getElementById('st-color').value = p.color || '';
@@ -4329,6 +4332,7 @@ async function submitNewStock(){
       condicion: document.getElementById('st-condicion').value,
       anio: parseInt(document.getElementById('st-anio').value) || null,
       km: parseInt(document.getElementById('st-km').value) || null,
+      version: document.getElementById('st-version').value,
       transmision: document.getElementById('st-transmision').value,
       combustible: document.getElementById('st-combustible').value,
       color: document.getElementById('st-color').value,
@@ -7491,7 +7495,16 @@ async function retrocederMatch(matchId){
 let matchesVistaFiltro = 'todos';
 // Tocar el filtro ya activo lo desactiva y vuelve a 'todos' — reemplaza al botón "Ver todo" que
 // había antes (sacado para no repetir un badge más en la fila).
-function cambiarMatchesVistaFiltro(v){ matchesVistaFiltro = (matchesVistaFiltro === v) ? 'todos' : v; showApp(vistaMatchesActual()); }
+function cambiarMatchesVistaFiltro(v){
+  matchesVistaFiltro = (matchesVistaFiltro === v) ? 'todos' : v;
+  // Solo un badge activo a la vez: al tildar busco/directa/vendo se vuelve a Pipeline (se
+  // destildan Concretadas/Caídas), porque este filtro siempre se calcula sobre pendientes.
+  if (matchesVistaFiltro !== 'todos') {
+    if (vistaMatchesActual() === 'manuales') matchesManualesTab = 'pipeline';
+    else matchesTab = 'pipeline';
+  }
+  showApp(vistaMatchesActual());
+}
 
 // Botones "Lo que busco / Lo que quieren" — se insertan en la MISMA fila que
 // "Pipeline / Operaciones concretadas / Operaciones caídas" (ver vistas 'matches' y 'manuales'),
@@ -8279,6 +8292,8 @@ let _matchesFavoritasLoaded = false;
 // tocar la que ya está activa vuelve a 'pipeline' (mismo patrón que el filtro busco/vendo).
 async function setMatchesTab(tab){
   matchesTab = (matchesTab === tab) ? 'pipeline' : tab;
+  // Al tildar este badge se destilda el filtro busco/directa/vendo, para que quede un solo badge activo.
+  if (matchesTab !== 'pipeline') matchesVistaFiltro = 'todos';
   if (tab === 'favoritas' && !_matchesFavoritasLoaded) {
     const mainEl = document.getElementById('main-content');
     const loaderTimeout = setTimeout(() => {
@@ -8715,6 +8730,7 @@ function renderDetailModalReal(v){
       </div>
       <div class="vehdetail-grid">
         <div><span class="lbl"><i class="fa-solid fa-certificate"></i>Condición</span><span class="val">${esc(v.condicion || 'Usado')}</span></div>
+        ${v.version ? `<div><span class="lbl"><i class="fa-solid fa-car-side"></i>Versión</span><span class="val">${esc(v.version)}</span></div>` : ''}
         <div><span class="lbl"><i class="fa-solid fa-gauge-high"></i>Kilometraje</span><span class="val">${v.km ? v.km.toLocaleString('es-AR')+' km' : '—'}</span></div>
         <div><span class="lbl"><i class="fa-solid fa-gears"></i>Transmisión</span><span class="val">${esc(v.transmision||'—')}</span></div>
         <div><span class="lbl"><i class="fa-solid fa-gas-pump"></i>Combustible</span><span class="val">${esc(v.combustible||'—')}</span></div>
@@ -9413,7 +9429,12 @@ let matchesManualesFiltroMes = 'todos';
 let matchesManualesFiltroAnio = new Date().getFullYear();
 let matchesManualesListaOculta = false;
 // Mismo criterio que setMatchesTab: sin botón "Pipeline", tocar la pestaña activa vuelve a 'pipeline'.
-function setMatchesManualesTab(tab){ matchesManualesTab = (matchesManualesTab === tab) ? 'pipeline' : tab; showApp('manuales'); }
+function setMatchesManualesTab(tab){
+  matchesManualesTab = (matchesManualesTab === tab) ? 'pipeline' : tab;
+  // Al tildar este badge se destilda el filtro busco/directa/vendo, para que quede un solo badge activo.
+  if (matchesManualesTab !== 'pipeline') matchesVistaFiltro = 'todos';
+  showApp('manuales');
+}
 function cambiarMatchesManualesFiltroMes(v){ matchesManualesFiltroMes = v; showApp('manuales'); }
 function cambiarMatchesManualesFiltroAnio(v){ matchesManualesFiltroAnio = Number(v); showApp('manuales'); }
 function toggleMatchesManualesLista(){ matchesManualesListaOculta = !matchesManualesListaOculta; showApp('manuales'); }
@@ -10496,16 +10517,17 @@ matches: ()=>{
       : `<div class="card"><p style="color:var(--paper-dim);margin:0;">Todavía no marcaste vehículos como favoritos. Usá el ícono de corazón en <a style="color:var(--red-dark);cursor:pointer;" onclick="showApp('explorar')">Explorar la Red</a>.</p></div>`;
   } else if(matchesTab==='concretadas'){
     const concretadasFiltradas = concretadas.filter(m => enMesFiltroMatches(m.cerradoAtRaw));
-    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(concretadasFiltradas);
     body = matchesFiltroBarHTML() + (matchesListaOculta ? '' : renderMatchSections(concretadasFiltradas, 'No hay operaciones concretadas para el período seleccionado.'));
   } else if(matchesTab==='caidas'){
     const caidasFiltradas = caidas.filter(m => enMesFiltroMatches(m.cerradoAtRaw));
-    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(caidasFiltradas);
     body = matchesFiltroBarHTML() + (matchesListaOculta ? '' : renderMatchSections(caidasFiltradas, 'No hay operaciones caídas para el período seleccionado.'));
   } else {
-    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(pendientes);
     body = renderMatchSections(pendientes, 'Todavía no hay matches. Cargá vehículos en <a style="color:var(--red-dark);cursor:pointer;" onclick="showApp(\'vehículos\')">Mi Stock</a> o clientes en <a style="color:var(--red-dark);cursor:pointer;" onclick="showApp(\'clientes\')">Mis Clientes</a> para empezar a cruzar contra la red.');
   }
+  // El badge busco/directa/vendo siempre se calcula sobre pendientes: así el número que ves
+  // nunca cambia según la pestaña en la que estabas antes de tocarlo (evita que diga "5" y al
+  // entrar muestre "0"). Tocarlo lleva siempre a Pipeline filtrado por ese tipo (ver setMatchesTab).
+  filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(pendientes);
   return `
   <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/img38.jpg');">
     <div class="explorar-hero-text">
@@ -10534,16 +10556,16 @@ manuales: ()=>{
   const caidas = misMatchesManuales.filter(m=>m.estado==='cancelada');
   if(matchesManualesTab==='concretadas'){
     const concretadasFiltradas = concretadas.filter(m => enMesFiltroMatchesManuales(m.cerradoAtRaw));
-    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(concretadasFiltradas);
     body = matchesManualesFiltroBarHTML() + (matchesManualesListaOculta ? '' : renderMatchSections(concretadasFiltradas, 'No hay operaciones concretadas para el período seleccionado.'));
   } else if(matchesManualesTab==='caidas'){
     const caidasFiltradas = caidas.filter(m => enMesFiltroMatchesManuales(m.cerradoAtRaw));
-    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(caidasFiltradas);
     body = matchesManualesFiltroBarHTML() + (matchesManualesListaOculta ? '' : renderMatchSections(caidasFiltradas, 'No hay operaciones caídas para el período seleccionado.'));
   } else {
-    filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(pendientes);
     body = renderMatchSections(pendientes, 'Todavía no hay matches manuales. Se crean solos cuando contactás o te contactan por WhatsApp desde una card de Explorar la Red o Gremio.');
   }
+  // Igual que en Mis Matches: el badge busco/directa/vendo siempre se calcula sobre pendientes,
+  // para que el número mostrado nunca cambie según la pestaña activa antes de tocarlo.
+  filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(pendientes);
   return `
   <div class="main-head"><div><h1>Matches Manuales</h1><p class="sub">Contactos directos por WhatsApp desde Explorar la Red y Gremio — ${pendientes.length} pendiente${pendientes.length===1?'':'s'} · ${concretadas.length} concretada${concretadas.length===1?'':'s'} · ${caidas.length} caída${caidas.length===1?'':'s'}</p></div></div>
   <div class="view-toggle">
