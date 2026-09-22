@@ -432,40 +432,40 @@
   .prop-body .actions{display:flex;gap:8px;margin-top:12px;}
 
   /* ---- listing cards (Explorar la Red) ---- */
-  .listing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
-  .listing-grid.cols-2{grid-template-columns:repeat(2,1fr);}
-  .listing-card{
+  .vehicle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .vehicle-grid.cols-2{grid-template-columns:repeat(2,1fr);}
+  .vehicle-card{
     background:#FFFFFF;border-radius:14px;overflow:visible;position:relative;
     border:1px solid #EDEBF7;
     box-shadow:0 1px 2px rgba(30,20,70,.04), 0 10px 26px -16px rgba(30,20,70,.22);
   }
-  .listing-photo{position:relative;height:180px;border-radius:14px 14px 0 0;overflow:hidden;background:var(--ink-3);}
-  .listing-photo img{width:100%;height:100%;object-fit:cover;display:block;}
-  .listing-type-pill{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.92);color:var(--red);font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.03em;}
-  .listing-agency-pill{position:absolute;bottom:10px;right:10px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);color:var(--ink);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.02em;}
-  .listing-agency-pill i{color:var(--red);font-size:10px;}
-  .listing-premium-badge{position:absolute;top:10px;left:10px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.15);color:#F5A623;font-size:15px;}
-  .listing-ribbon{
+  .vehicle-photo{position:relative;height:180px;border-radius:14px 14px 0 0;overflow:hidden;background:var(--ink-3);}
+  .vehicle-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .vehicle-type-pill{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.92);color:var(--red);font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.03em;}
+  .vehicle-agency-pill{position:absolute;bottom:10px;right:10px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);color:var(--ink);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.02em;}
+  .vehicle-agency-pill i{color:var(--red);font-size:10px;}
+  .vehicle-premium-badge{position:absolute;top:10px;left:10px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.15);color:#F5A623;font-size:15px;}
+  .vehicle-ribbon{
     position:absolute;left:0;top:165px;z-index:2;
     background:var(--red);color:#fff;font-size:11.5px;font-weight:700;
     padding:7px 20px 7px 12px;display:flex;align-items:center;gap:6px;letter-spacing:.03em;
     clip-path:polygon(0 0,100% 0,86% 100%,0 100%);
   }
-  .listing-body{padding:32px 18px 18px;}
-  .listing-price-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-  .listing-price{font-size:23px;font-weight:900;color:var(--red);line-height:1;}
-  .listing-price .unit{font-size:13px;font-weight:400;color:var(--paper-dim);margin-left:3px;}
-  .listing-heart{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;color:var(--red);cursor:pointer;flex-shrink:0;background:none;}
-  .listing-heart.is-fav{color:#E2495F;border-color:#E2495F;}
-  .listing-title{font-size:19px;font-weight:900;color:var(--ink);margin:6px 0 4px;}
-  .listing-agency-line{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 2px;}
-  .listing-addr{font-size:13px;color:var(--paper-dim);margin-bottom:8px;}
-  .listing-commission{font-size:11.5px;color:#8ae5b0;margin-bottom:16px;display:flex;align-items:center;gap:6px;}
-  .listing-commission strong{font-weight:700;}
-  .listing-divider{border-top:1px solid var(--line);margin-bottom:13px;}
-  .listing-specs{display:flex;gap:16px;flex-wrap:wrap;}
-  .listing-spec{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);}
-  .listing-spec i{color:var(--red);flex-shrink:0;}
+  .vehicle-body{padding:32px 18px 18px;}
+  .vehicle-price-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+  .vehicle-price{font-size:23px;font-weight:900;color:var(--red);line-height:1;}
+  .vehicle-price .unit{font-size:13px;font-weight:400;color:var(--paper-dim);margin-left:3px;}
+  .vehicle-heart{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;color:var(--red);cursor:pointer;flex-shrink:0;background:none;}
+  .vehicle-heart.is-fav{color:#E2495F;border-color:#E2495F;}
+  .vehicle-title{font-size:19px;font-weight:900;color:var(--ink);margin:6px 0 4px;}
+  .vehicle-agency-line{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 2px;}
+  .vehicle-addr{font-size:13px;color:var(--paper-dim);margin-bottom:8px;}
+  .vehicle-commission{font-size:11.5px;color:#8ae5b0;margin-bottom:16px;display:flex;align-items:center;gap:6px;}
+  .vehicle-commission strong{font-weight:700;}
+  .vehicle-divider{border-top:1px solid var(--line);margin-bottom:13px;}
+  .vehicle-specs{display:flex;gap:16px;flex-wrap:wrap;}
+  .vehicle-spec{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);}
+  .vehicle-spec i{color:var(--red);flex-shrink:0;}
 
   /* ---- avatares de cliente ---- */
   .avatar-circle{width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;background:var(--ink-3);color:var(--red);font-weight:700;font-size:13px;}
@@ -658,27 +658,27 @@
   .terms-banner a{color:var(--red);font-weight:700;text-decoration:underline;}
 
   /* ---- modal detalle de vehículo ---- */
-  .property-swiper{width:100%;height:360px;border-radius:14px 14px 0 0;--swiper-theme-color:#FFFFFF;}
-  .property-swiper .swiper-slide img{width:100%;height:100%;object-fit:cover;display:block;}
-  .property-swiper .swiper-button-next,.property-swiper .swiper-button-prev{background:rgba(28,43,54,.45);width:36px;height:36px;border-radius:50%;color:#FFFFFF;}
-  .property-swiper .swiper-button-next:after,.property-swiper .swiper-button-prev:after{font-size:14px;}
-  .property-swiper .swiper-pagination-bullet{background:#FFFFFF;opacity:.6;}
-  .property-swiper .swiper-pagination-bullet-active{opacity:1;background:var(--red);}
-  .propdetail-info{padding:26px 28px 28px;}
-  .propdetail-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:4px;}
-  .propdetail-price{font-size:26px;font-weight:900;color:var(--red);}
-  .propdetail-price .unit{font-size:14px;font-weight:400;color:var(--paper-dim);margin-left:4px;}
-  .propdetail-title{font-size:21px;font-weight:900;color:var(--ink);margin:6px 0 2px;}
-  .propdetail-addr{font-size:13.5px;color:var(--paper-dim);margin-bottom:18px;}
-  .propdetail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:18px;}
-  .propdetail-grid .lbl{display:flex;align-items:center;gap:6px;font-size:10.5px;font-family:var(--font-body);font-weight:700;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;}
-  .propdetail-grid .val{display:block;font-size:14px;color:var(--ink);font-weight:700;}
-  .propdetail-map-section{margin-bottom:18px;}
-  .propdetail-map-label{font-size:11px;font-weight:700;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
-  .propdetail-map-frame{border-radius:10px;overflow:hidden;border:1px solid var(--line-strong);}
-  .propdetail-agency{font-size:13px;color:var(--paper-dim);margin-bottom:18px;}
-  .propdetail-agency strong{color:var(--ink);}
-  .propdetail-actions{display:flex;gap:10px;}
+  .vehicle-swiper{width:100%;height:360px;border-radius:14px 14px 0 0;--swiper-theme-color:#FFFFFF;}
+  .vehicle-swiper .swiper-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+  .vehicle-swiper .swiper-button-next,.vehicle-swiper .swiper-button-prev{background:rgba(28,43,54,.45);width:36px;height:36px;border-radius:50%;color:#FFFFFF;}
+  .vehicle-swiper .swiper-button-next:after,.vehicle-swiper .swiper-button-prev:after{font-size:14px;}
+  .vehicle-swiper .swiper-pagination-bullet{background:#FFFFFF;opacity:.6;}
+  .vehicle-swiper .swiper-pagination-bullet-active{opacity:1;background:var(--red);}
+  .vehdetail-info{padding:26px 28px 28px;}
+  .vehdetail-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:4px;}
+  .vehdetail-price{font-size:26px;font-weight:900;color:var(--red);}
+  .vehdetail-price .unit{font-size:14px;font-weight:400;color:var(--paper-dim);margin-left:4px;}
+  .vehdetail-title{font-size:21px;font-weight:900;color:var(--ink);margin:6px 0 2px;}
+  .vehdetail-addr{font-size:13.5px;color:var(--paper-dim);margin-bottom:18px;}
+  .vehdetail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:18px;}
+  .vehdetail-grid .lbl{display:flex;align-items:center;gap:6px;font-size:10.5px;font-family:var(--font-body);font-weight:700;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;}
+  .vehdetail-grid .val{display:block;font-size:14px;color:var(--ink);font-weight:700;}
+  .vehdetail-map-section{margin-bottom:18px;}
+  .vehdetail-map-label{font-size:11px;font-weight:700;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+  .vehdetail-map-frame{border-radius:10px;overflow:hidden;border:1px solid var(--line-strong);}
+  .vehdetail-agency{font-size:13px;color:var(--paper-dim);margin-bottom:18px;}
+  .vehdetail-agency strong{color:var(--ink);}
+  .vehdetail-actions{display:flex;gap:10px;}
 
   /* ---- modal calificar (swiper cards) ---- */
   .rating-swiper{width:280px;height:230px;margin:22px auto 4px;}
@@ -870,6 +870,66 @@
   .faq-c-item.faq-c-open .faq-c-a{display:block;}
   .faq-c-a p{margin:0;color:var(--paper-dim);font-size:13.5px;line-height:1.65;}
 
+  /* ---- FAQs (vista en la app, con sidebar de categorías) ---- */
+  .faq2-wrap{display:flex;gap:28px;align-items:flex-start;}
+  .faq2-sidebar{width:272px;flex-shrink:0;}
+  .faq2-sidebar-label{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--paper-dim);text-transform:uppercase;margin-bottom:12px;padding-left:4px;}
+  .faq2-cat{display:flex;align-items:center;gap:12px;padding:13px;border-radius:14px;cursor:pointer;margin-bottom:8px;border:1px solid transparent;transition:background .15s ease,border-color .15s ease;}
+  .faq2-cat:hover{background:var(--ink-3);}
+  .faq2-cat.active{border-color:var(--line-strong);}
+  .faq2-cat-icon{width:38px;height:38px;border-radius:10px;background:var(--ink-3);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--ink);font-size:14px;transition:background .15s ease,color .15s ease;}
+  .faq2-cat.active .faq2-cat-icon{background:var(--red);color:#FFFFFF;}
+  .faq2-cat-text{flex:1;min-width:0;}
+  .faq2-cat-title{font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.3;}
+  .faq2-cat-count{font-size:11.5px;color:var(--paper-dim);margin-top:2px;}
+  .faq2-cat-arrow{font-size:11px;color:var(--line-strong);flex-shrink:0;}
+  .faq2-content{flex:1;min-width:0;}
+  .faq2-content-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px;}
+  .faq2-content-icon{width:44px;height:44px;border-radius:12px;background:var(--ink);color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+  .faq2-content-head h1{font-family:var(--font-display);font-size:28px;font-weight:600;margin:0 0 6px;}
+  .faq2-content-head .sub{font-size:13.5px;color:var(--paper-dim);margin:0;}
+  .faq2-list{display:flex;flex-direction:column;gap:10px;}
+  .faq2-item{background:#FFFFFF;border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .15s ease;}
+  .faq2-item.open{border-color:var(--line-strong);}
+  .faq2-q{width:100%;background:none;border:none;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;font-size:15px;font-weight:700;color:var(--ink);font-family:var(--font-body);}
+  .faq2-chev{width:26px;height:26px;border-radius:8px;background:var(--ink-3);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--paper-dim);font-size:11px;transition:transform .15s ease,background .15s ease,color .15s ease;}
+  .faq2-item.open .faq2-chev{background:var(--red);color:#FFFFFF;transform:rotate(180deg);}
+  .faq2-a{display:none;padding:0 18px 18px;}
+  .faq2-item.open .faq2-a{display:block;}
+  .faq2-a p{margin:0 0 10px;color:var(--paper-dim);font-size:13.5px;line-height:1.65;}
+  .faq2-a p:last-child{margin-bottom:0;}
+  /* Banner de soporte: foto de fondo (con degradé para legibilidad) + texto real en HTML
+     (mismas fuentes/tamaños que el resto del sitio) + panel blanco con logo y botón, todo
+     en una sola fila, del mismo alto que el banner original. */
+  .faq2-help-banner{display:flex;align-items:stretch;border-radius:14px;overflow:hidden;margin-top:22px;border:1px solid var(--line);height:92px;}
+  .faq2-help-photo{position:relative;flex:1 1 60%;background-image:url('assets/img-faq-soporte-banner.jpg');background-size:cover;background-position:center;display:flex;align-items:center;}
+  .faq2-help-photo::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,30,38,.72) 0%,rgba(20,30,38,.45) 55%,rgba(20,30,38,.12) 100%);}
+  .faq2-help-photo-inner{position:relative;z-index:1;padding:0 24px;}
+  .faq2-help-title{color:#FFFFFF;font-family:var(--font-display);font-size:17px;font-weight:700;margin:0 0 2px;line-height:1.25;}
+  .faq2-help-sub{color:rgba(255,255,255,.85);font-size:12px;margin:0;line-height:1.4;}
+  .faq2-help-white{flex:0 0 230px;background:#FFFFFF;display:flex;align-items:center;justify-content:center;gap:12px;padding:0 14px;}
+  .faq2-help-logo{height:20px;width:auto;flex-shrink:0;}
+  .faq2-help-btn{white-space:nowrap;font-size:13px;padding:9px 14px;}
+  @media (max-width:860px){
+    .faq2-wrap{flex-direction:column;}
+    .faq2-sidebar{width:100%;display:flex;flex-wrap:wrap;gap:8px;}
+    .faq2-cat{width:calc(50% - 4px);margin-bottom:0;}
+  }
+  @media (max-width:640px){
+    .faq2-help-banner{height:auto;flex-direction:column;}
+    .faq2-help-photo{padding:14px 0;}
+    .faq2-help-white{flex:none;width:100%;padding:14px;}
+    .faq2-help-logo{display:none;}
+  }
+  /* Banner de "Proveedores" (foto, sin overlay de texto encima — el título va arriba, en HTML) */
+  .prov-benefits-banner{position:relative;height:150px;border-radius:14px;overflow:hidden;border:1px solid var(--line);margin-bottom:22px;background-image:url('assets/img-proveedores-banner.jpg');background-size:cover;background-position:center;display:flex;align-items:center;}
+  .prov-benefits-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,30,38,.72) 0%,rgba(20,30,38,.42) 55%,rgba(20,30,38,.1) 100%);}
+  .prov-benefits-title{position:relative;z-index:1;color:#FFFFFF;font-family:var(--font-display);font-size:17px;font-weight:700;margin:0;padding:0 24px;}
+  @media (max-width:520px){
+    .faq2-sidebar{display:block;}
+    .faq2-cat{width:100%;margin-bottom:8px;}
+  }
+
   .lp-photo-swiper{width:100%;--swiper-theme-color:var(--red);}
   .lp-photo-slide{position:relative;height:440px;background-size:cover;background-position:center;
     display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;}
@@ -957,15 +1017,15 @@
   .explorar-hero-text h1{color:#FFFFFF;font-size:32px;font-weight:900;margin:0 0 8px;font-family:var(--font-display);}
   .explorar-hero-text p{color:rgba(255,255,255,.88);font-size:14.5px;margin:0;}
   .hero-eyebrow{display:block;color:#FBD9D9;font-weight:900;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
-  .listing-agency-pill{position:absolute;bottom:10px;right:10px;background:rgba(255,255,255,.92);color:var(--red);font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.03em;display:flex;align-items:center;gap:5px;}
-  .listing-detail-btn{
+  .vehicle-agency-pill{position:absolute;bottom:10px;right:10px;background:rgba(255,255,255,.92);color:var(--red);font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.03em;display:flex;align-items:center;gap:5px;}
+  .vehicle-detail-btn{
     width:100%;margin-top:16px;padding:9px 0;
     background:var(--red);color:#FFFFFF;border:none;border-radius:8px;
     font-family:var(--font-body);font-weight:700;font-size:13px;
     cursor:pointer;transition:background .15s ease;
     display:flex;align-items:center;justify-content:center;gap:7px;
   }
-  .listing-detail-btn:hover{background:var(--red-dark);}
+  .vehicle-detail-btn:hover{background:var(--red-dark);}
 
   .banner{
     border:1px solid #8FD9A8;background:#cdf4dd;
@@ -1019,7 +1079,7 @@
 
   @media (max-width:980px){
     .hero{grid-template-columns:1fr;padding:70px 24px;}
-    .steps,.plans-grid,.prop-grid,.listing-grid,.kpi-grid,.two-col,.row-2,.row-3{grid-template-columns:1fr;}
+    .steps,.plans-grid,.prop-grid,.vehicle-grid,.kpi-grid,.two-col,.row-2,.row-3{grid-template-columns:1fr;}
     .app-shell{grid-template-columns:1fr;}
     .sidebar{position:relative;height:auto;}
     .landing-nav,.section,.main{padding-left:20px;padding-right:20px;}
@@ -2756,10 +2816,10 @@
   </div>
 </div>
 
-<div id="modal-propdetail" class="modal-backdrop hidden">
+<div id="modal-vehdetail" class="modal-backdrop hidden">
   <div class="modal modal-xl" style="position:relative;padding:0;">
-    <button class="avatar-modal-close" style="position:absolute;top:16px;right:16px;z-index:20;background:rgba(255,255,255,.9);" onclick="closeModal('propdetail')"><i class="fa-solid fa-xmark"></i></button>
-    <div id="propdetail-body"></div>
+    <button class="avatar-modal-close" style="position:absolute;top:16px;right:16px;z-index:20;background:rgba(255,255,255,.9);" onclick="closeModal('vehdetail')"><i class="fa-solid fa-xmark"></i></button>
+    <div id="vehdetail-body"></div>
   </div>
 </div>
 
@@ -3385,7 +3445,7 @@ function _stockCountPorAgencia(){
   return counts;
 }
 
-function sortProps(list, sortKey){
+function sortVehicles(list, sortKey){
   const arr = [...list];
   if(sortKey==='precio_asc') arr.sort((a,b)=>a.precio-b.precio);
   else if(sortKey==='precio_desc') arr.sort((a,b)=>b.precio-a.precio);
@@ -3421,7 +3481,7 @@ function showExplorar(){
   exploreAgencyFilter = null;
   showApp('explorar');
 }
-function goToAgencyProperties(agencyName){
+function goToAgencyVehicles(agencyName){
   exploreAgencyFilter = agencyName;
   showApp('explorar');
 }
@@ -3443,7 +3503,7 @@ function starIcons(n){
 function agencyActionsHTML(id, name){
   // "Calificar" se sacó de acá: ahora una calificación queda atada a una operación (match) cerrada
   // puntual, se dispara desde la ficha del match en Mis Matches, no en abstracto sobre la agencia.
-  return `<div class="agency-actions-btns"><button class="btn btn-sm btn-editar-violeta" onclick="goToAgencyProperties('${name}')">Vehículos</button><button class="btn btn-sm btn-editar-violeta" onclick="openReviewsModal('${id}','${name}')">Ver reviews</button><button class="btn btn-sm btn-eliminar-pastel" onclick="openReportModal('${id}','${name}')"><i class="fa-solid fa-flag"></i> Denunciar</button></div>`;
+  return `<div class="agency-actions-btns"><button class="btn btn-sm btn-editar-violeta" onclick="goToAgencyVehicles('${name}')">Vehículos</button><button class="btn btn-sm btn-editar-violeta" onclick="openReviewsModal('${id}','${name}')">Ver reviews</button><button class="btn btn-sm btn-eliminar-pastel" onclick="openReportModal('${id}','${name}')"><i class="fa-solid fa-flag"></i> Denunciar</button></div>`;
 }
 
 /* ---------------- modal calificar ---------------- */
@@ -3542,7 +3602,7 @@ function abrirPerfilAgenciaPublico(agencyId){
   if (a.lat && a.lon) {
     const bbox = `${a.lon-0.01}%2C${a.lat-0.008}%2C${a.lon+0.01}%2C${a.lat+0.008}`;
     const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${a.lat}%2C${a.lon}`;
-    mapHTML = `<div class="propdetail-map-frame"><iframe width="100%" height="220" frameborder="0" scrolling="no" style="border:0;" src="${mapSrc}"></iframe></div>`;
+    mapHTML = `<div class="vehdetail-map-frame"><iframe width="100%" height="220" frameborder="0" scrolling="no" style="border:0;" src="${mapSrc}"></iframe></div>`;
   } else {
     mapHTML = `<div style="font-size:12.5px;color:var(--paper-dim);padding:10px 0;">${esc(a.nombre)} todavía no cargó su ubicación.</div>`;
   }
@@ -3827,7 +3887,7 @@ function renderClientDetailModal(c){
         <div style="font-size:13px;color:var(--paper-dim);">${c.tel||'Sin teléfono'}${esc(c.email?' · '+c.email:'')}</div>
       </div>
     </div>
-    <div class="propdetail-grid">
+    <div class="vehdetail-grid">
       <div><span class="lbl">Busca</span><span class="val">${esc(c.marca||'Cualquier marca')}${esc(c.modelo?' '+c.modelo:'')}</span></div>
       <div><span class="lbl">Año</span><span class="val">${rango}</span></div>
       <div><span class="lbl">Km máximo</span><span class="val">${c.kmMax?Number(c.kmMax).toLocaleString('es-AR')+' km':'—'}</span></div>
@@ -4752,7 +4812,7 @@ function gremioCardHTML(v, esPropio){
     : null;
   return `
   <div class="prop-card" style="border-color:var(--red);">
-    <div class="listing-photo" style="height:170px;cursor:pointer;" onclick="abrirDetalleGremio('${v.id}', ${esPropio})">
+    <div class="vehicle-photo" style="height:170px;cursor:pointer;" onclick="abrirDetalleGremio('${v.id}', ${esPropio})">
       ${foto ? `<img src="${foto}" alt="${esc(v.marca||'')} ${esc(v.modelo||'')}" style="width:100%;height:100%;object-fit:cover;">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--paper-dim);"><i class="fa-solid fa-car" style="font-size:32px;"></i></div>`}
       <span class="pill pill-brick" style="position:absolute;top:10px;left:10px;"><i class="fa-solid fa-gem"></i> Oportunidad Exclusiva</span>
     </div>
@@ -4820,7 +4880,7 @@ async function deleteProp(id){
   });
 }
 
-function listingCardReal(v, esAdminView=false){
+function vehicleCardReal(v, esAdminView=false){
   const foto = (v.fotos && v.fotos.length) ? v.fotos[0] : null;
   const agName = v.agencias?.nombre || 'Agencia';
   const agCiudad = v.agencias?.ciudad || '—';
@@ -4830,34 +4890,34 @@ function listingCardReal(v, esAdminView=false){
   const isFav = misIntereses.includes(v.id);
   const esPropio = currentAgencia && v.agencia_id === currentAgencia.id;
   return `
-    <div class="listing-card">
-      <div class="listing-photo">
+    <div class="vehicle-card">
+      <div class="vehicle-photo">
         ${foto ? `<img src="${foto}" alt="${esc(v.marca||'')} ${esc(v.modelo||'')}">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--paper-dim);"><i class="fa-solid fa-car" style="font-size:32px;"></i></div>`}
-        ${v.agencias?.plan === 'premium' ? `<div class="listing-premium-badge" title="Anuncio destacado"><i class="fa-solid fa-star"></i></div>` : ''}
-        <span class="listing-type-pill">${esc(v.marca||'')}</span>
-        <span class="listing-agency-pill"><i class="fa-solid fa-building"></i> ${esc(agName)}</span>
+        ${v.agencias?.plan === 'premium' ? `<div class="vehicle-premium-badge" title="Anuncio destacado"><i class="fa-solid fa-star"></i></div>` : ''}
+        <span class="vehicle-type-pill">${esc(v.marca||'')}</span>
+        <span class="vehicle-agency-pill"><i class="fa-solid fa-building"></i> ${esc(agName)}</span>
       </div>
       ${esAdminView && v.fotos && v.fotos.length > 0 ? `<button type="button" class="btn btn-sm" style="width:100%;border-radius:0;" onclick="abrirEditarPortadaAdmin('${v.id}')"><i class="fa-solid fa-image"></i> Editar portada</button>` : ''}
-      ${isPopular ? `<div class="listing-ribbon">${icoSpark} Popular</div>` : ''}
-      <div class="listing-body">
-        <div class="listing-price-row">
-          <div class="listing-price">${esc(fmtMoney(v.precio, v.moneda))}</div>
-          ${esPropio ? '' : `<button class="listing-heart ${isFav?'is-fav':''}" data-vid="${v.id}" onclick="toggleFavoriteReal('${v.id}')">${isFav ? '<i class="fa-solid fa-heart"></i>' : icoHeart}</button>`}
+      ${isPopular ? `<div class="vehicle-ribbon">${icoSpark} Popular</div>` : ''}
+      <div class="vehicle-body">
+        <div class="vehicle-price-row">
+          <div class="vehicle-price">${esc(fmtMoney(v.precio, v.moneda))}</div>
+          ${esPropio ? '' : `<button class="vehicle-heart ${isFav?'is-fav':''}" data-vid="${v.id}" onclick="toggleFavoriteReal('${v.id}')">${isFav ? '<i class="fa-solid fa-heart"></i>' : icoHeart}</button>`}
         </div>
-        <div class="listing-title">${esc(v.marca||'')} ${esc(v.modelo||'')} ${v.anio||''} ${v.condicion === 'OKM' ? `<span class="pill pill-sage" style="font-size:9.5px;padding:2px 7px;vertical-align:middle;margin-left:4px;">OKM</span>` : ''}</div>
-        <div class="listing-addr">${esc(agCiudad)}</div>
-        <div class="listing-commission"><i class="fa-solid fa-hand-holding-dollar"></i> Comisión: <strong>${esc(v.comision||'—')}</strong></div>
+        <div class="vehicle-title">${esc(v.marca||'')} ${esc(v.modelo||'')} ${v.anio||''} ${v.condicion === 'OKM' ? `<span class="pill pill-sage" style="font-size:9.5px;padding:2px 7px;vertical-align:middle;margin-left:4px;">OKM</span>` : ''}</div>
+        <div class="vehicle-addr">${esc(agCiudad)}</div>
+        <div class="vehicle-commission"><i class="fa-solid fa-hand-holding-dollar"></i> Comisión: <strong>${esc(v.comision||'—')}</strong></div>
         <div style="display:flex;align-items:center;gap:8px;margin:10px 0;">
           <div class="stock-thumb" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;">${agLogo ? `<img src="${agLogo}" alt="${esc(agName)}">` : `<i class="fa-solid fa-car" style="font-size:11px;"></i>`}</div>
           <span style="font-size:13px;color:var(--paper-dim);font-weight:600;">${esc(agName)}</span>${v.agencias?.verificada ? `<i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:12px;" title="Agencia verificada por Red de Autos"></i>` : ''}
         </div>
-        <div class="listing-divider"></div>
-        <div class="listing-specs">
-          <div class="listing-spec"><i class="fa-solid fa-road"></i> ${v.km ? v.km.toLocaleString('es-AR') : '—'} km</div>
-          ${v.transmision ? `<div class="listing-spec"><i class="fa-solid fa-gears"></i> ${esc(v.transmision)}</div>` : ''}
-          ${v.color ? `<div class="listing-spec"><i class="fa-solid fa-palette"></i> ${esc(v.color)}</div>` : ''}
+        <div class="vehicle-divider"></div>
+        <div class="vehicle-specs">
+          <div class="vehicle-spec"><i class="fa-solid fa-road"></i> ${v.km ? v.km.toLocaleString('es-AR') : '—'} km</div>
+          ${v.transmision ? `<div class="vehicle-spec"><i class="fa-solid fa-gears"></i> ${esc(v.transmision)}</div>` : ''}
+          ${v.color ? `<div class="vehicle-spec"><i class="fa-solid fa-palette"></i> ${esc(v.color)}</div>` : ''}
         </div>
-        <button class="listing-detail-btn" onclick="openPropertyDetailReal('${v.id}')"><i class="fa-solid fa-eye"></i> Ver detalle</button>
+        <button class="vehicle-detail-btn" onclick="openVehicleDetailReal('${v.id}')"><i class="fa-solid fa-eye"></i> Ver detalle</button>
       </div>
     </div>
   `;
@@ -4890,7 +4950,7 @@ function openKpiInfo(titulo, texto){
 }
 function closeModal(name){
   document.getElementById('modal-'+name).classList.add('hidden');
-  if(name==='propdetail' && currentSwiper){ try{ currentSwiper.destroy(true,true); }catch(e){} currentSwiper=null; }
+  if(name==='vehdetail' && currentSwiper){ try{ currentSwiper.destroy(true,true); }catch(e){} currentSwiper=null; }
   if(name==='calificar' && ratingSwiperInstance){ try{ ratingSwiperInstance.destroy(true,true); }catch(e){} ratingSwiperInstance=null; }
   if(name==='agencydetail' && agencyDetailSwiperInstance){ try{ agencyDetailSwiperInstance.destroy(true,true); }catch(e){} agencyDetailSwiperInstance=null; }
 }
@@ -5465,7 +5525,7 @@ function fmtFechaCorta(d){ return d.toLocaleDateString('es-AR', { day:'2-digit',
 function fmtARS(n){ return 'ARS ' + Math.round(n).toLocaleString('es-AR'); }
 
 let ADMIN_AGENCIES = [];
-let _adminAgencyDetailProps = []; // vehículos de la agencia que el admin está viendo en "Ver detalle"
+let _adminAgencyDetailVehicles = []; // vehículos de la agencia que el admin está viendo en "Ver detalle"
 let ADMIN_MATCHES = [];       // matches reales de toda la red, para KPIs y para contar "ops" por agencia
 let ADMIN_VEHICULOS_COUNT = 0;
 let ADMIN_BUSQUEDAS_COUNT = 0;
@@ -6212,7 +6272,7 @@ let _adminPortadaFotos = [];
 let _adminPortadaReplaceIndex = null;
 let _adminPortadaSubiendo = false;
 function abrirEditarPortadaAdmin(vehiculoId){
-  const v = _adminAgencyDetailProps.find(x => x.id === vehiculoId);
+  const v = _adminAgencyDetailVehicles.find(x => x.id === vehiculoId);
   if (!v || !v.fotos || v.fotos.length < 1) return;
   _adminPortadaVehiculoId = vehiculoId;
   _adminPortadaFotos = [...v.fotos];
@@ -6245,7 +6305,7 @@ async function handleAdminPortadaFileChange(event){
   const file = event.target.files[0];
   event.target.value = '';
   if (!file || _adminPortadaReplaceIndex === null) return;
-  const v = _adminAgencyDetailProps.find(x => x.id === _adminPortadaVehiculoId);
+  const v = _adminAgencyDetailVehicles.find(x => x.id === _adminPortadaVehiculoId);
   if (!v) return;
   const idx = _adminPortadaReplaceIndex;
 
@@ -6278,10 +6338,10 @@ async function guardarPortadaAdmin(){
   if (error) { toast('Error al guardar la portada.'); console.error('guardarPortadaAdmin:', error); return; }
   // Actualizamos en memoria para que la card se refresque sin tener que recargar todo el detalle
   // de la agencia (que además nos sacaría de la pestaña "Vehículos" de vuelta a "Resumen").
-  const v = _adminAgencyDetailProps.find(x => x.id === _adminPortadaVehiculoId);
+  const v = _adminAgencyDetailVehicles.find(x => x.id === _adminPortadaVehiculoId);
   if (v) v.fotos = _adminPortadaFotos;
-  document.getElementById('agencydetail-props-grid').innerHTML = _adminAgencyDetailProps.length
-    ? `<div class="listing-grid cols-2">${_adminAgencyDetailProps.map(x=>listingCardReal(x, true)).join('')}</div>`
+  document.getElementById('agencydetail-vehicles-grid').innerHTML = _adminAgencyDetailVehicles.length
+    ? `<div class="vehicle-grid cols-2">${_adminAgencyDetailVehicles.map(x=>vehicleCardReal(x, true)).join('')}</div>`
     : '';
   closeModal('editarportada');
   toast('Portada actualizada');
@@ -6309,25 +6369,25 @@ async function openAgencyDetail(agencyId){
   ]);
   if (eVeh) console.error('openAgencyDetail vehiculos:', eVeh);
   if (eRev) console.error('openAgencyDetail calificaciones:', eRev);
-  const props = vehiculos || [];
+  const vehs = vehiculos || [];
   const revs = reviews || [];
-  _adminAgencyDetailProps = props;
+  _adminAgencyDetailVehicles = vehs;
 
   const resumenSlide = `
     <div class="swiper-slide">
       <div class="agency-kpi-row" style="grid-template-columns:repeat(5,1fr);">
         <div class="kpi"><div class="lbl">Operaciones cerradas</div><div class="val">${a.ops}</div></div>
         <div class="kpi"><div class="lbl">Calificación</div><div class="val" style="font-size:16px;">${a.rating ? starIcons(Math.round(a.rating)) : '<span style="color:var(--paper-dim);font-size:13px;">Sin calificar</span>'}</div></div>
-        <div class="kpi"><div class="lbl">Vehículos publicados</div><div class="val">${props.length}</div></div>
+        <div class="kpi"><div class="lbl">Vehículos publicados</div><div class="val">${vehs.length}</div></div>
         <div class="kpi"><div class="lbl">Fecha de registro</div><div class="val" style="font-size:15px;">${new Date(a.registeredAt).toLocaleDateString('es-AR')}</div></div>
         <div class="kpi"><div class="lbl">Plan</div><div class="val" style="font-size:18px;">${a.plan}</div></div>
       </div>
       <div class="card"><div class="eyebrow" style="margin-bottom:10px;">Estado de la cuenta</div><p style="font-size:13px;color:var(--paper-dim);margin:0;">${a.status==='Pausado' ? 'Esta cuenta está suspendida y no puede publicar ni generar matches hasta ser reactivada.' : a.status==='Inactivo' ? 'Esta agencia figura como inactiva.' : 'Agencia activa en la red.'}</p></div>
     </div>
   `;
-  const propsSlide = `
+  const vehiclesSlide = `
     <div class="swiper-slide">
-      <div id="agencydetail-props-grid">${props.length ? `<div class="listing-grid cols-2">${props.map(v=>listingCardReal(v, true)).join('')}</div>` : `<p style="color:var(--paper-dim);font-size:13px;">Esta agencia no tiene vehículos publicados todavía.</p>`}</div>
+      <div id="agencydetail-vehicles-grid">${vehs.length ? `<div class="vehicle-grid cols-2">${vehs.map(v=>vehicleCardReal(v, true)).join('')}</div>` : `<p style="color:var(--paper-dim);font-size:13px;">Esta agencia no tiene vehículos publicados todavía.</p>`}</div>
     </div>
   `;
   const reviewsSlide = `
@@ -6347,7 +6407,7 @@ async function openAgencyDetail(agencyId){
       `).join('') : `<p style="color:var(--paper-dim);font-size:13px;">Todavía no hay reviews para esta agencia.</p>`}
     </div>
   `;
-  document.getElementById('agencydetail-wrapper').innerHTML = resumenSlide + propsSlide + reviewsSlide;
+  document.getElementById('agencydetail-wrapper').innerHTML = resumenSlide + vehiclesSlide + reviewsSlide;
   document.querySelectorAll('.agency-detail-tab').forEach((t,i)=>t.classList.toggle('active', i===0));
   if(agencyDetailSwiperInstance){ try{ agencyDetailSwiperInstance.destroy(true,true); }catch(e){} }
   if(window.Swiper){
@@ -6817,6 +6877,133 @@ const adminRenderers = {
 function scrollToSection(id){document.getElementById(id).scrollIntoView({behavior:'smooth'});}
 function toggleFaq(el){el.parentElement.classList.toggle('open');}
 function toggleFaqC(btn){ btn.closest('.faq-c-item').classList.toggle('faq-c-open'); }
+
+/* ---------------- FAQs (vista en la app, con sidebar de categorías) ---------------- */
+// Contenido curado a mano (no viene de Supabase): cada categoría agrupa las preguntas
+// que se muestran en el panel de la derecha. `a` puede tener uno o más párrafos.
+const FAQ_CATEGORIAS = [
+  {
+    key: 'red', label: 'Red de Autos', icon: 'fa-globe',
+    desc: 'Primeros pasos y funcionamiento de la comunidad.',
+    preguntas: [
+      { q: '¿Qué es Red de Autos?', a: ['Es la red B2B que conecta concesionarias del NOA para compartir stock de vehículos y búsquedas de clientes, generando matches automáticos entre lo que una concesionaria tiene y lo que otra necesita.'] },
+      { q: '¿Cómo me uno a la red?', a: ['Necesitás un código de invitación. Con él completás los datos de tu concesionaria y tu cuenta queda pendiente de verificación por nuestro equipo antes de activarse.'] },
+      { q: '¿Solo puedo vender o también puedo comprar?', a: ['Podés hacer ambas cosas: publicar vehículos de venta o consignación que tengas en tu stock, y también cargar clientes que buscan comprar o consignar algo que no tenés, para que la red te avise si otra concesionaria lo tiene.'] },
+      { q: '¿Red de Autos interviene en la operación?', a: ['No. Facilitamos el contacto entre concesionarias y el seguimiento del match, pero el acuerdo económico y la operación en sí son siempre directos entre las partes.'] },
+    ],
+  },
+  {
+    key: 'matches', label: 'Matches y operaciones', icon: 'fa-link',
+    desc: 'Cómo se generan los matches y cómo se cierra una operación.',
+    preguntas: [
+      { q: '¿Cómo funciona el sistema de matches?', a: ['El sistema cruza tu stock y tus clientes contra las búsquedas y vehículos de toda la red. Cuando hay compatibilidad de tipo, ciudad, operación y presupuesto, se genera un match automático.'] },
+      { q: '¿Cómo funcionan los matches manuales?', a: ['Además de los matches automáticos, podés contactar directamente a una agencia desde una card en Explorar la Red o en Oportunidades Exclusivas. Ese contacto también queda registrado — en "Matches Manuales", separado de "Mis Matches" para no mezclarlo con los automáticos — con su propio seguimiento. Si le vas a llevar un cliente, funciona igual que un match automático (con comisión de por medio); si el interés es tuyo, para comprarlo o consultarlo vos mismo, lo marcás como una consulta directa y queda sin comisión ni cliente asociado.'] },
+      { q: '¿Hay reserva de vehículo en el sistema?', a: [
+        'La plataforma actúa únicamente como un canal de conexión y gestión entre las partes, por lo que el uso del sistema no genera una reserva ni congela la unidad automáticamente si hay otras agencias negociando en paralelo por el mismo auto.',
+        'La operación se rige bajo la regla de prioridad directa: quien realiza la seña o coloca el dinero primero, se queda con el vehículo. Si estás interesado en una unidad, te recomendamos coordinar y concretar el pago con la agencia propietaria a la mayor brevedad para asegurar la transacción.',
+      ] },
+      { q: '¿Quién garantiza el estado real del auto y la responsabilidad de la venta?', a: ['La responsabilidad sobre la garantía técnica, mecánica y la documentación del vehículo recae exclusivamente en la agencia o concesionario vendedor. La plataforma actúa como el canal transaccional y facilitador de la operación, verificando la identidad de las partes, pero la garantía sobre el bien se rige por la legislación vigente y las condiciones directas que establece el vendedor final.'] },
+      { q: '¿Cómo es el proceso de negociación de un vehículo y qué plazos existen para cerrarlo?', a: [
+        'La negociación se inicia formalmente en el momento en que se produce un match entre las partes a través de la plataforma.',
+        'No existen plazos fijos ni límites de tiempo prefijados por el sistema; la operación se mantiene activa y se cierra definitivamente cuando el cliente da su respuesta final sobre si desea concretar la compra o no. Durante todo el proceso, la agencia propietaria del vehículo es la única que tiene la potestad de finalizar la operación, marcándola formalmente en la plataforma como concretada o cancelada.',
+      ] },
+    ],
+  },
+  {
+    key: 'comisiones', label: 'Comisiones y pagos', icon: 'fa-sack-dollar',
+    desc: 'Cómo se define, cobra y factura la comisión.',
+    preguntas: [
+      { q: '¿Cómo se fija la comisión?', a: ['Al publicar un vehículo, vos definís el porcentaje (o monto) que estás dispuesto a pagarle a la concesionaria que traiga al comprador o consignante. Ese dato queda visible al producirse el match.'] },
+      { q: '¿Quién le paga la comisión a quién?', a: ['La concesionaria que tiene el vehículo le paga la comisión a la que trajo al comprador o consignante, según el porcentaje definido al publicar.'] },
+      { q: '¿Qué pasa si la otra agencia no paga la comisión?', a: ['Podés reportarlo desde el botón "Denunciar" en Concesionarias Asociadas. El equipo evalúa cada caso y puede advertir, suspender o dar de baja a la concesionaria infractora.'] },
+      { q: '¿Cómo se emiten las facturas y cobros de comisiones?', a: ['La facturación se divide según la naturaleza del concepto: el concesionario o agencia vendedora emite la factura comercial por la venta del vehículo al comprador final; por su parte, la plataforma emite la factura electrónica correspondiente a los honorarios por servicio de intermediación o uso de software a la parte correspondiente.'] },
+    ],
+  },
+  {
+    key: 'planes', label: 'Planes y publicaciones', icon: 'fa-tag',
+    desc: 'Diferencias entre planes y cómo gestionar tus publicaciones.',
+    preguntas: [
+      { q: '¿Qué diferencia hay entre Plan Pro y Premium?', a: ['El Plan Pro es autogestión: vos cargás y actualizás tu stock y tus clientes. El Plan Premium incluye todo eso más un equipo que carga y mantiene tu stock al día, con soporte prioritario.'] },
+      { q: '¿Cómo contrato el Plan Premium?', a: ['Desde Mi Perfil, en la sección "Plan actual", elegís Plan Premium y nuestro equipo se pone en contacto para coordinar el cambio y el relevamiento inicial de tu stock.'] },
+      { q: '¿Cómo funcionan los anuncios destacados?', a: ['Es un beneficio automático del Plan Premium: tus vehículos aparecen primero en Explorar la Red (antes que los de cualquier agencia Pro, sin importar el orden que elija quien está mirando) y llevan una estrella distintiva en la card. No hay que activarlo ni elegir qué auto destacar — aplica solo a todo tu stock mientras tengas el Plan Premium.'] },
+      { q: '¿Puedo cambiar en cualquier momento?', a: ['Sí, podés cambiar de plan cuando quieras desde Mi Perfil. El cambio se hace efectivo en el siguiente ciclo de facturación.'] },
+    ],
+  },
+  {
+    key: 'privacidad', label: 'Privacidad y cuenta', icon: 'fa-user-shield',
+    desc: 'Qué datos se comparten y cómo se protege tu cuenta.',
+    preguntas: [
+      { q: '¿Mis datos y mi stock de vehículos son visibles para todos?', a: ['Tu stock de vehículos sí es visible para toda la red (es lo que permite generar matches), pero las fotos completas y tus datos de contacto quedan protegidos hasta que se produce un match real.'] },
+      { q: '¿Los datos de mis clientes son visibles para todos?', a: ['No. Los datos de contacto de tus clientes son siempre privados. Solo se comparten los criterios de búsqueda necesarios para generar el match (tipo de vehículo, zona, presupuesto).'] },
+      { q: '¿Cómo se resguardan los clientes compartidos entre agencias?', a: [
+        'La privacidad y protección de tu cartera de clientes está 100% garantizada. La agencia dueña del vehículo jamás tiene acceso a la información personal ni de contacto de tu comprador.',
+        'Todas las conexiones y comunicaciones sobre la operación son totalmente privadas dentro de la plataforma. De hecho, el flujo de trabajo está diseñado para que seas vos quien acompañe físicamente a tu cliente a ver el vehículo en la otra agencia, manteniendo el control absoluto de tu relación comercial en todo momento.',
+      ] },
+      { q: '¿Qué pasa con mi calificación?', a: ['Otras concesionarias pueden calificarte y dejarte reviews después de colaborar en una operación. Esa calificación queda visible en "Concesionarias Asociadas" y construye tu reputación dentro de la red.'] },
+      { q: '¿Cómo funciona el sistema de reputación o calificaciones entre agencias?', a: ['Para garantizar evaluaciones reales y objetivas dentro de la plataforma, el sistema solo permite calificar, dejar comentarios o realizar denuncias por incumplimiento entre agencias que hayan cerrado efectivamente una operación conjunta. Esto evita valoraciones falsas y asegura que la reputación de cada agencia refleje su profesionalismo y cumplimiento en operaciones reales.'] },
+      { q: '¿Puedo ser dado de baja de la red?', a: ['Sí. Si no cumplís los Términos y Condiciones —por ejemplo, no pagar una comisión acordada— el equipo puede advertir, suspender o dar de baja tu cuenta según la gravedad del caso.'] },
+    ],
+  },
+];
+
+let _faqActiveCat = 'red';
+
+function selectFaqCategoria(key){
+  if (!FAQ_CATEGORIAS.some(c => c.key === key) || key === _faqActiveCat) return;
+  _faqActiveCat = key;
+  document.getElementById('main-content').innerHTML = renderers.faqapp();
+}
+
+function toggleFaq2(btn){ btn.closest('.faq2-item').classList.toggle('open'); }
+
+function renderFaqApp(){
+  const cat = FAQ_CATEGORIAS.find(c => c.key === _faqActiveCat) || FAQ_CATEGORIAS[0];
+  return `
+  <div class="faq2-wrap">
+    <div class="faq2-sidebar">
+      <div class="faq2-sidebar-label">Explorar por tema</div>
+      ${FAQ_CATEGORIAS.map(c => `
+        <div class="faq2-cat ${c.key===cat.key?'active':''}" onclick="selectFaqCategoria('${c.key}')">
+          <div class="faq2-cat-icon"><i class="fa-solid ${c.icon}"></i></div>
+          <div class="faq2-cat-text">
+            <div class="faq2-cat-title">${c.label}</div>
+            <div class="faq2-cat-count">${c.preguntas.length} preguntas</div>
+          </div>
+          <i class="fa-solid fa-chevron-right faq2-cat-arrow"></i>
+        </div>
+      `).join('')}
+    </div>
+    <div class="faq2-content">
+      <div class="faq2-content-head">
+        <div class="faq2-content-icon"><i class="fa-solid ${cat.icon}"></i></div>
+        <div><h1>${cat.label}</h1><p class="sub">${cat.desc}</p></div>
+      </div>
+      <div class="faq2-list">
+        ${cat.preguntas.map((item, i) => `
+          <div class="faq2-item ${i===0?'open':''}">
+            <button type="button" class="faq2-q" onclick="toggleFaq2(this)">
+              <span>${item.q}</span>
+              <span class="faq2-chev"><i class="fa-solid fa-chevron-down"></i></span>
+            </button>
+            <div class="faq2-a">${item.a.map(p => `<p>${p}</p>`).join('')}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="faq2-help-banner">
+        <div class="faq2-help-photo">
+          <div class="faq2-help-photo-inner">
+            <div class="faq2-help-title">¿Todavía necesitás ayuda?</div>
+            <p class="faq2-help-sub">Nuestro equipo está disponible para resolver tus dudas.</p>
+          </div>
+        </div>
+        <div class="faq2-help-white">
+          <img src="assets/img01.webp" alt="Red de Autos" class="faq2-help-logo">
+          <button type="button" class="btn btn-solid faq2-help-btn" onclick="showApp('soporte')">Contactar Soporte</button>
+        </div>
+      </div>
+    </div>
+  </div>
+`;}
 function toast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.remove('hidden');
@@ -7803,7 +7990,7 @@ async function confirmarCargarComision(){
 }
 
 let matchesTab = 'pipeline';
-let favoriteProps = []; // stub vacío: las funciones mock viejas (listingCard/renderDetailModal) todavía la referencian
+let favoriteVehiculos = []; // stub vacío: las funciones mock viejas (vehicleCard/renderDetailModal) todavía la referencian
 let misIntereses = [];
 let _statsVistasVehiculos = {};
 
@@ -7834,7 +8021,7 @@ async function toggleFavoriteReal(vehiculoId){
   // Actualización quirúrgica: solo tocamos los botones de corazón de este vehículo en pantalla,
   // sin recargar ni redibujar el resto de la grilla (eso es lo que causaba el "salto" visual
   // entre cards al tildar/destildar un favorito).
-  document.querySelectorAll(`.listing-heart[data-vid="${vehiculoId}"]`).forEach(btn => {
+  document.querySelectorAll(`.vehicle-heart[data-vid="${vehiculoId}"]`).forEach(btn => {
     btn.classList.toggle('is-fav', nowFav);
     btn.innerHTML = nowFav ? '<i class="fa-solid fa-heart"></i>' : icoHeart;
   });
@@ -7842,7 +8029,7 @@ async function toggleFavoriteReal(vehiculoId){
   // y se acaba de destildar un favorito, esa card tiene que desaparecer de esa lista puntual
   // (ahí sí cambia qué se muestra, no es solo un ícono) — se saca solo esa card, sin recargar nada más.
   if (!nowFav && document.querySelector('.nav-item.active')?.dataset.view === 'matches' && matchesTab === 'favoritas') {
-    const card = document.querySelector(`.listing-heart[data-vid="${vehiculoId}"]`)?.closest('.listing-card');
+    const card = document.querySelector(`.vehicle-heart[data-vid="${vehiculoId}"]`)?.closest('.vehicle-card');
     if (card) {
       card.remove();
       const grid = document.getElementById('favoritas-grid');
@@ -8438,14 +8625,14 @@ const CITY_COORDS = {
   'Catamarca': [-28.4696, -65.7852],
   'La Rioja': [-29.4131, -66.8558],
 };
-function propertyCoords(p){
+function vehicleCoords(p){
   const base = CITY_COORDS[p.ciudad] || CITY_COORDS['Tucumán'];
   let hash = 0;
   for(let i=0;i<p.id.length;i++){ hash = (hash*31 + p.id.charCodeAt(i)) % 1000; }
   const jitter = (hash/1000 - 0.5) * 0.05;
   return [base[0]+jitter, base[1]+jitter*1.3];
 }
-function openPropertyDetailReal(vehiculoId){
+function openVehicleDetailReal(vehiculoId){
   const v = redStock.find(x=>x.id===vehiculoId);
   if(!v) return;
   const esPropio = currentAgencia && v.agencia_id === currentAgencia.id;
@@ -8490,20 +8677,20 @@ function renderDetailModalReal(v){
     : `<div class="swiper-slide" style="display:flex;align-items:center;justify-content:center;background:var(--ink-3);min-height:320px;"><i class="fa-solid fa-car" style="font-size:64px;color:var(--paper-dim);"></i></div>`;
   const esPropio = currentAgencia && v.agencia_id === currentAgencia.id;
   const isFav = misIntereses.includes(v.id);
-  const heartBtn = esPropio ? '' : `<button class="listing-heart ${isFav?'is-fav':''}" data-vid="${v.id}" onclick="toggleFavoriteReal('${v.id}'); renderDetailModalReal(redStock.find(x=>x.id==='${v.id}'));">${isFav ? '<i class="fa-solid fa-heart"></i>' : icoHeart}</button>`;
+  const heartBtn = esPropio ? '' : `<button class="vehicle-heart ${isFav?'is-fav':''}" data-vid="${v.id}" onclick="toggleFavoriteReal('${v.id}'); renderDetailModalReal(redStock.find(x=>x.id==='${v.id}'));">${isFav ? '<i class="fa-solid fa-heart"></i>' : icoHeart}</button>`;
 
   const agLat = v.agencias?.lat, agLon = v.agencias?.lon;
   let mapHTML;
   if (agLat && agLon) {
     const bbox = `${agLon-0.01}%2C${agLat-0.008}%2C${agLon+0.01}%2C${agLat+0.008}`;
     const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${agLat}%2C${agLon}`;
-    mapHTML = `<div class="propdetail-map-section">
-      <div class="propdetail-map-label"><i class="fa-solid fa-map-location-dot"></i> Ubicación aproximada</div>
-      <div class="propdetail-map-frame"><iframe width="100%" height="220" frameborder="0" scrolling="no" style="border:0;" src="${mapSrc}"></iframe></div>
+    mapHTML = `<div class="vehdetail-map-section">
+      <div class="vehdetail-map-label"><i class="fa-solid fa-map-location-dot"></i> Ubicación aproximada</div>
+      <div class="vehdetail-map-frame"><iframe width="100%" height="220" frameborder="0" scrolling="no" style="border:0;" src="${mapSrc}"></iframe></div>
     </div>`;
   } else {
-    mapHTML = `<div class="propdetail-map-section">
-      <div class="propdetail-map-label"><i class="fa-solid fa-map-location-dot"></i> Ubicación aproximada</div>
+    mapHTML = `<div class="vehdetail-map-section">
+      <div class="vehdetail-map-label"><i class="fa-solid fa-map-location-dot"></i> Ubicación aproximada</div>
       <div style="font-size:12.5px;color:var(--paper-dim);padding:6px 0 2px;">${esc(v.agencias?.nombre || 'Esta agencia')} todavía no cargó su dirección en Mi Perfil.</div>
     </div>`;
   }
@@ -8512,21 +8699,21 @@ function renderDetailModalReal(v){
     ? `https://wa.me/${v.agencias.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(construirMensajeWhatsappVehiculo(v.agencias?.nombre, [v.marca,v.modelo].filter(Boolean).join(' ')))}`
     : null;
 
-  document.getElementById('propdetail-body').innerHTML = `
-    <div class="swiper property-swiper">
+  document.getElementById('vehdetail-body').innerHTML = `
+    <div class="swiper vehicle-swiper">
       <div class="swiper-wrapper">${slidesHTML}</div>
       ${fotos.length > 1 ? `<div class="swiper-pagination"></div><div class="swiper-button-prev"></div><div class="swiper-button-next"></div>` : ''}
     </div>
-    <div class="propdetail-info">
-      <div class="propdetail-top">
+    <div class="vehdetail-info">
+      <div class="vehdetail-top">
         <div>
-          <div class="propdetail-price">${v.es_gremio && v.precio_gremio ? `<span style="text-decoration:line-through;color:var(--paper-dim);font-size:15px;margin-right:8px;">${esc(fmtMoney(v.precio, v.moneda))}</span>${esc(fmtMoney(v.precio_gremio, v.moneda))} <span class="pill pill-brick" style="vertical-align:middle;"><i class="fa-solid fa-gem"></i> Gremio</span>` : fmtMoney(v.precio, v.moneda)}</div>
-          <div class="propdetail-title">${esc(v.marca||'')} ${esc(v.modelo||'')} ${v.anio||''} ${esPropio ? '<span class="pill pill-sage" style="margin-left:6px;">Tu vehículo</span>' : ''}</div>
-          <div class="propdetail-addr">${esc(v.agencias?.ciudad || '—')}</div>
+          <div class="vehdetail-price">${v.es_gremio && v.precio_gremio ? `<span style="text-decoration:line-through;color:var(--paper-dim);font-size:15px;margin-right:8px;">${esc(fmtMoney(v.precio, v.moneda))}</span>${esc(fmtMoney(v.precio_gremio, v.moneda))} <span class="pill pill-brick" style="vertical-align:middle;"><i class="fa-solid fa-gem"></i> Gremio</span>` : fmtMoney(v.precio, v.moneda)}</div>
+          <div class="vehdetail-title">${esc(v.marca||'')} ${esc(v.modelo||'')} ${v.anio||''} ${esPropio ? '<span class="pill pill-sage" style="margin-left:6px;">Tu vehículo</span>' : ''}</div>
+          <div class="vehdetail-addr">${esc(v.agencias?.ciudad || '—')}</div>
         </div>
         ${heartBtn}
       </div>
-      <div class="propdetail-grid">
+      <div class="vehdetail-grid">
         <div><span class="lbl"><i class="fa-solid fa-certificate"></i>Condición</span><span class="val">${esc(v.condicion || 'Usado')}</span></div>
         <div><span class="lbl"><i class="fa-solid fa-gauge-high"></i>Kilometraje</span><span class="val">${v.km ? v.km.toLocaleString('es-AR')+' km' : '—'}</span></div>
         <div><span class="lbl"><i class="fa-solid fa-gears"></i>Transmisión</span><span class="val">${esc(v.transmision||'—')}</span></div>
@@ -8536,17 +8723,17 @@ function renderDetailModalReal(v){
         <div><span class="lbl"><i class="fa-solid fa-percent"></i>Comisión</span><span class="val">${esc(v.comision||'—')}</span></div>
       </div>
       ${mapHTML}
-      <div class="propdetail-agency">Publicada por <strong>${esc(v.agencias?.nombre || 'Agencia')}</strong>${verificadaBadgeHTML(v.agencias?.verificada)}</div>
-      <div class="propdetail-actions">
+      <div class="vehdetail-agency">Publicada por <strong>${esc(v.agencias?.nombre || 'Agencia')}</strong>${verificadaBadgeHTML(v.agencias?.verificada)}</div>
+      <div class="vehdetail-actions">
         ${waHref ? `<button class="btn btn-solid btn-contact-lime" onclick="abrirContactoManual('${v.id}')"><i class="fa-brands fa-whatsapp"></i> Hacer Match</button>` : ''}
-        <button class="btn" onclick="closeModal('propdetail')">Cerrar</button>
+        <button class="btn" onclick="closeModal('vehdetail')">Cerrar</button>
       </div>
     </div>
   `;
-  openModal('propdetail');
+  openModal('vehdetail');
   if(currentSwiper){ try{ currentSwiper.destroy(true,true); }catch(e){} }
   if(window.Swiper && fotos.length > 1){
-    currentSwiper = new Swiper('.property-swiper', {
+    currentSwiper = new Swiper('.vehicle-swiper', {
       loop:true,
       pagination:{el:'.swiper-pagination', clickable:true},
       navigation:{nextEl:'.swiper-button-next', prevEl:'.swiper-button-prev'},
@@ -8964,15 +9151,15 @@ function abrirDetalleBusquedaRed(busquedaId){
   const waHref = b.agencias?.telefono
     ? `https://wa.me/${b.agencias.telefono.replace(/\D/g,'')}?text=${encodeURIComponent('Hola, vi que buscan un '+marca+' '+modelo+' en Red de Autos. Tengo algo que puede servir.')}`
     : null;
-  document.getElementById('propdetail-body').innerHTML = `
-    <div class="propdetail-info" style="padding:24px;">
-      <div class="propdetail-top">
+  document.getElementById('vehdetail-body').innerHTML = `
+    <div class="vehdetail-info" style="padding:24px;">
+      <div class="vehdetail-top">
         <div>
-          <div class="propdetail-title">${esc(marca||'Cualquier marca')} ${esc(modelo||'')}</div>
-          <div class="propdetail-addr">Publicado por ${esc(b.agencias?.nombre || 'Agencia')}${verificadaBadgeHTML(b.agencias?.verificada)} · ${esc(b.agencias?.ciudad || '—')}</div>
+          <div class="vehdetail-title">${esc(marca||'Cualquier marca')} ${esc(modelo||'')}</div>
+          <div class="vehdetail-addr">Publicado por ${esc(b.agencias?.nombre || 'Agencia')}${verificadaBadgeHTML(b.agencias?.verificada)} · ${esc(b.agencias?.ciudad || '—')}</div>
         </div>
       </div>
-      <div class="propdetail-grid">
+      <div class="vehdetail-grid">
         <div><span class="lbl">Año</span><span class="val">${anioDesde||'—'} a ${anioHasta||'—'}</span></div>
         <div><span class="lbl">Km máximo</span><span class="val">${kmMax? Number(kmMax).toLocaleString('es-AR')+' km' : '—'}</span></div>
         <div><span class="lbl">Transmisión</span><span class="val">${esc(transmision||'Indiferente')}</span></div>
@@ -8980,13 +9167,13 @@ function abrirDetalleBusquedaRed(busquedaId){
         <div><span class="lbl">Presupuesto</span><span class="val">${esc(precioMax? fmtMoney(precioMax,b.moneda||'ARS') : '—')}</span></div>
         <div><span class="lbl">Urgencia</span><span class="val">${esc(c.urgencia||'—')}</span></div>
       </div>
-      <div class="propdetail-actions">
+      <div class="vehdetail-actions">
         ${waHref ? `<button class="btn btn-solid" onclick="window.open('${waHref}','_blank')"><i class="fa-brands fa-whatsapp"></i> Contactar Agencia</button>` : ''}
-        <button class="btn" onclick="closeModal('propdetail')">Cerrar</button>
+        <button class="btn" onclick="closeModal('vehdetail')">Cerrar</button>
       </div>
     </div>
   `;
-  openModal('propdetail');
+  openModal('vehdetail');
 }
 
 // Semáforo de antigüedad: usa los umbrales configurados por la agencia (o 15/30 por defecto)
@@ -10180,8 +10367,8 @@ explorar: ()=>`
     <button class="btn ${!exploreSoloMiStock?'btn-solid':''}" onclick="setExploreSoloMiStock(false)"><i class="fa-solid fa-globe"></i> Ver toda la red</button>
     <button class="btn ${exploreSoloMiStock?'btn-solid':''}" onclick="setExploreSoloMiStock(true)"><i class="fa-solid fa-warehouse"></i> Ver mi stock</button>
   </div>
-  <div class="listing-grid">
-    ${sortProps(_exploreFiltrados(), exploreSort).map(v=>listingCardReal(v)).join('') || `<div class="card"><p style="color:var(--paper-dim);margin:0;">No hay vehículos que coincidan con estos filtros.</p></div>`}
+  <div class="vehicle-grid">
+    ${sortVehicles(_exploreFiltrados(), exploreSort).map(v=>vehicleCardReal(v)).join('') || `<div class="card"><p style="color:var(--paper-dim);margin:0;">No hay vehículos que coincidan con estos filtros.</p></div>`}
   </div>
 `,
 
@@ -10305,7 +10492,7 @@ matches: ()=>{
     // Sin selector busco/vendo acá: es una lista de vehículos favoritos, no de matches.
     const favs = redStock.filter(v=>misIntereses.includes(v.id));
     body = favs.length
-      ? `<div class="listing-grid" id="favoritas-grid">${favs.map(v=>listingCardReal(v)).join('')}</div>`
+      ? `<div class="vehicle-grid" id="favoritas-grid">${favs.map(v=>vehicleCardReal(v)).join('')}</div>`
       : `<div class="card"><p style="color:var(--paper-dim);margin:0;">Todavía no marcaste vehículos como favoritos. Usá el ícono de corazón en <a style="color:var(--red-dark);cursor:pointer;" onclick="showApp('explorar')">Explorar la Red</a>.</p></div>`;
   } else if(matchesTab==='concretadas'){
     const concretadasFiltradas = concretadas.filter(m => enMesFiltroMatches(m.cerradoAtRaw));
@@ -10430,10 +10617,10 @@ clientes: ()=>{
 exclusiva: ()=>{
   const alerta = redGremioReal.length ? `<div class="banner"><div class="banner-left"><i class="fa-solid fa-gem" style="font-size:22px;color:var(--red);"></i><div class="txt"><strong>${redGremioReal.length} oportunidad${redGremioReal.length===1?'':'es'} exclusiva${redGremioReal.length===1?'':'s'} disponible${redGremioReal.length===1?'':'s'} en la red</strong><span>Precios especiales que otras agencias comparten solo con colegas.</span></div></div></div>` : '';
   const listaMis = misGremioReal.length
-    ? `<div class="listing-grid">${misGremioReal.map(v=>gremioCardHTML(v, true)).join('')}</div>`
+    ? `<div class="vehicle-grid">${misGremioReal.map(v=>gremioCardHTML(v, true)).join('')}</div>`
     : `<div class="card"><p style="color:var(--paper-dim);margin:0;">Todavía no publicaste ningún precio gremio. Usá "Publicar Precio Gremio" para ofrecerle un descuento especial al resto de la red sobre un auto que no se mueve.</p></div>`;
   const listaRed = redGremioReal.length
-    ? `<div class="listing-grid">${redGremioReal.map(v=>gremioCardHTML(v, false)).join('')}</div>`
+    ? `<div class="vehicle-grid">${redGremioReal.map(v=>gremioCardHTML(v, false)).join('')}</div>`
     : `<div class="card"><p style="color:var(--paper-dim);margin:0;">Ninguna otra agencia tiene publicado un precio gremio por el momento.</p></div>`;
   return `
   <div class="main-head"><div><h1>Oportunidades Exclusivas</h1><p class="sub">Precios especiales que solo se comparten dentro de la red</p></div>
@@ -10468,6 +10655,7 @@ proveedores: ()=>{
     <button class="btn btn-sm ${!proveedorRubroFiltro?'btn-solid':''}" onclick="filtrarProveedoresPorRubro(null)">Todos</button>
     ${rubros.map(r=>`<button class="btn btn-sm ${proveedorRubroFiltro===r?'btn-solid':''}" onclick="filtrarProveedoresPorRubro('${r}')">${r}</button>`).join('')}
   </div>` : ''}
+  <div class="prov-benefits-banner"><div class="prov-benefits-title">Beneficios de asociados de la red</div></div>
   <div id="proveedores-lista">${proveedoresListaHTML()}</div>
 `;
 },
@@ -10739,49 +10927,7 @@ usuarios: ()=>{
   </div>
 `;},
 
-faqapp: ()=>`
-  <div class="faq-centered-wrap">
-    <div class="faq-centered-head">
-      <h1>Preguntas frecuentes</h1>
-      <p class="sub">Todo lo que necesitás saber para operar en la red</p>
-    </div>
-    <div class="faq-centered-list">
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Qué es Red de Autos?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Es la red B2B que conecta concesionarias del NOA para compartir stock de vehículos y búsquedas de clientes, generando matches automáticos entre lo que una concesionaria tiene y lo que otra necesita.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Cómo me uno a la red?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Necesitás un código de invitación. Con él completás los datos de tu concesionaria y tu cuenta queda pendiente de verificación por nuestro equipo antes de activarse.</p></div></div>
-
-      <div class="faq-c-item faq-c-open"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Cómo funciona el sistema de matches?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>El sistema cruza tu stock y tus clientes contra las búsquedas y vehículos de toda la red. Cuando hay compatibilidad de tipo, ciudad, operación y presupuesto, se genera un match automático.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Cómo funcionan los matches manuales?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Además de los matches automáticos, podés contactar directamente a una agencia desde una card en Explorar la Red o en Oportunidades Exclusivas. Ese contacto también queda registrado — en "Matches Manuales", separado de "Mis Matches" para no mezclarlo con los automáticos — con su propio seguimiento. Si le vas a llevar un cliente, funciona igual que un match automático (con comisión de por medio); si el interés es tuyo, para comprarlo o consultarlo vos mismo, lo marcás como una consulta directa y queda sin comisión ni cliente asociado.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Solo puedo vender o también puedo comprar?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Podés hacer ambas cosas: publicar vehículos de venta o consignación que tengas en tu stock, y también cargar clientes que buscan comprar o consignar algo que no tenés, para que la red te avise si otra concesionaria lo tiene.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Cómo se fija la comisión?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Al publicar un vehículo, vos definís el porcentaje (o monto) que estás dispuesto a pagarle a la concesionaria que traiga al comprador o consignante. Ese dato queda visible al producirse el match.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Quién le paga la comisión a quién?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>La concesionaria que tiene el vehículo le paga la comisión a la que trajo al comprador o consignante, según el porcentaje definido al publicar.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Qué pasa si la otra agencia no paga la comisión?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Podés reportarlo desde el botón "Denunciar" en Concesionarias Asociadas. El equipo evalúa cada caso y puede advertir, suspender o dar de baja a la concesionaria infractora.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Red de Autos interviene en la operación?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>No. Facilitamos el contacto entre concesionarias y el seguimiento del match, pero el acuerdo económico y la operación en sí son siempre directos entre las partes.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Qué diferencia hay entre Plan Pro y Premium?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>El Plan Pro es autogestión: vos cargás y actualizás tu stock y tus clientes. El Plan Premium incluye todo eso más un equipo que carga y mantiene tu stock al día, con soporte prioritario.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Cómo contrato el Plan Premium?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Desde Mi Perfil, en la sección "Plan actual", elegís Plan Premium y nuestro equipo se pone en contacto para coordinar el cambio y el relevamiento inicial de tu stock.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Cómo funcionan los anuncios destacados?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Es un beneficio automático del Plan Premium: tus vehículos aparecen primero en Explorar la Red (antes que los de cualquier agencia Pro, sin importar el orden que elija quien está mirando) y llevan una estrella distintiva en la card. No hay que activarlo ni elegir qué auto destacar — aplica solo a todo tu stock mientras tengas el Plan Premium.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Puedo cambiar en cualquier momento?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Sí, podés cambiar de plan cuando quieras desde Mi Perfil. El cambio se hace efectivo en el siguiente ciclo de facturación.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Mis datos y mi stock de vehículos son visibles para todos?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Tu stock de vehículos sí es visible para toda la red (es lo que permite generar matches), pero las fotos completas y tus datos de contacto quedan protegidos hasta que se produce un match real.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Los datos de mis clientes son visibles para todos?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>No. Los datos de contacto de tus clientes son siempre privados. Solo se comparten los criterios de búsqueda necesarios para generar el match (tipo de vehículo, zona, presupuesto).</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Qué pasa con mi calificación?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Otras concesionarias pueden calificarte y dejarte reviews después de colaborar en una operación. Esa calificación queda visible en "Concesionarias Asociadas" y construye tu reputación dentro de la red.</p></div></div>
-
-      <div class="faq-c-item"><button class="faq-c-q" onclick="toggleFaqC(this)"><span>¿Puedo ser dado de baja de la red?</span><i class="fa-solid fa-plus chev"></i></button><div class="faq-c-a"><p>Sí. Si no cumplís los Términos y Condiciones —por ejemplo, no pagar una comisión acordada— el equipo puede advertir, suspender o dar de baja tu cuenta según la gravedad del caso.</p></div></div>
-    </div>
-  </div>
-`,
+faqapp: ()=> renderFaqApp(),
 
 precios: ()=>`
   <div class="main-head"><div><h1>Precios</h1><p class="sub">Elegí el plan que mejor se adapta a tu agencia</p></div></div>
