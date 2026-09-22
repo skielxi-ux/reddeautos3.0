@@ -553,6 +553,65 @@
   .match-section-title:first-child{margin-top:0;}
   .match-section-title i{color:var(--red);}
   .match-section-count{background:var(--ink-3);color:var(--paper-dim);font-size:12px;font-weight:700;padding:2px 9px;border-radius:10px;margin-left:auto;}
+
+  /* ---- Match card v2 (rediseño con topbar, vehículo, flujo de agencias, stepper y banner de acciones) ---- */
+  .mc-card{background:#fff;border:1px solid #E7E7EA;border-radius:18px;padding:22px;margin-bottom:22px;box-shadow:0 2px 10px rgba(16,24,40,.05);}
+  .mc-eyebrow{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--paper-dim);margin:0 0 3px;}
+  .mc-topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid #EFEFF1;flex-wrap:wrap;}
+  .mc-topbar-left{display:flex;align-items:center;gap:12px;}
+  .mc-topbar-icon{width:36px;height:36px;border-radius:50%;background:#F5F5F6;color:var(--paper-dim);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+  .mc-topbar-title{font-size:14px;font-weight:700;color:var(--ink);}
+  .mc-status-pill{font-size:11.5px;font-weight:700;padding:6px 14px;border-radius:20px;white-space:nowrap;}
+  .mc-status-pill.yellow{background:#FEF7E0;color:#8A6D1B;}
+  .mc-status-pill.green{background:#f0fdf4;color:#166534;}
+  .mc-status-pill.red{background:#FEF2F2;color:#991B1B;}
+  .mc-status-pill.gray{background:#F5F5F6;color:var(--paper-dim);}
+
+  .mc-vehicle{display:flex;align-items:center;gap:16px;padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid #EFEFF1;flex-wrap:wrap;}
+  .mc-vehicle-photo{width:96px;height:96px;border-radius:14px;overflow:hidden;background:var(--ink-3);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--paper-dim);font-size:26px;}
+  .mc-vehicle-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .mc-vehicle-info{flex:1;min-width:180px;}
+  .mc-vehicle-title{font-size:19px;font-weight:800;color:var(--ink);line-height:1.2;margin:0 0 4px;}
+  .mc-vehicle-specs{font-size:12.5px;color:var(--paper-dim);margin:0 0 6px;}
+  .mc-vehicle-price{font-size:15px;font-weight:800;color:var(--red-dark);}
+  .mc-vehicle-cta{flex-shrink:0;}
+
+  .mc-section{margin-bottom:22px;}
+  .mc-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+  .mc-section-title{font-size:16px;font-weight:800;color:var(--ink);}
+  .mc-agencies-count{font-size:12px;color:var(--paper-dim);display:flex;align-items:center;gap:6px;white-space:nowrap;}
+  .mc-agencies-count i{color:var(--red);font-size:8px;}
+
+  .mc-flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;}
+  .mc-node{flex:1 1 160px;background:#FAFAFB;border:1px solid #EDEDEF;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;min-width:150px;}
+  .mc-node.highlight{border-color:var(--red);background:#FFF6F6;}
+  .mc-node .dot-icon{width:38px;height:38px;border-radius:50%;background:var(--ink-3);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:14px;border:1px solid var(--line-strong);flex-shrink:0;overflow:hidden;}
+  .mc-node .dot-icon img{width:100%;height:100%;object-fit:cover;display:block;}
+  .mc-node .dot-agency-fallback{background:var(--red);border-color:var(--red);color:#FFFFFF;font-weight:800;font-size:15px;}
+  .mc-node-name{font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.25;}
+  .mc-node-role{font-size:11.5px;color:var(--paper-dim);margin-top:2px;}
+  .mc-node-link{font-size:11px;font-weight:700;color:var(--red);text-decoration:none;margin-top:3px;display:inline-block;cursor:pointer;}
+  .mc-node-pill{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;background:var(--red);color:#fff;padding:2px 8px;border-radius:20px;margin-top:4px;}
+  .mc-flow-connector{flex:0 0 24px;min-width:16px;align-self:center;height:2px;background:linear-gradient(to right,#EDEDEF,var(--red),#EDEDEF);}
+  @media (max-width:640px){ .mc-flow{flex-direction:column;} .mc-flow-connector{width:2px;height:18px;margin:0 auto;background:linear-gradient(to bottom,#EDEDEF,var(--red),#EDEDEF);} }
+
+  .mc-stepper-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .mc-stepper{display:flex;align-items:flex-start;flex:1 1 320px;}
+  .mc-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;text-align:center;}
+  .mc-step-line{position:absolute;top:19px;left:-50%;width:100%;height:2px;background:#EDEDEF;z-index:0;}
+  .mc-step:first-child .mc-step-line{display:none;}
+  .mc-step.done .mc-step-line{background:var(--red);}
+  .mc-step-dot{width:38px;height:38px;border-radius:50%;background:#F5F5F6;border:2px solid #EDEDEF;color:var(--paper-dim);display:flex;align-items:center;justify-content:center;font-size:14px;position:relative;z-index:1;}
+  .mc-step.done .mc-step-dot{background:#22C55E;border-color:#22C55E;color:#fff;}
+  .mc-step.current .mc-step-dot{background:#fff;border-color:var(--red);color:var(--red);box-shadow:0 0 0 4px #FDEDED;}
+  .mc-step-label{font-size:11.5px;font-weight:600;color:var(--paper-dim);margin-top:8px;max-width:90px;line-height:1.3;}
+  .mc-step.done .mc-step-label,.mc-step.current .mc-step-label{color:var(--ink);font-weight:700;}
+  .mc-step-current-tag{font-size:10px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.02em;margin-top:2px;}
+  .mc-notes{display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex:0 0 auto;}
+
+  .mc-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:#FAFAFB;border:1px solid #EDEDEF;border-radius:14px;padding:16px 18px;margin-top:20px;}
+  .mc-banner-primary{flex:1 1 260px;display:flex;flex-direction:column;gap:10px;}
+  .mc-banner-secondary{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto;}
   .avatar-circle svg{width:100%;height:100%;display:block;}
   .avatar-picker-trigger{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
   .client-type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;}
@@ -694,6 +753,103 @@
   .plan-choice-btn.plan-choice-danger .plan-choice-name{color:#E2726B;}
   .plan-choice-name{font-weight:700;font-size:15px;color:var(--ink);}
   .plan-choice-desc{font-size:12px;color:var(--paper-dim);line-height:1.4;}
+
+  /* ---- Mi Perfil v2 (layout tipo dashboard SaaS, con sidebar "En esta página") ---- */
+  .mp-breadcrumb{font-size:12px;color:var(--paper-dim);margin-bottom:10px;}
+  .mp-breadcrumb b{color:var(--ink);font-weight:600;}
+  .mp-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
+  .mp-header h1{font-family:var(--font-display);font-size:30px;font-weight:900;margin:0 0 4px;color:var(--ink);}
+  .mp-header .sub{color:var(--paper-dim);font-size:13.5px;margin:0;}
+  .mp-header .btn{border-radius:10px;}
+
+  .mp-identity-card{
+    background:#fff;border:1px solid #E7E7EA;border-radius:16px;padding:18px 22px;
+    display:flex;align-items:center;gap:16px;margin-bottom:20px;
+    box-shadow:0 1px 2px rgba(16,24,40,.04);
+  }
+  .mp-identity-logo{width:56px;height:56px;border-radius:12px;flex-shrink:0;}
+  .mp-identity-info{flex:1;min-width:0;}
+  .mp-identity-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .mp-identity-name-row strong{font-size:16.5px;font-weight:800;color:var(--ink);}
+  .mp-identity-desc{font-size:12.5px;color:var(--paper-dim);margin:3px 0 0;}
+  .mp-badge-verificado{
+    display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+    color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:3px 9px;border-radius:20px;
+  }
+  .mp-identity-card .btn{border-radius:10px;white-space:nowrap;}
+
+  .mp-shell{display:grid;grid-template-columns:1fr 260px;gap:20px;align-items:start;}
+  @media (max-width:900px){ .mp-shell{grid-template-columns:1fr;} .mp-aside{position:static !important;order:-1;} }
+
+  .mp-card{
+    background:#fff;border:1px solid #E7E7EA;border-radius:16px;padding:22px 24px;margin-bottom:20px;
+    box-shadow:0 1px 2px rgba(16,24,40,.04);
+  }
+  .mp-card-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;}
+  .mp-card-icon{
+    width:34px;height:34px;border-radius:10px;background:#FDEDED;color:var(--red);
+    display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;
+  }
+  .mp-card-title{font-size:15.5px;font-weight:800;color:var(--ink);margin:0 0 2px;}
+  .mp-card-desc{font-size:12.5px;color:var(--paper-dim);margin:0;line-height:1.45;}
+
+  .mp-fotos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;}
+  .mp-fotos-grid .profile-foto-local-item:first-child::after{
+    content:'Portada';position:absolute;left:6px;bottom:6px;background:var(--red);color:#fff;
+    font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;letter-spacing:.02em;
+  }
+
+  .mp-banner-ok{
+    display:flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;
+    font-size:12.5px;font-weight:600;padding:10px 14px;border-radius:10px;margin-top:2px;
+  }
+  .mp-banner-warn{
+    display:flex;align-items:center;gap:8px;background:#FEF9E7;border:1px solid #FAE3A0;color:#8A6D1B;
+    font-size:12.5px;font-weight:600;padding:10px 14px;border-radius:10px;margin-top:2px;
+  }
+
+  .mp-plan-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  @media (max-width:640px){ .mp-plan-grid{grid-template-columns:1fr;} }
+  .mp-plan-card{
+    position:relative;text-align:left;background:#fff;border:1.5px solid #E7E7EA;border-radius:14px;
+    padding:16px;cursor:pointer;display:flex;flex-direction:column;gap:5px;
+  }
+  .mp-plan-card.selected{border-color:var(--red);background:#FFF9F9;}
+  .mp-plan-card.selected .mp-plan-check{
+    position:absolute;top:12px;right:12px;width:18px;height:18px;border-radius:50%;background:var(--red);
+    color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;
+  }
+  .mp-plan-card.danger{border-color:#F3D4D2;}
+  .mp-plan-card.danger:hover{border-color:#E2726B;background:#FDEDEC;}
+  .mp-plan-card.danger .mp-plan-name{color:#C62828;}
+  .mp-plan-name{font-weight:700;font-size:14.5px;color:var(--ink);}
+  .mp-plan-desc{font-size:11.5px;color:var(--paper-dim);line-height:1.4;}
+
+  .mp-btn-outline{
+    background:#fff;border:1px solid #D8D8DC;color:var(--ink);font-weight:600;font-size:13px;
+    padding:9px 16px;border-radius:10px;cursor:pointer;
+  }
+  .mp-btn-outline:hover{border-color:var(--red);color:var(--red);}
+
+  .mp-subhead{font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;}
+  .mp-subdesc{font-size:12.5px;color:var(--paper-dim);margin:0 0 14px;line-height:1.5;}
+  .mp-divider{border-top:1px solid #EEEEEE;margin:22px 0;}
+
+  .mp-aside{position:sticky;top:20px;}
+  .mp-aside-card{
+    background:#fff;border:1px solid #E7E7EA;border-radius:16px;padding:18px;
+    box-shadow:0 1px 2px rgba(16,24,40,.04);
+  }
+  .mp-aside-eyebrow{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;color:var(--paper-dim);margin:0 0 10px;text-transform:uppercase;}
+  .mp-aside-nav{display:flex;flex-direction:column;gap:2px;margin-bottom:18px;}
+  .mp-aside-nav a{
+    font-size:13px;color:var(--ink);padding:7px 8px;border-radius:8px;cursor:pointer;text-decoration:none;
+  }
+  .mp-aside-nav a:hover{background:#F5F5F6;color:var(--red);}
+  .mp-aside-progress-label{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 8px;}
+  .mp-progress-track{height:7px;border-radius:20px;background:#EDEDEF;overflow:hidden;}
+  .mp-progress-fill{height:100%;background:#22C55E;border-radius:20px;transition:width .3s ease;}
+  .mp-aside-progress-note{font-size:11.5px;color:var(--paper-dim);margin:8px 0 0;line-height:1.45;}
 
   /* ---- FAQ centered accordion (estilo Tailwind) ---- */
   .faq-centered-wrap{max-width:680px;margin:0 auto;padding:10px 0 40px;}
@@ -1912,6 +2068,10 @@
         <option value="basico">Básico</option>
         <option value="destacado">Destacado (aparece primero en el directorio y con distintivo)</option>
       </select>
+    </div>
+    <div id="prov-descuento-row" class="field hidden" style="border-top:1px solid var(--line);padding-top:16px;margin-top:4px;">
+      <label>Descuento</label>
+      <button type="button" class="btn btn-sm" id="prov-descuento-btn" onclick="abrirDescuentoProveedorAdmin(document.getElementById('prov-id').value)"><i class="fa-solid fa-tag"></i> Gestionar descuento</button>
     </div>
     <div class="modal-close-row">
       <button class="btn" onclick="closeModal('proveedor')">Cancelar</button>
@@ -5443,7 +5603,7 @@ async function cargarDatosAdmin(view){
 
 // Clics de "mapa" y "whatsapp" de los últimos 30 días, por proveedor — esto es lo que se le
 // puede mostrar de informe a un proveedor que paga el plan Destacado, como prueba de alcance.
-let ADMIN_STATS_CLICS_PROVEEDORES = {}; // { proveedorId: { whatsapp, mapa } }
+let ADMIN_STATS_CLICS_PROVEEDORES = {}; // { proveedorId: { whatsapp, mapa, descuento } }
 async function cargarStatsClicsProveedores(){
   ADMIN_STATS_CLICS_PROVEEDORES = {};
   const ids = ADMIN_PROVEEDORES.map(p => p.id);
@@ -5457,9 +5617,10 @@ async function cargarStatsClicsProveedores(){
     .gte('created_at', desde);
   if (error) { console.warn('cargarStatsClicsProveedores:', error); return; }
   (data || []).forEach(ev => {
-    const s = (ADMIN_STATS_CLICS_PROVEEDORES[ev.objeto_id] ||= { whatsapp: 0, mapa: 0 });
+    const s = (ADMIN_STATS_CLICS_PROVEEDORES[ev.objeto_id] ||= { whatsapp: 0, mapa: 0, descuento: 0 });
     if (ev.tipo_evento === 'whatsapp') s.whatsapp++;
     else if (ev.tipo_evento === 'mapa') s.mapa++;
+    else if (ev.tipo_evento === 'descuento') s.descuento++;
   });
 }
 
@@ -5855,10 +6016,10 @@ function proveedorAdminRubroOptionsHTML(){
 function proveedoresAdminRowsHTML(list){
   if (!list.length) return `<tr><td colspan="7" class="empty-row">${ADMIN_PROVEEDORES.length ? 'Ningún proveedor coincide con el filtro.' : 'Todavía no hay proveedores cargados. Hacé clic en "Agregar proveedor" para cargar el primero.'}</td></tr>`;
   return list.map(p => {
-    const clics = ADMIN_STATS_CLICS_PROVEEDORES[p.id] || { whatsapp: 0, mapa: 0 };
-    const clicsHTML = (clics.whatsapp === 0 && clics.mapa === 0)
+    const clics = ADMIN_STATS_CLICS_PROVEEDORES[p.id] || { whatsapp: 0, mapa: 0, descuento: 0 };
+    const clicsHTML = (clics.whatsapp === 0 && clics.mapa === 0 && !clics.descuento)
       ? `<span style="font-size:11.5px;color:var(--paper-dim);">Sin clics aún</span>`
-      : `<span style="font-size:12.5px;white-space:nowrap;" title="Últimos 30 días: clics en WhatsApp · clics en Mapa"><i class="fa-brands fa-whatsapp"></i> ${esc(clics.whatsapp)} · <i class="fa-solid fa-location-dot"></i> ${esc(clics.mapa)}</span>`;
+      : `<span style="font-size:12.5px;white-space:nowrap;" title="Últimos 30 días: clics en WhatsApp · clics en Mapa · clics en Descuento"><i class="fa-brands fa-whatsapp"></i> ${esc(clics.whatsapp)} · <i class="fa-solid fa-location-dot"></i> ${esc(clics.mapa)} · <i class="fa-solid fa-tag"></i> ${esc(clics.descuento||0)}</span>`;
     return `<tr>
     <td style="font-weight:700;">${esc(p.nombre)}</td>
     <td>${esc(p.rubro || '—')}</td>
@@ -5869,7 +6030,6 @@ function proveedoresAdminRowsHTML(list){
     <td>${adminStatusPill(p.estado === 'activo' ? 'Activo' : 'Inactivo')}${descuentoVigente(p) ? ' <span class="pill pill-sage" style="margin-left:4px;"><i class="fa-solid fa-tag"></i> Descuento activo</span>' : ''}</td>
     <td style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn btn-sm btn-editar-violeta btn-hover-fill" onclick="editarProveedorAdmin('${p.id}')"><i class="fa-solid fa-pen"></i> Editar</button>
-      <button class="btn btn-sm" onclick="abrirDescuentoProveedorAdmin('${p.id}')"><i class="fa-solid fa-tag"></i> Descuento</button>
       <button class="btn btn-sm ${esc(p.estado==='activo'?'btn-eliminar-pastel':'whatsapp-btn')}" onclick="toggleEstadoProveedor('${p.id}', ${p.estado==='activo'})"><i class="fa-solid ${p.estado==='activo'?'fa-ban':'fa-rotate-left'}"></i> ${p.estado==='activo'?'Desactivar':'Reactivar'}</button>
       <button class="btn btn-sm btn-eliminar-pastel" onclick="eliminarProveedorAdmin('${p.id}','${escJs(p.nombre)}')"><i class="fa-solid fa-trash"></i> Eliminar</button>
     </td>
@@ -5900,6 +6060,7 @@ function openNuevoProveedorModal(){
   proveedorLogoDataUrl = null;
   document.getElementById('prov-logo-input').value = '';
   document.getElementById('prov-logo-preview').innerHTML = '<i class="fa-solid fa-shop"></i>';
+  document.getElementById('prov-descuento-row').classList.add('hidden');
   openModal('proveedor');
 }
 function editarProveedorAdmin(id){
@@ -5917,6 +6078,11 @@ function editarProveedorAdmin(id){
   proveedorLogoDataUrl = null;
   document.getElementById('prov-logo-input').value = '';
   document.getElementById('prov-logo-preview').innerHTML = p.foto_url ? `<img src="${p.foto_url}" style="width:100%;height:100%;object-fit:cover;">` : '<i class="fa-solid fa-shop"></i>';
+  document.getElementById('prov-descuento-row').classList.remove('hidden');
+  const descBtn = document.getElementById('prov-descuento-btn');
+  descBtn.innerHTML = descuentoVigente(p)
+    ? `<i class="fa-solid fa-tag"></i> Gestionar descuento <span class="pill pill-sage" style="margin-left:4px;">Activo</span>`
+    : `<i class="fa-solid fa-tag"></i> Gestionar descuento`;
   openModal('proveedor');
 }
 async function guardarProveedorAdmin(){
@@ -6900,13 +7066,26 @@ function renderMatchPipelineStepper(etapa, esCompraDirecta){
     return `<div class="pipeline-caida"><i class="fa-solid fa-circle-xmark"></i> Operación caída</div>`;
   }
   const idx = MATCH_PIPELINE_STAGES.findIndex(s => s.key === etapa);
-  return `<div class="pipeline-steps-v">${MATCH_PIPELINE_STAGES.map((s,i)=>`
-    <div class="pipeline-step-v ${i<=idx?'done':''} ${i===idx?'current':''}">
-      ${i<MATCH_PIPELINE_STAGES.length-1?`<div class="pipeline-line-v ${i<idx?'done':''}"></div>`:''}
-      <span class="pipeline-dot-v"><i class="${s.icon.includes('fa-brands')?s.icon:'fa-solid '+s.icon}"></i></span>
-      <span class="pipeline-label-v">${(esCompraDirecta && s.labelCompraDirecta) ? s.labelCompraDirecta : s.label}</span>
+  return `<div class="mc-stepper">${MATCH_PIPELINE_STAGES.map((s,i)=>`
+    <div class="mc-step ${i<idx?'done':''} ${i===idx?'current':''}">
+      <div class="mc-step-line"></div>
+      <span class="mc-step-dot"><i class="${s.icon.includes('fa-brands')?s.icon:'fa-solid '+s.icon}"></i></span>
+      <span class="mc-step-label">${(esCompraDirecta && s.labelCompraDirecta) ? s.labelCompraDirecta : s.label}</span>
+      ${i===idx ? `<span class="mc-step-current-tag">Etapa actual</span>` : ''}
     </div>
   `).join('')}</div>`;
+}
+// Pill de estado general que va arriba a la derecha de la tarjeta de match (topbar).
+function matchStatusPillHTML(m){
+  if (m.estado === 'concretada') return `<span class="mc-status-pill green"><i class="fa-solid fa-circle-check"></i> Concretada</span>`;
+  if (m.estado === 'cancelada') return `<span class="mc-status-pill red"><i class="fa-solid fa-circle-xmark"></i> Caída</span>`;
+  const porEtapa = {
+    propuesta: 'Propuesta enviada',
+    contactado: 'En negociación',
+    visita: 'Visita coordinada',
+    realizada: 'Visita realizada',
+  };
+  return `<span class="mc-status-pill yellow">${esc(porEtapa[m.etapa] || 'En curso')}</span>`;
 }
 
 // Touchpoint 1 del pipeline: la agencia compradora (la que tiene el cliente) tiene que aceptar la
@@ -7329,51 +7508,86 @@ function matchCardHTML(m){
     ? `<strong style="cursor:pointer;" onclick="openMatchClientDetail('${m.id}')">${m.clienteNombre}</strong>`
     : `<strong>${m.clienteNombre}</strong>`;
 
+  const origenLabel = m.origen === 'manual' ? 'Oportunidad compartida' : 'Coincidencia automática';
+  const tercerNodo = m.esCompraDirecta
+    ? `<div class="mc-node">
+        <span class="dot-icon"><i class="fa-solid fa-user"></i></span>
+        <div><div class="mc-node-name">Compra directa</div><div class="mc-node-role">Sin cliente ni comisión</div><div class="mc-node-role" style="margin-top:4px;">Operación entre agencias</div></div>
+      </div>`
+    : `<div class="mc-node">
+        <span class="dot-icon"><i class="fa-solid fa-user"></i></span>
+        <div><div class="mc-node-name">${clienteNombreHTML}</div><div class="mc-node-role">${m.clienteProtegido ? 'Nombre protegido' : 'Cliente'}</div></div>
+      </div>`;
+
   return `
-  <div class="match-row">
-    <div class="match-claim-note"><i class="fa-solid fa-clock"></i> Match del ${m.fecha}</div>
-    <div class="match-vehicle-hero">
-      <div class="stock-thumb" style="width:56px;height:56px;">
-        ${m.vehiculoFoto ? `<img src="${m.vehiculoFoto}" alt="${m.vehiculo}">` : `<i class="fa-solid fa-car"></i>`}
+  <div class="mc-card">
+    <div class="mc-topbar">
+      <div class="mc-topbar-left">
+        <span class="mc-topbar-icon"><i class="fa-solid fa-clock"></i></span>
+        <div>
+          <p class="mc-eyebrow">${esc(origenLabel)}</p>
+          <p class="mc-topbar-title">Match del ${esc(m.fecha)}</p>
+        </div>
       </div>
-      <div>
-        <div class="match-vehicle-title">${m.vehiculo}</div>
-        <div class="match-vehicle-sub">${[m.detalle, m.precio].filter(Boolean).join(' · ')}</div>
-      </div>
+      ${matchStatusPillHTML(m)}
     </div>
-    <div class="match-row-main">
-      <div class="match-flow">
-        <div class="flow-node">
+
+    <div class="mc-vehicle">
+      <div class="mc-vehicle-photo">${m.vehiculoFoto ? `<img src="${m.vehiculoFoto}" alt="${esc(m.vehiculo)}">` : `<i class="fa-solid fa-car"></i>`}</div>
+      <div class="mc-vehicle-info">
+        <p class="mc-eyebrow">Vehículo del match</p>
+        <p class="mc-vehicle-title">${esc(m.vehiculo)}</p>
+        ${m.detalle ? `<p class="mc-vehicle-specs">${esc(m.detalle)}</p>` : ''}
+        ${m.precio ? `<p class="mc-vehicle-price">${esc(m.precio)}</p>` : ''}
+      </div>
+      ${m.vehiculoId ? `<button type="button" class="btn btn-sm mc-vehicle-cta" onclick="openPropertyDetailReal('${m.vehiculoId}')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver publicación</button>` : ''}
+    </div>
+
+    <div class="mc-section">
+      <div class="mc-section-head">
+        <div><p class="mc-eyebrow">Recorrido del match</p><p class="mc-section-title">Agencias participantes</p></div>
+        <span class="mc-agencies-count"><i class="fa-solid fa-circle"></i> 2 agencias conectadas</span>
+      </div>
+      <div class="mc-flow">
+        <div class="mc-node">
           ${agencyAvatarHTML(currentAgencia?.nombre || 'Tu concesionaria', currentAgencia?.logo_url)}
-          <div class="text">
-            <strong class="flow-my-agency">${esc(currentAgencia?.nombre || 'Tu concesionaria')}</strong>
-            <span>${m.soyVendedor ? 'Tu vehículo' : 'Tu búsqueda'}</span>
+          <div>
+            <div class="mc-node-name">${esc(currentAgencia?.nombre || 'Tu concesionaria')}</div>
+            <div class="mc-node-role">${m.soyVendedor ? 'Tu vehículo' : 'Tu búsqueda'}</div>
             ${verVehiculoMio}
           </div>
         </div>
-        <div class="flow-connector"></div>
-        <div class="flow-node">
+        <div class="mc-flow-connector"></div>
+        <div class="mc-node highlight">
           ${agencyAvatarHTML(m.otraAgencia, m.otraAgenciaLogo)}
-          <div class="text"><strong>${esc(m.otraAgencia)}</strong>${m.otraAgenciaVerificada ? `<i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:11px;margin-left:4px;" title="Agencia verificada por Red de Autos"></i>` : ''}<span>${m.soyVendedor ? 'La búsqueda' : 'Tiene el vehículo'}</span>${verVehiculoOtro}</div>
+          <div>
+            <div class="mc-node-name">${esc(m.otraAgencia)}${m.otraAgenciaVerificada ? ` <i class="fa-solid fa-circle-check" style="color:#3897F0;font-size:11px;" title="Agencia verificada por Red de Autos"></i>` : ''}</div>
+            <div class="mc-node-role">${m.soyVendedor ? 'La búsqueda' : 'Tiene el vehículo'}</div>
+            ${verVehiculoOtro}
+          </div>
         </div>
-        <div class="flow-connector"></div>
-        <div class="flow-node">
-          <span class="dot-icon"><i class="fa-solid fa-user"></i></span>
-          <div class="text">${clienteNombreHTML}${m.clienteProtegido ? '<span>Nombre protegido</span>' : (m.esCompraDirecta ? '<span>Sin cliente ni comisión</span>' : '')}</div>
-        </div>
+        <div class="mc-flow-connector"></div>
+        ${tercerNodo}
       </div>
-      ${renderMatchPipelineStepper(m.etapa, m.esCompraDirecta)}
-      <div class="match-actions-row">
-        <div class="match-actions">
-          ${primaryActions}
-          ${volverBtn}
-          ${cerrarCaidaBtn}
-          ${reabrirBtn}
-        </div>
-        ${notas.length ? `<div class="notes-stack">${notas.join('')}</div>` : ''}
-      </div>
-      ${motivoHTML}
     </div>
+
+    <div class="mc-section">
+      <div class="mc-section-head">
+        <div><p class="mc-eyebrow">Estado de la operación</p><p class="mc-section-title">Seguimiento</p></div>
+      </div>
+      <div class="mc-stepper-row">
+        ${renderMatchPipelineStepper(m.etapa, m.esCompraDirecta)}
+        ${notas.length ? `<div class="mc-notes">${notas.join('')}</div>` : ''}
+      </div>
+    </div>
+
+    ${motivoHTML}
+
+    ${(primaryActions || cerrarCaidaBtn || volverBtn || reabrirBtn) ? `
+    <div class="mc-banner">
+      ${primaryActions ? `<div class="mc-banner-primary">${primaryActions}</div>` : ''}
+      <div class="mc-banner-secondary">${volverBtn}${cerrarCaidaBtn}${reabrirBtn}</div>
+    </div>` : ''}
   </div>`;
 }
 
@@ -7975,6 +8189,35 @@ document.addEventListener('click', (e) => {
     cont.classList.add('hidden');
   }
 });
+// Scroll suave a una sección de Mi Perfil desde el nav "En esta página" de la sidebar.
+function mpScrollTo(id){
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+// Calcula qué tan completo está el perfil de la agencia, para la barra de progreso de la
+// sidebar. Pondera los campos que otras agencias ven (logo, fotos, contacto, ubicación).
+function calcPerfilCompletoPct(){
+  if (!currentAgencia) return { pct: 0, falta: 'Completá los datos de tu agencia.' };
+  const campos = [
+    { ok: !!currentAgencia.logo_url, falta: 'un logo' },
+    { ok: !!(currentAgencia.fotos_local && currentAgencia.fotos_local.length), falta: 'fotos de tu local' },
+    { ok: !!currentAgencia.nombre, falta: 'el nombre de la agencia' },
+    { ok: !!currentAgencia.ciudad, falta: 'la ciudad' },
+    { ok: !!currentAgencia.telefono, falta: 'el WhatsApp' },
+    { ok: !!currentAgencia.email, falta: 'el email de contacto' },
+    { ok: !!currentAgencia.direccion, falta: 'la dirección' },
+    { ok: !!currentAgencia.lat, falta: 'confirmar la ubicación en el mapa' },
+    { ok: !!currentAgencia.horarios, falta: 'los horarios de atención' },
+    { ok: !!currentAgencia.contacto, falta: 'el nombre de contacto' },
+  ];
+  const completos = campos.filter(c => c.ok).length;
+  const pct = Math.round((completos / campos.length) * 100);
+  const faltantes = campos.filter(c => !c.ok).map(c => c.falta);
+  const nota = faltantes.length
+    ? `Agregá ${faltantes.slice(0, 2).join(' y ')}${faltantes.length > 2 ? `, entre otros,` : ''} para alcanzar el 100%.`
+    : '¡Tu perfil está completo!';
+  return { pct, nota };
+}
 // Geocodifica la dirección cargada en Mi Perfil (Nominatim/OpenStreetMap) y la guarda en Supabase.
 // El resto del formulario de Mi Perfil todavía no está conectado a datos reales — eso queda para
 // cuando convirtamos esa página completa; por ahora este botón solo persiste la dirección/mapa.
@@ -8514,6 +8757,7 @@ function fmtFechaCortaSimple(dateStr){
 function verDescuentoProveedor(id){
   const p = proveedoresReal.find(x => x.id === id);
   if (!p) return;
+  registrarClicReal('proveedor', id, 'descuento');
   const vigente = descuentoVigente(p);
   const body = document.getElementById('descuentoproveedor-body');
   document.getElementById('descuentoproveedor-nombre').textContent = `Descuentos de ${p.nombre}`;
@@ -10204,117 +10448,178 @@ proveedores: ()=>{
 `;
 },
 
-perfil: ()=>`
-  <div class="main-head"><div><h1>Mi Perfil</h1><p class="sub">Datos de tu agencia en la red</p></div>
-  <button class="btn btn-solid" id="btn-guardar-perfil" onclick="guardarPerfil()"><i class="fa-solid fa-check"></i> Guardar cambios</button></div>
+perfil: ()=>{
+  const { pct, nota } = calcPerfilCompletoPct();
+  return `
+  <div class="mp-page">
+    <div class="mp-breadcrumb">Cuenta <i class="fa-solid fa-chevron-right" style="font-size:8px;margin:0 2px;"></i> <b>Mi perfil</b></div>
+    <div class="mp-header">
+      <div><h1>Mi perfil</h1><p class="sub">Gestioná la información y preferencias de tu agencia.</p></div>
+      <button class="btn btn-solid" id="btn-guardar-perfil" onclick="guardarPerfil()"><i class="fa-solid fa-check"></i> Guardar cambios</button>
+    </div>
 
-  <div class="card profile-form">
-
-    <div class="profile-logo-row">
-      <div class="profile-logo-preview" id="perfil-logo-preview">${currentAgencia?.logo_url ? `<img src="${currentAgencia.logo_url}" alt="Logo">` : '<i class="fa-solid fa-car"></i>'}</div>
-      <div>
-        <input type="file" id="logo-upload" accept="image/*" style="display:none;" onchange="handleLogoUpload(event)">
-        <button class="btn btn-sm" onclick="document.getElementById('logo-upload').click()"><i class="fa-solid fa-upload"></i> Subir logo</button>
-        <p style="font-size:11.5px;color:var(--paper-dim);margin:8px 0 0;">PNG o JPG, se recomienda fondo cuadrado.</p>
-        <p style="font-size:11.5px;color:var(--paper-dim);margin:2px 0 0;">Tamaño ideal: 300x300 píxeles (mínimo 150x150) para que se vea nítido en todo el sistema.</p>
+    <div class="mp-identity-card">
+      <div class="profile-logo-preview mp-identity-logo" id="perfil-logo-preview">${currentAgencia?.logo_url ? `<img src="${currentAgencia.logo_url}" alt="Logo">` : '<i class="fa-solid fa-car"></i>'}</div>
+      <div class="mp-identity-info">
+        <div class="mp-identity-name-row">
+          <strong>${esc(currentAgencia?.nombre || 'Tu agencia')}</strong>
+          ${currentAgencia?.verificada ? `<span class="mp-badge-verificado"><i class="fa-solid fa-circle-check"></i> Perfil verificado</span>` : ''}
+        </div>
+        <p class="mp-identity-desc">Tu identidad visual se muestra en todo el ecosistema de Red de Autos.</p>
       </div>
+      <input type="file" id="logo-upload" accept="image/*" style="display:none;" onchange="handleLogoUpload(event)">
+      <button class="btn btn-sm" onclick="document.getElementById('logo-upload').click()"><i class="fa-solid fa-upload"></i> Cambiar logo</button>
     </div>
 
-    <div class="profile-section-title"><i class="fa-solid fa-images"></i> Fotos del local</div>
-    <p style="font-size:11.5px;color:var(--paper-dim);margin:-4px 0 10px;">Se muestran en tu ficha dentro de Agencias Asociadas — ayudan a que otras agencias confíen en visitar tu local. Hasta 6 fotos.</p>
-    <div class="profile-fotos-local-grid" id="perfil-fotos-local-grid">${renderFotosLocalGrid(currentAgencia?.fotos_local || [])}</div>
-    <input type="file" id="fotos-local-upload" accept="image/*" multiple style="display:none;" onchange="handleFotosLocalUpload(event)">
+    <div class="mp-shell">
+      <div class="mp-main">
 
-    <div class="profile-section-title"><i class="fa-solid fa-car"></i> Datos de la agencia</div>
-    <div class="row-2">
-      <div class="field"><label>Nombre de la agencia</label><input id="perfilNombre" value="${esc(currentAgencia?.nombre ? currentAgencia.nombre.replace(/"/g,'&quot;') : '')}"></div>
-      <div class="field"><label>Ciudad</label>
-        <select id="perfilCiudad">${CIUDADES_RED.map(c=>`<option ${esc(currentAgencia?.ciudad===c?'selected':'')}>${c}</option>`).join('')}</select>
+        <div class="mp-card" id="mp-sec-fotos">
+          <div class="mp-card-head">
+            <div class="mp-card-icon"><i class="fa-solid fa-images"></i></div>
+            <div><p class="mp-card-title">Fotos del local</p><p class="mp-card-desc">Ayudá a otras agencias a reconocerte y confiar en tu local. Podés subir hasta 6 fotos.</p></div>
+          </div>
+          <div class="mp-fotos-grid profile-fotos-local-grid" id="perfil-fotos-local-grid">${renderFotosLocalGrid(currentAgencia?.fotos_local || [])}</div>
+          <input type="file" id="fotos-local-upload" accept="image/*" multiple style="display:none;" onchange="handleFotosLocalUpload(event)">
+        </div>
+
+        <div class="mp-card" id="mp-sec-datos">
+          <div class="mp-card-head">
+            <div class="mp-card-icon"><i class="fa-solid fa-flag"></i></div>
+            <div><p class="mp-card-title">Datos de la agencia</p><p class="mp-card-desc">Información pública que verán otras agencias de la red.</p></div>
+          </div>
+          <div class="row-2">
+            <div class="field"><label>Nombre de la agencia</label><input id="perfilNombre" value="${esc(currentAgencia?.nombre ? currentAgencia.nombre.replace(/"/g,'&quot;') : '')}"></div>
+            <div class="field"><label>Ciudad</label>
+              <select id="perfilCiudad">${CIUDADES_RED.map(c=>`<option ${esc(currentAgencia?.ciudad===c?'selected':'')}>${c}</option>`).join('')}</select>
+            </div>
+          </div>
+        </div>
+
+        <div class="mp-card" id="mp-sec-contacto">
+          <div class="mp-card-head">
+            <div class="mp-card-icon"><i class="fa-solid fa-address-card"></i></div>
+            <div><p class="mp-card-title">Contacto</p><p class="mp-card-desc">Datos para que otras agencias puedan comunicarse con vos.</p></div>
+          </div>
+          <div class="row-3">
+            <div class="field"><label>WhatsApp</label><input id="perfilWhatsapp" value="${esc(currentAgencia?.telefono ? currentAgencia.telefono.replace(/"/g,'&quot;') : '')}" placeholder="+54 9 ..."></div>
+            <div class="field"><label>Email</label><input id="perfilEmail" value="${esc(currentAgencia?.email ? currentAgencia.email.replace(/"/g,'&quot;') : '')}" placeholder="contacto@agencia.com"></div>
+            <div class="field" style="position:relative;"><label>Dirección</label>
+              <input id="perfilDireccion" value="${esc(currentAgencia?.direccion ? currentAgencia.direccion.replace(/"/g,'&quot;') : '')}" placeholder="Calle y altura, ciudad" oninput="onDireccionInputChange(this)" autocomplete="off">
+              <input type="hidden" id="perfilDireccionLat" value="${currentAgencia?.lat || ''}">
+              <input type="hidden" id="perfilDireccionLon" value="${currentAgencia?.lon || ''}">
+              <div id="perfilDireccionSugerencias" class="direccion-sugerencias hidden"></div>
+            </div>
+          </div>
+          <div class="row-2">
+            <div class="field"><label>Horarios de atención</label><input id="perfilHorarios" value="${esc(currentAgencia?.horarios ? currentAgencia.horarios.replace(/"/g,'&quot;') : '')}" placeholder="Ej: Lun a Vie 9 a 18hs, Sáb 9 a 13hs"></div>
+            <div class="field"><label>Nombre de contacto</label><input id="perfilContacto" value="${esc(currentAgencia?.contacto ? currentAgencia.contacto.replace(/"/g,'&quot;') : '')}" placeholder="A quién preguntar en el local"></div>
+          </div>
+          <div id="perfilDireccionEstado">${currentAgencia?.lat
+            ? `<div class="mp-banner-ok"><i class="fa-solid fa-circle-check"></i> Ubicación verificada y visible en el mapa de tus vehículos.</div>`
+            : `<div class="mp-banner-warn"><i class="fa-solid fa-triangle-exclamation"></i> Todavía no cargaste tu ubicación — el mapa del detalle no va a mostrar nada hasta que guardes una dirección.</div>`}</div>
+        </div>
+
+        <div class="mp-card" id="mp-sec-plan">
+          <div class="mp-card-head">
+            <div class="mp-card-icon"><i class="fa-solid fa-star"></i></div>
+            <div><p class="mp-card-title">Plan actual</p><p class="mp-card-desc">Administrá el nivel de servicio de tu agencia.</p></div>
+          </div>
+          <div class="mp-plan-grid">
+            <button class="mp-plan-card ${currentAgencia?.plan!=='premium'?'selected':''}" onclick="solicitarCambioPlan('pro')" ${currentAgencia?.plan!=='premium'?'disabled':''}>
+              ${currentAgencia?.plan!=='premium' ? `<span class="mp-plan-check"><i class="fa-solid fa-check"></i></span>` : ''}
+              <span class="mp-plan-name">Plan Pro</span>
+              <span class="mp-plan-desc">${currentAgencia?.plan!=='premium' ? 'Tu plan actual' : 'Solicitar volver a Pro'}</span>
+            </button>
+            <button class="mp-plan-card ${currentAgencia?.plan==='premium'?'selected':''}" onclick="solicitarCambioPlan('premium')" ${currentAgencia?.plan==='premium'?'disabled':''}>
+              ${currentAgencia?.plan==='premium' ? `<span class="mp-plan-check"><i class="fa-solid fa-check"></i></span>` : ''}
+              <span class="mp-plan-name">Plan Premium</span>
+              <span class="mp-plan-desc">${currentAgencia?.plan==='premium' ? 'Tu plan actual' : 'Gestión de stock + soporte prioritario'}</span>
+            </button>
+            <button class="mp-plan-card danger" onclick="abrirSolicitudBaja()">
+              <span class="mp-plan-name">Dar de baja</span>
+              <span class="mp-plan-desc">Cancelar tu cuenta en la red</span>
+            </button>
+          </div>
+          <p style="font-size:11.5px;color:var(--paper-dim);margin:14px 0 0;">Los cambios de plan y las bajas las gestiona el equipo de Red de Autos. Recibirás una confirmación por email.</p>
+        </div>
+
+        <div class="mp-card" id="mp-sec-seguridad">
+          <div class="mp-card-head">
+            <div class="mp-card-icon"><i class="fa-solid fa-lock"></i></div>
+            <div><p class="mp-card-title">Seguridad</p><p class="mp-card-desc">Actualizá tu contraseña para proteger tu cuenta.</p></div>
+          </div>
+          <div class="row-3">
+            <div class="field"><label>Contraseña actual</label><input type="password" id="pw-actual" placeholder="••••••••"></div>
+            <div class="field"><label>Nueva contraseña</label><input type="password" id="pw-nueva" placeholder="••••••••"></div>
+            <div class="field"><label>Confirmar contraseña</label><input type="password" id="pw-confirmar" placeholder="••••••••"></div>
+          </div>
+          <button class="mp-btn-outline" onclick="updatePassword()">Actualizar contraseña</button>
+        </div>
+
+        <div class="mp-card" id="mp-sec-config">
+          <div class="mp-card-head">
+            <div class="mp-card-icon"><i class="fa-solid fa-gear"></i></div>
+            <div><p class="mp-card-title">Configuración</p><p class="mp-card-desc">Personalizá cómo trabaja la plataforma para tu agencia.</p></div>
+          </div>
+
+          <p class="mp-subhead">Semáforo de antigüedad en stock</p>
+          <p class="mp-subdesc">Definí cuántos días tarda un vehículo en pasar de verde a amarillo, y luego a rojo en Mi Stock.</p>
+          <div class="row-2">
+            <div class="field"><label>🟢 Verde hasta (días)</label><input type="number" id="cfg-verde-dias" value="${currentAgencia?.semaforo_dias_verde ?? 15}"></div>
+            <div class="field"><label>🟡 Amarillo hasta (días)</label><input type="number" id="cfg-amarillo-dias" value="${currentAgencia?.semaforo_dias_amarillo ?? 30}"></div>
+          </div>
+          <p style="font-size:12px;color:var(--paper-dim);margin:0;">🔴 Rojo: a partir del día siguiente al límite amarillo.</p>
+
+          <div class="mp-divider"></div>
+
+          <p class="mp-subhead">Mensaje de WhatsApp precargado</p>
+          <p class="mp-subdesc">Usá las variables <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{agencia}</code> y <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{vehiculo}</code> para personalizar automáticamente el mensaje.</p>
+          <textarea id="cfg-whatsapp-msg" rows="3">${currentAgencia?.whatsapp_template ? currentAgencia.whatsapp_template.replace(/</g,'&lt;') : 'Hola {agencia}, vi el {vehiculo} en Red de Autos y me interesa. ¿Podés darme más info?'}</textarea>
+
+          <div class="mp-divider"></div>
+
+          <div class="row-2">
+            <div>
+              <p class="mp-subhead">Comisión sugerida por defecto</p>
+              <select id="cfg-comision-default">
+                ${['1%','1,5%','2%','2,5%','3%'].map(c=>`<option ${(currentAgencia?.comision_default||'3%')===c?'selected':''}>${c}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <p class="mp-subhead">Moneda por defecto</p>
+              <select id="cfg-moneda-default">
+                <option ${(currentAgencia?.moneda_default||'USD')==='ARS'?'selected':''}>ARS</option>
+                <option ${(currentAgencia?.moneda_default||'USD')==='USD'?'selected':''}>USD</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
       </div>
+
+      <aside class="mp-aside">
+        <div class="mp-aside-card">
+          <p class="mp-aside-eyebrow">En esta página</p>
+          <nav class="mp-aside-nav">
+            <a onclick="mpScrollTo('mp-sec-fotos')">Fotos del local</a>
+            <a onclick="mpScrollTo('mp-sec-datos')">Datos de la agencia</a>
+            <a onclick="mpScrollTo('mp-sec-contacto')">Contacto</a>
+            <a onclick="mpScrollTo('mp-sec-plan')">Plan actual</a>
+            <a onclick="mpScrollTo('mp-sec-seguridad')">Seguridad</a>
+            <a onclick="mpScrollTo('mp-sec-config')">Configuración</a>
+          </nav>
+          <div class="mp-aside-progress">
+            <p class="mp-aside-progress-label">Perfil completo ${pct}%</p>
+            <div class="mp-progress-track"><div class="mp-progress-fill" style="width:${pct}%;"></div></div>
+            <p class="mp-aside-progress-note">${nota}</p>
+          </div>
+        </div>
+      </aside>
     </div>
-
-    <div class="profile-section-title"><i class="fa-solid fa-address-card"></i> Contacto</div>
-    <div class="row-3">
-      <div class="field"><label>WhatsApp</label><input id="perfilWhatsapp" value="${esc(currentAgencia?.telefono ? currentAgencia.telefono.replace(/"/g,'&quot;') : '')}" placeholder="+54 9 ..."></div>
-      <div class="field"><label>Email</label><input id="perfilEmail" value="${esc(currentAgencia?.email ? currentAgencia.email.replace(/"/g,'&quot;') : '')}" placeholder="contacto@agencia.com"></div>
-      <div class="field" style="position:relative;"><label>Dirección</label>
-        <input id="perfilDireccion" value="${esc(currentAgencia?.direccion ? currentAgencia.direccion.replace(/"/g,'&quot;') : '')}" placeholder="Calle y altura, ciudad — para mostrarla en el mapa del detalle del vehículo" oninput="onDireccionInputChange(this)" autocomplete="off">
-        <input type="hidden" id="perfilDireccionLat" value="${currentAgencia?.lat || ''}">
-        <input type="hidden" id="perfilDireccionLon" value="${currentAgencia?.lon || ''}">
-        <div id="perfilDireccionSugerencias" class="direccion-sugerencias hidden"></div>
-      </div>
-    </div>
-    <div class="row-2">
-      <div class="field"><label>Horarios de atención</label><input id="perfilHorarios" value="${esc(currentAgencia?.horarios ? currentAgencia.horarios.replace(/"/g,'&quot;') : '')}" placeholder="Ej: Lun a Vie 9 a 18hs, Sáb 9 a 13hs"></div>
-      <div class="field"><label>Nombre de contacto</label><input id="perfilContacto" value="${esc(currentAgencia?.contacto ? currentAgencia.contacto.replace(/"/g,'&quot;') : '')}" placeholder="A quién preguntar en el local"></div>
-    </div>
-    <div id="perfilDireccionEstado" style="font-size:11.5px;color:var(--paper-dim);margin:-10px 0 16px;">${currentAgencia?.lat ? '<i class="fa-solid fa-circle-check" style="color:var(--sage);"></i> Ubicación guardada, ya se muestra en el mapa de tus vehículos.' : 'Todavía no cargaste tu ubicación — el mapa del detalle no va a mostrar nada hasta que guardes una dirección.'}</div>
-
-    <div class="profile-section-title"><i class="fa-solid fa-star"></i> Plan actual</div>
-    <p style="font-size:13px;color:var(--paper-dim);margin:-4px 0 16px;">Plan actual: <strong style="color:var(--ink);">${currentAgencia?.plan==='premium' ? 'Premium' : 'Pro'}</strong></p>
-    <div class="plan-choice-row">
-      <button class="plan-choice-btn ${currentAgencia?.plan!=='premium'?'selected':''}" onclick="solicitarCambioPlan('pro')" ${currentAgencia?.plan!=='premium'?'disabled':''}>
-        <span class="plan-choice-name">Plan Pro</span>
-        <span class="plan-choice-desc">${currentAgencia?.plan!=='premium' ? 'Tu plan actual' : 'Solicitar volver a Pro'}</span>
-      </button>
-      <button class="plan-choice-btn ${currentAgencia?.plan==='premium'?'selected':''}" onclick="solicitarCambioPlan('premium')" ${currentAgencia?.plan==='premium'?'disabled':''}>
-        <span class="plan-choice-name">Plan Premium</span>
-        <span class="plan-choice-desc">${currentAgencia?.plan==='premium' ? 'Tu plan actual' : 'Stock gestionada por nuestro equipo + soporte prioritario'}</span>
-      </button>
-      <button class="plan-choice-btn plan-choice-danger" onclick="abrirSolicitudBaja()">
-        <span class="plan-choice-name">Dar de baja</span>
-        <span class="plan-choice-desc">Cancelar tu cuenta en la red</span>
-      </button>
-    </div>
-    <p style="font-size:11.5px;color:var(--paper-dim);margin:10px 0 0;">Los cambios de plan y las bajas las gestiona el equipo de Red de Autos — al confirmar le llega el pedido a nuestro equipo, no es un cambio automático.</p>
-
-    <div class="profile-section-title"><i class="fa-solid fa-lock"></i> Cambiar contraseña</div>
-    <div class="row-3">
-      <div class="field"><label>Contraseña actual</label><input type="password" id="pw-actual" placeholder="••••••••"></div>
-      <div class="field"><label>Nueva contraseña</label><input type="password" id="pw-nueva" placeholder="••••••••"></div>
-      <div class="field"><label>Confirmar nueva contraseña</label><input type="password" id="pw-confirmar" placeholder="••••••••"></div>
-    </div>
-    <button class="btn btn-solid" onclick="updatePassword()">Actualizar contraseña</button>
-
-    <div class="profile-section-title"><i class="fa-solid fa-gear"></i> Configuración</div>
-    <p style="font-size:13px;color:var(--paper-dim);margin:-4px 0 20px;">Personalizá cómo la plataforma trabaja para tu agencia.</p>
-
-    <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Semáforo de antigüedad en stock</p>
-    <p style="font-size:13px;color:var(--paper-dim);margin:0 0 16px;line-height:1.55;max-width:640px;">Definí cuántos días tarda un vehículo en pasar de 🟢 a 🟡 y de 🟡 a 🔴 en Mi Stock, así podés priorizar precio gremio o más visibilidad según tu propio criterio.</p>
-    <div class="row-2">
-      <div class="field"><label>🟢 Verde hasta (días)</label><input type="number" id="cfg-verde-dias" value="${currentAgencia?.semaforo_dias_verde ?? 15}"></div>
-      <div class="field"><label>🟡 Amarillo hasta (días)</label><input type="number" id="cfg-amarillo-dias" value="${currentAgencia?.semaforo_dias_amarillo ?? 30}"></div>
-    </div>
-    <p style="font-size:12px;color:var(--paper-dim);margin:0;">🔴 Rojo: a partir del día siguiente al límite amarillo.</p>
-
-    <div style="border-top:1px solid var(--line);margin:26px 0;"></div>
-
-    <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Mensaje de WhatsApp precargado</p>
-    <p style="font-size:13px;color:var(--paper-dim);margin:0 0 12px;line-height:1.55;max-width:640px;">El texto que se completa automáticamente cuando contactás a otra agencia por un vehículo que te interesa (en Explorar la Red y Oportunidades Exclusivas). Usá <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{agencia}</code>, <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{vehiculo}</code>, <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{miNombre}</code> y <code style="background:var(--ink-3);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px;color:var(--ink);">{miAgencia}</code> para que se completen solos — estos dos últimos toman el "Nombre de contacto" y el nombre de tu agencia de más arriba en esta misma página, así la otra agencia sabe quién le escribe.</p>
-    <textarea id="cfg-whatsapp-msg" rows="3" style="max-width:640px;">${currentAgencia?.whatsapp_template ? currentAgencia.whatsapp_template.replace(/</g,'&lt;') : 'Hola {agencia}, te escribe {miNombre} de {miAgencia}. Vi el {vehiculo} en Red de Autos y me interesa. ¿Podés darme más info?'}</textarea>
-
-    <div style="border-top:1px solid var(--line);margin:26px 0;"></div>
-
-    <div class="row-2">
-      <div>
-        <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Comisión sugerida por defecto</p>
-        <p style="font-size:13px;color:var(--paper-dim);margin:0 0 10px;line-height:1.5;">La que aparece precargada al cargar un vehículo nuevo.</p>
-        <select id="cfg-comision-default">
-          ${['1%','1,5%','2%','2,5%','3%'].map(c=>`<option ${(currentAgencia?.comision_default||'3%')===c?'selected':''}>${c}</option>`).join('')}
-        </select>
-      </div>
-      <div>
-        <p style="font-weight:700;font-size:14px;color:var(--ink);margin:0 0 6px;">Moneda por defecto</p>
-        <p style="font-size:13px;color:var(--paper-dim);margin:0 0 10px;line-height:1.5;">La que aparece precargada al cargar un vehículo nuevo.</p>
-        <select id="cfg-moneda-default">
-          <option ${(currentAgencia?.moneda_default||'USD')==='ARS'?'selected':''}>ARS</option>
-          <option ${(currentAgencia?.moneda_default||'USD')==='USD'?'selected':''}>USD</option>
-        </select>
-      </div>
-    </div>
-
   </div>
-`,
+`;
+},
 
 usuarios: ()=>{
   const quota = usuariosInvitadosQuotaPlan();
