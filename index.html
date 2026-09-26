@@ -1034,9 +1034,9 @@
     width:calc(100% + 84px);
   }
   .explorar-hero-text{max-width:520px;}
-  .explorar-hero-text h1{color:#FFFFFF;font-size:32px;font-weight:900;margin:0 0 8px;font-family:var(--font-display);}
+  .explorar-hero-text h1{color:#45E587;font-size:32px;font-weight:900;margin:0 0 8px;font-family:var(--font-display);}
   .explorar-hero-text p{color:rgba(255,255,255,.88);font-size:14.5px;margin:0;}
-  .hero-eyebrow{display:block;color:#FBD9D9;font-weight:900;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+  .hero-eyebrow{display:block;color:#FFFFFF;font-weight:900;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
   .vehicle-agency-pill{position:absolute;bottom:10px;right:10px;background:rgba(255,255,255,.92);color:var(--red);font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.03em;display:flex;align-items:center;gap:5px;}
   .vehicle-detail-btn{
     width:100%;margin-top:16px;padding:9px 0;
@@ -10373,7 +10373,13 @@ dashboard: ()=>`
 `,
 
 explorar: ()=>`
-  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-explorar-red.jpg');"></div>
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-explorar-red.png');">
+    <div class="explorar-hero-text">
+      <span class="hero-eyebrow">Descubrí el stock de toda la red, no solo el tuyo</span>
+      <h1>Explorar la Red</h1>
+      <p>Vehículos disponibles en toda la red de agencias.</p>
+    </div>
+  </div>
   ${exploreAgencyFilter ? `<div class="agency-filter-chip">Mostrando vehículos de <strong>${exploreAgencyFilter}</strong><button onclick="clearAgencyFilter()">Ver todas <i class="fa-solid fa-xmark"></i></button></div>` : ''}
   <div class="search-panel">
     <div class="search-panel-row">
@@ -10473,7 +10479,13 @@ explorar: ()=>`
 `,
 
 redbusca: ()=>`
-  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-redbusca.jpg');"></div>
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-redbusca.png');">
+    <div class="explorar-hero-text">
+      <span class="hero-eyebrow">Lo que tus colegas necesitan para sus clientes</span>
+      <h1>La Red está buscando</h1>
+      <p>Vehículos que buscan las agencias de la red</p>
+    </div>
+  </div>
   <div class="search-panel">
     <div class="search-panel-row">
       <div class="filter-field">
@@ -10565,7 +10577,13 @@ redbusca: ()=>`
 `,
 
 busquedas: ()=>`
-  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-misbusquedas.png');"></div>
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-misbusquedas.png');">
+    <div class="explorar-hero-text">
+      <span class="hero-eyebrow">Tus búsquedas activas, en un solo lugar</span>
+      <h1>Mis búsquedas</h1>
+      <p>Vehículos que estás buscando para tus clientes</p>
+    </div>
+  </div>
   <div class="main-head" style="margin-bottom:18px;"><div></div>
   <button class="btn btn-solid" onclick="openNewSearchModal()"><i class="fa-solid fa-plus"></i> Agregar vehículo</button></div>
   <table>
@@ -10603,7 +10621,13 @@ matches: ()=>{
   // entrar muestre "0"). Tocarlo lleva siempre a Pipeline filtrado por ese tipo (ver setMatchesTab).
   filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(pendientes);
   return `
-  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-matches.png');"></div>
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-matches.png');">
+    <div class="explorar-hero-text">
+      <span class="hero-eyebrow">Coincidencias y seguimiento de operaciones</span>
+      <h1>Con Red de Autos no perdés nunca más una venta.</h1>
+      <p>Cruzamos tu stock y tus búsquedas con toda la red, automáticamente</p>
+    </div>
+  </div>
   <div class="main-head"><div><h1>Mis Matches</h1><p class="sub">${pendientes.length} pendiente${pendientes.length===1?'':'s'} · ${concretadas.length} concretada${concretadas.length===1?'':'s'} · ${caidas.length} caída${caidas.length===1?'':'s'}</p></div></div>
   <div class="view-toggle">
     <button class="view-toggle-btn ${matchesTab==='favoritas'?'active':''}" onclick="setMatchesTab('favoritas')"><i class="fa-solid fa-heart"></i> Vehículos que me interesan</button>
@@ -10635,7 +10659,13 @@ manuales: ()=>{
   // para que el número mostrado nunca cambie según la pestaña activa antes de tocarlo.
   filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(pendientes);
   return `
-  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-matches.png');"></div>
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-matches.png');">
+    <div class="explorar-hero-text">
+      <span class="hero-eyebrow">Coincidencias y seguimiento de operaciones</span>
+      <h1>Con Red de Autos no perdés nunca más una venta.</h1>
+      <p>Cruzamos tu stock y tus búsquedas con toda la red, automáticamente</p>
+    </div>
+  </div>
   <div class="main-head"><div><h1>Matches Manuales</h1><p class="sub">Contactos directos por WhatsApp desde Explorar la Red y Gremio — ${pendientes.length} pendiente${pendientes.length===1?'':'s'} · ${concretadas.length} concretada${concretadas.length===1?'':'s'} · ${caidas.length} caída${caidas.length===1?'':'s'}</p></div></div>
   <div class="view-toggle">
     <button class="view-toggle-btn ${matchesManualesTab==='concretadas'?'active':''}" onclick="setMatchesManualesTab('concretadas')"><i class="fa-solid fa-circle-check"></i> Operaciones concretadas</button>
@@ -10738,7 +10768,13 @@ asociadas: ()=>`
 proveedores: ()=>{
   const rubros = [...new Set(proveedoresReal.map(p=>p.rubro))].sort((a,b)=>a.localeCompare(b,'es'));
   return `
-  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-proveedores.png');"></div>
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-proveedores.png');">
+    <div class="explorar-hero-text">
+      <span class="hero-eyebrow">Beneficios para toda la red</span>
+      <h1>Encontrá beneficios especiales de proveedores</h1>
+      <p>Descuentos, promociones y más dentro de la plataforma.</p>
+    </div>
+  </div>
   <div class="main-head"><div><h1>Proveedores</h1><p class="sub">Mecánica, gomería, chapa y pintura, gestoría, seguros y más — directorio de la red</p></div></div>
   <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;">
     <input id="proveedores-search-input" placeholder="Buscar por nombre o ciudad..." value="${proveedorBuscarQuery}" oninput="onProveedorBuscarInput(this.value)" style="flex:1;min-width:220px;padding:10px 14px;border-radius:10px;border:1px solid #E2E1ED;font-family:var(--font-body);font-size:13.5px;">
