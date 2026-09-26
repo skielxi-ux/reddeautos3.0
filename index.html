@@ -103,6 +103,14 @@
   .search-pulse .ring:nth-child(2){animation-delay:.6s;}
   .search-pulse .ring:nth-child(3){animation-delay:1.2s;}
   .search-pulse i{position:relative;z-index:1;color:var(--red);font-size:11px;}
+  .row-menu{position:relative;display:inline-block;}
+  .row-menu-btn{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line-strong);border-radius:var(--radius);background:#FFFFFF;color:var(--paper-dim);cursor:pointer;}
+  .row-menu-btn:hover{border-color:var(--red);color:var(--red-dark);}
+  .row-menu-list{position:absolute;right:0;top:calc(100% + 4px);background:#FFFFFF;border:1px solid var(--line-strong);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.14);min-width:150px;z-index:50;overflow:hidden;}
+  .row-menu-list.hidden{display:none;}
+  .row-menu-item{display:flex;align-items:center;gap:9px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink);white-space:nowrap;}
+  .row-menu-item:hover{background:var(--ink-3);}
+  .row-menu-item.danger{color:#C0392B;}
   .segmented-control{display:inline-flex;border:1px solid var(--line-strong);border-radius:22px;padding:3px;background:#FFFFFF;gap:2px;}
   .segmented-btn{font-family:var(--font-body);font-weight:600;font-size:13.5px;border:none;background:transparent;color:var(--paper-dim);padding:8px 18px;border-radius:19px;cursor:pointer;transition:all .15s ease;display:inline-flex;align-items:center;gap:7px;}
   .segmented-btn:hover{color:var(--ink);}
@@ -937,10 +945,6 @@
     .faq2-help-white{flex:none;width:100%;padding:14px;}
     .faq2-help-logo{display:none;}
   }
-  /* Banner de "Proveedores" (foto, sin overlay de texto encima — el título va arriba, en HTML) */
-  .prov-benefits-banner{position:relative;height:150px;border-radius:14px;overflow:hidden;border:1px solid var(--line);margin-bottom:22px;background-image:url('assets/img-proveedores-banner.jpg');background-size:cover;background-position:center;display:flex;align-items:center;}
-  .prov-benefits-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,30,38,.72) 0%,rgba(20,30,38,.42) 55%,rgba(20,30,38,.1) 100%);}
-  .prov-benefits-title{position:relative;z-index:1;color:#FFFFFF;font-family:var(--font-display);font-size:17px;font-weight:700;margin:0;padding:0 24px;}
   @media (max-width:520px){
     .faq2-sidebar{display:block;}
     .faq2-cat{width:100%;margin-bottom:8px;}
@@ -1024,9 +1028,9 @@
 
 
   .explorar-hero{
-    position:relative;border-radius:16px;overflow:hidden;min-height:170px;
+    position:relative;border-radius:0;overflow:hidden;min-height:170px;
     background-size:cover;background-position:center;
-    display:flex;align-items:center;padding:0 40px;margin:0 -42px 22px -42px;
+    display:flex;align-items:center;padding:0 40px;margin:-34px -42px 22px -42px;
     width:calc(100% + 84px);
   }
   .explorar-hero-text{max-width:520px;}
@@ -1099,7 +1103,7 @@
     .app-shell{grid-template-columns:1fr;}
     .sidebar{position:relative;height:auto;}
     .landing-nav,.section,.main{padding-left:20px;padding-right:20px;}
-    .explorar-hero{margin:0 -20px 22px -20px;width:calc(100% + 40px);border-radius:0;}
+    .explorar-hero{margin:-34px -20px 22px -20px;width:calc(100% + 40px);border-radius:0;}
   }
 
   /* ================= LANDING nueva (V35) ================= */
@@ -3109,11 +3113,16 @@ function leadsExternosTablaHTML(){
               <option value="caliente" ${l.interes==='caliente'?'selected':''}>Caliente</option>
             </select>
           </td>
-          <td style="white-space:nowrap;display:flex;gap:6px;">
+          <td style="white-space:nowrap;display:flex;gap:6px;align-items:center;">
             ${l.telefono ? `<button class="btn btn-sm whatsapp-btn" onclick="whatsappLeadExterno('${l.id}')" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>` : ''}
             <button class="btn btn-sm" onclick="abrirNotasLeadExterno('${l.id}')"><i class="fa-solid fa-note-sticky"></i> Notas</button>
-            <button class="btn btn-sm" onclick="openLeadExternoModal('${l.id}')"><i class="fa-solid fa-pen"></i> Editar</button>
-            <button class="btn btn-sm btn-eliminar-pastel" onclick="eliminarLeadExterno('${l.id}')"><i class="fa-solid fa-trash"></i> Eliminar</button>
+            <div class="row-menu">
+              <button type="button" class="row-menu-btn" onclick="toggleRowMenu(event, 'rowmenu-lead-${l.id}')" title="Más acciones"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+              <div class="row-menu-list hidden" id="rowmenu-lead-${l.id}">
+                <div class="row-menu-item" onclick="openLeadExternoModal('${l.id}')"><i class="fa-solid fa-pen"></i> Editar</div>
+                <div class="row-menu-item danger" onclick="eliminarLeadExterno('${l.id}')"><i class="fa-solid fa-trash"></i> Eliminar</div>
+              </div>
+            </div>
           </td>
         </tr>`;
       }).join('')}
@@ -8409,7 +8418,18 @@ document.addEventListener('click', (e) => {
   if (cont && !cont.classList.contains('hidden') && e.target !== input && !cont.contains(e.target)) {
     cont.classList.add('hidden');
   }
+  // Cierra cualquier menú de fila (⋮) abierto si el clic fue afuera de él.
+  document.querySelectorAll('.row-menu-list:not(.hidden)').forEach(list => {
+    if (!list.parentElement.contains(e.target)) list.classList.add('hidden');
+  });
 });
+// Abre/cierra el menú de acciones secundarias (⋮) de una fila; cierra cualquier otro que
+// haya quedado abierto para que nunca haya dos a la vez.
+function toggleRowMenu(event, menuId){
+  event.stopPropagation();
+  document.querySelectorAll('.row-menu-list').forEach(el => { if (el.id !== menuId) el.classList.add('hidden'); });
+  document.getElementById(menuId)?.classList.toggle('hidden');
+}
 // Scroll suave a una sección de Mi Perfil desde el nav "En esta página" de la sidebar.
 function mpScrollTo(id){
   const el = document.getElementById(id);
@@ -10353,13 +10373,7 @@ dashboard: ()=>`
 `,
 
 explorar: ()=>`
-  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/img35.jpg');">
-    <div class="explorar-hero-text">
-      <span class="hero-eyebrow">Descubrí el stock de toda la red, no solo el tuyo</span>
-      <h1>Explorar la Red</h1>
-      <p>Vehículos disponibles en toda la red de agencias</p>
-    </div>
-  </div>
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-explorar-red.jpg');"></div>
   ${exploreAgencyFilter ? `<div class="agency-filter-chip">Mostrando vehículos de <strong>${exploreAgencyFilter}</strong><button onclick="clearAgencyFilter()">Ver todas <i class="fa-solid fa-xmark"></i></button></div>` : ''}
   <div class="search-panel">
     <div class="search-panel-row">
@@ -10459,13 +10473,7 @@ explorar: ()=>`
 `,
 
 redbusca: ()=>`
-  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/img36.jpg');">
-    <div class="explorar-hero-text">
-      <span class="hero-eyebrow">Lo que tus colegas necesitan para sus clientes</span>
-      <h1>La Red está buscando</h1>
-      <p>Vehículos que buscan las agencias de la red</p>
-    </div>
-  </div>
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-redbusca.jpg');"></div>
   <div class="search-panel">
     <div class="search-panel-row">
       <div class="filter-field">
@@ -10557,13 +10565,7 @@ redbusca: ()=>`
 `,
 
 busquedas: ()=>`
-  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/img37.jpg');">
-    <div class="explorar-hero-text">
-      <span class="hero-eyebrow">Tus búsquedas activas, en un solo lugar</span>
-      <h1>Mis búsquedas</h1>
-      <p>Vehículos que estás buscando para tus clientes</p>
-    </div>
-  </div>
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-misbusquedas.png');"></div>
   <div class="main-head" style="margin-bottom:18px;"><div></div>
   <button class="btn btn-solid" onclick="openNewSearchModal()"><i class="fa-solid fa-plus"></i> Agregar vehículo</button></div>
   <table>
@@ -10601,13 +10603,7 @@ matches: ()=>{
   // entrar muestre "0"). Tocarlo lleva siempre a Pipeline filtrado por ese tipo (ver setMatchesTab).
   filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(pendientes);
   return `
-  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/img38.jpg');">
-    <div class="explorar-hero-text">
-      <span class="hero-eyebrow">Coincidencias y seguimiento de operaciones</span>
-      <h1>Con Red de Autos no perdés nunca más una venta.</h1>
-      <p>Cruzamos tu stock y tus búsquedas con toda la red, automáticamente</p>
-    </div>
-  </div>
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-matches.png');"></div>
   <div class="main-head"><div><h1>Mis Matches</h1><p class="sub">${pendientes.length} pendiente${pendientes.length===1?'':'s'} · ${concretadas.length} concretada${concretadas.length===1?'':'s'} · ${caidas.length} caída${caidas.length===1?'':'s'}</p></div></div>
   <div class="view-toggle">
     <button class="view-toggle-btn ${matchesTab==='favoritas'?'active':''}" onclick="setMatchesTab('favoritas')"><i class="fa-solid fa-heart"></i> Vehículos que me interesan</button>
@@ -10639,6 +10635,7 @@ manuales: ()=>{
   // para que el número mostrado nunca cambie según la pestaña activa antes de tocarlo.
   filtroBuscoVendoHTML = matchFiltroBuscoVendoHTML(pendientes);
   return `
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-matches.png');"></div>
   <div class="main-head"><div><h1>Matches Manuales</h1><p class="sub">Contactos directos por WhatsApp desde Explorar la Red y Gremio — ${pendientes.length} pendiente${pendientes.length===1?'':'s'} · ${concretadas.length} concretada${concretadas.length===1?'':'s'} · ${caidas.length} caída${caidas.length===1?'':'s'}</p></div></div>
   <div class="view-toggle">
     <button class="view-toggle-btn ${matchesManualesTab==='concretadas'?'active':''}" onclick="setMatchesManualesTab('concretadas')"><i class="fa-solid fa-circle-check"></i> Operaciones concretadas</button>
@@ -10741,6 +10738,7 @@ asociadas: ()=>`
 proveedores: ()=>{
   const rubros = [...new Set(proveedoresReal.map(p=>p.rubro))].sort((a,b)=>a.localeCompare(b,'es'));
   return `
+  <div class="explorar-hero" style="background-size:cover;background-repeat:no-repeat;background-position:center;background-image:url('assets/banner-proveedores.png');"></div>
   <div class="main-head"><div><h1>Proveedores</h1><p class="sub">Mecánica, gomería, chapa y pintura, gestoría, seguros y más — directorio de la red</p></div></div>
   <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;">
     <input id="proveedores-search-input" placeholder="Buscar por nombre o ciudad..." value="${proveedorBuscarQuery}" oninput="onProveedorBuscarInput(this.value)" style="flex:1;min-width:220px;padding:10px 14px;border-radius:10px;border:1px solid #E2E1ED;font-family:var(--font-body);font-size:13.5px;">
@@ -10749,7 +10747,6 @@ proveedores: ()=>{
     <button class="btn btn-sm ${!proveedorRubroFiltro?'btn-solid':''}" onclick="filtrarProveedoresPorRubro(null)">Todos</button>
     ${rubros.map(r=>`<button class="btn btn-sm ${proveedorRubroFiltro===r?'btn-solid':''}" onclick="filtrarProveedoresPorRubro('${r}')">${r}</button>`).join('')}
   </div>` : ''}
-  <div class="prov-benefits-banner"><div class="prov-benefits-title">Beneficios de asociados de la red</div></div>
   <div id="proveedores-lista">${proveedoresListaHTML()}</div>
 `;
 },
