@@ -8907,8 +8907,10 @@ function calcularAlertasRadar(){
     });
   }
 
-  // 2) Operaciones concretadas (como compradora) sin la comisión cargada
-  const sinComision = dashMatches.filter(m => m.estado === 'concretada' && !m.comision_monto && m.agencia_compradora === currentAgencia.id);
+  // 2) Operaciones concretadas (como compradora) sin la comisión cargada.
+  // Las compras directas no tienen comisión (se saltea el cálculo al cerrarlas), así que
+  // no cuentan acá aunque no tengan comision_monto: no es un dato faltante, es esperado.
+  const sinComision = dashMatches.filter(m => m.estado === 'concretada' && !m.comision_monto && m.agencia_compradora === currentAgencia.id && !m.es_compra_directa);
   if (sinComision.length) {
     alertas.push({
       icon: 'fa-sack-dollar',
@@ -9904,7 +9906,7 @@ performance: ()=>{
     if (!m.soyVendedor && m.comisionMonto) {
       comisiones[m.comisionMoneda === 'USD' ? 'USD' : 'ARS'] += Number(m.comisionMonto);
     }
-    if (!m.soyVendedor && !m.comisionMonto) {
+    if (!m.soyVendedor && !m.comisionMonto && !m.esCompraDirecta) {
       concretadasSinComisionCargada++;
     }
     if (m.soyVendedor) {
