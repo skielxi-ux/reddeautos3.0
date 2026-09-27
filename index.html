@@ -364,6 +364,27 @@
   .kpi .val{font-family:var(--font-display);font-size:28px;font-weight:600;}
   .kpi .val.red{color:var(--red-dark);}
 
+  /* ---- Resumen compacto de Performance ---- */
+  .perf-resumen-banner{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:18px 20px;margin-bottom:18px;}
+  .perf-resumen-eyebrow{font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#3F7A46;margin-bottom:6px;}
+  .perf-resumen-title{font-family:var(--font-display);font-size:19px;font-weight:700;color:#14532d;margin-bottom:5px;}
+  .perf-resumen-sub{font-size:12.5px;color:#3F7A46;}
+  .perf-resumen-pill{display:inline-flex;align-items:center;gap:8px;background:#FFFFFF;border:1px solid #bbf7d0;color:#166534;font-weight:700;font-size:12.5px;padding:8px 14px;border-radius:20px;white-space:nowrap;}
+  .perf-kpi-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;margin-bottom:10px;}
+  .perf-attn-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:background .12s ease;}
+  .perf-attn-item:hover{background:#F5F4F0;}
+  .perf-attn-item:last-child{margin-bottom:0;}
+  .perf-attn-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+  .perf-attn-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .perf-attn-body strong{font-size:13px;color:var(--ink);}
+  .perf-attn-body span{font-size:11.5px;color:var(--paper-dim);}
+  .perf-attn-arrow{color:var(--paper-dim);font-size:12px;flex-shrink:0;}
+  .perf-donut{width:92px;height:92px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:4px auto 12px;flex-shrink:0;}
+  .perf-donut-inner{width:68px;height:68px;background:#FFFFFF;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .perf-ministat{text-align:center;}
+  .perf-ministat .lbl{font-family:var(--font-mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--paper-dim);margin-bottom:4px;}
+  .perf-ministat .val{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--ink);}
+
   .two-col{display:grid;grid-template-columns:1.3fr .9fr;gap:20px;}
 
   .comisiones-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
@@ -9878,9 +9899,13 @@ performance: ()=>{
   const comisiones = { ARS: 0, USD: 0 };
   const ventas = { ARS: 0, USD: 0 };
   let unidadesPropiasVendidas = 0;
+  let concretadasSinComisionCargada = 0;
   concretadas.forEach(m => {
     if (!m.soyVendedor && m.comisionMonto) {
       comisiones[m.comisionMoneda === 'USD' ? 'USD' : 'ARS'] += Number(m.comisionMonto);
+    }
+    if (!m.soyVendedor && !m.comisionMonto) {
+      concretadasSinComisionCargada++;
     }
     if (m.soyVendedor) {
       unidadesPropiasVendidas++;
@@ -9941,6 +9966,55 @@ performance: ()=>{
   const aniosDisponibles = [anioActual - 1, anioActual, anioActual + 1];
   const nombreMes = MESES_ES[perfMes - 1];
 
+  /* ============ RESUMEN COMPACTO (mes anterior, para comparar) ============ */
+  let perfMesAntMes = perfMes - 1, perfMesAntAnio = perfAnio;
+  if (perfMesAntMes < 1) { perfMesAntMes = 12; perfMesAntAnio = perfAnio - 1; }
+  const enMesAnterior = (fechaIso) => {
+    if (!fechaIso) return false;
+    const d = new Date(fechaIso);
+    return (d.getMonth() + 1) === perfMesAntMes && d.getFullYear() === perfMesAntAnio;
+  };
+  const comisionesMesAnteriorARS = misMatchesReal
+    .filter(m => m.estado === 'concretada' && enMesAnterior(m.cerradoAtRaw) && !m.soyVendedor && m.comisionMonto && m.comisionMoneda !== 'USD')
+    .reduce((a, m) => a + Number(m.comisionMonto), 0);
+  const pctCambioGenere = comisionesMesAnteriorARS > 0
+    ? Math.round(((comisiones.ARS - comisionesMesAnteriorARS) / comisionesMesAnteriorARS) * 100)
+    : null;
+
+  // Lista combinada de "Requiere tu atención": oportunidades sin contactar (más urgentes primero)
+  // y clientes sin cubrir, priorizando lo más antiguo de cada tipo.
+  const itemsAtencion = [];
+  sinContactar
+    .slice()
+    .sort((a, b) => (perfDiasDesde(b.createdAtRaw) || 0) - (perfDiasDesde(a.createdAtRaw) || 0))
+    .slice(0, 3)
+    .forEach(m => {
+      const dias = perfDiasDesde(m.createdAtRaw);
+      itemsAtencion.push({
+        icono: 'fa-phone-slash', color: 'var(--red)', bg: '#FEE2E2',
+        titulo: esc(m.vehiculo),
+        detalle: `${esc(m.soyVendedor ? 'Te consultó ' + m.otraAgencia : 'Para ' + m.clienteNombre)} · ${dias === null ? 'sin fecha' : (dias === 0 ? 'hoy' : 'hace ' + dias + (dias === 1 ? ' día' : ' días'))}`,
+        cta: 'matches',
+      });
+    });
+  busquedasSinMatch
+    .slice()
+    .sort((a, b) => (perfDiasDesde(b.createdAtRaw) || 0) - (perfDiasDesde(a.createdAtRaw) || 0))
+    .slice(0, 2)
+    .forEach(b => {
+      const dias = perfDiasDesde(b.createdAtRaw);
+      itemsAtencion.push({
+        icono: 'fa-user-clock', color: 'var(--brick)', bg: '#FFEDD5',
+        titulo: esc(b.nombre),
+        detalle: `${esc(b.tipo)} · ${dias === null ? 'sin fecha' : (dias === 0 ? 'hoy esperando' : 'hace ' + dias + (dias === 1 ? ' día' : ' días') + ' esperando')}`,
+        cta: 'busquedas',
+      });
+    });
+
+  // Caídas después de haber sido contactadas: indica que el problema no es falta de uso,
+  // sino algo que se rompe en la negociación (precio, unidad, contraparte).
+  const caidasConContacto = caidas.filter(m => m.contactadoAt).length;
+
   /* ============ VEREDICTO ============ */
   let veredicto;
   if (concretadas.length === 0 && sinContactar.length === 0 && busquedasSinMatch.length === 0) {
@@ -9993,13 +10067,7 @@ performance: ()=>{
       <h1>Performance</h1>
       <p class="sub">Lo que la red te devolvió este mes, lo que quedó sin usar y lo que te costó</p>
     </div>
-    ${currentAgencia?.plan === 'premium' ? `<button id="perf-export-btn" class="btn btn-solid" onclick="exportarInformePerformance()"><i class="fa-solid fa-file-arrow-down"></i> Importar informe</button>` : ''}
-  </div>
-
-  <!-- ============ EL MES EN TRES NÚMEROS ============ -->
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
-      <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">El mes en tres números</strong>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <div class="mes-anio-picker">
         <select onchange="cambiarPerfMes(this.value)">
           ${MESES_ES.map((m, i) => `<option value="${i + 1}" ${perfMes === i + 1 ? 'selected' : ''}>${m}</option>`).join('')}
@@ -10008,129 +10076,92 @@ performance: ()=>{
           ${aniosDisponibles.map(a => `<option value="${a}" ${perfAnio === a ? 'selected' : ''}>${a}</option>`).join('')}
         </select>
       </div>
-    </div>
-
-    <div class="row-3">
-      <div class="kpi" style="border-left:3px solid var(--sage);">
-        <button class="kpi-info-btn" onclick="openKpiInfo('Generé','Comisiones que cobraste este mes por operaciones cerradas en las que vos pusiste el cliente. Se cuentan al cerrarse la operación, no al pactarse. Abajo aparecen además las unidades de tu propio stock que se vendieron gracias a la red: esa plata es facturación tuya, no comisión, por eso se muestra aparte.')"><i class="fa-solid fa-circle-info"></i></button>
-        <div class="lbl"><i class="fa-solid fa-arrow-trend-up"></i>Generé</div>
-        <div class="val" style="color:var(--sage);font-size:${(comisiones.ARS && comisiones.USD) ? '20px' : '28px'};">${perfMoneda(comisiones)}</div>
-        <p class="sub" style="margin:8px 0 0;font-size:12px;">
-          en comisiones cobradas &middot; ${concretadas.length} ${concretadas.length === 1 ? 'operación cerrada' : 'operaciones cerradas'}
-        </p>
-        ${unidadesPropiasVendidas ? `<p class="sub" style="margin:6px 0 0;font-size:12px;border-top:1px dashed var(--line);padding-top:6px;">+ ${unidadesPropiasVendidas} ${unidadesPropiasVendidas === 1 ? 'unidad propia vendida' : 'unidades propias vendidas'} por la red <span class="mono">(${perfMoneda(ventas)} facturados)</span></p>` : ''}
-      </div>
-
-      <div class="kpi" style="border-left:3px solid var(--red);">
-        <button class="kpi-info-btn" onclick="openKpiInfo('Dejé sobre la mesa','Dos fugas distintas. Primero: oportunidades que la red ya te trajo y que nadie del equipo contactó todavía. Segundo: búsquedas activas de tus clientes que no tienen ninguna unidad compatible en la red. La primera es un problema de uso interno y se arregla hoy; la segunda es falta de oferta y se arregla pidiéndole esa unidad a la red. La comisión en juego es la que cobrarías vos si esos matches abiertos se cerraran.')"><i class="fa-solid fa-circle-info"></i></button>
-        <div class="lbl"><i class="fa-solid fa-hourglass-half"></i>Dejé sobre la mesa</div>
-        <div class="val" style="color:var(--red);">${sinContactar.length + busquedasSinMatch.length}</div>
-        <p class="sub" style="margin:8px 0 0;font-size:12px;">
-          ${sinContactar.length} ${sinContactar.length === 1 ? 'oportunidad sin contactar' : 'oportunidades sin contactar'} &middot; ${busquedasSinMatch.length} ${busquedasSinMatch.length === 1 ? 'cliente sin cubrir' : 'clientes sin cubrir'}
-        </p>
-        ${(enJuego.ARS || enJuego.USD) ? `<p class="sub" style="margin:6px 0 0;font-size:12px;border-top:1px dashed var(--line);padding-top:6px;">Comisión en juego: <span class="mono">${perfMoneda(enJuego)}</span></p>` : ''}
-      </div>
-
-      <div class="kpi">
-        <button class="kpi-info-btn" onclick="openKpiInfo('Me costó','Abono mensual de tu plan. Es el número contra el que se mide todo lo demás: si las comisiones cobradas no lo superan de forma sostenida, la red todavía no se está pagando sola. El retorno se calcula solo con comisiones, que son margen limpio, y no con el precio de los autos vendidos, que es facturación.')"><i class="fa-solid fa-circle-info"></i></button>
-        <div class="lbl"><i class="fa-solid fa-receipt"></i>Me costó</div>
-        <div class="val">${costoPlan ? fmtMoney(costoPlan, 'ARS') : '—'}</div>
-        <p class="sub" style="margin:8px 0 0;font-size:12px;">
-          ${costoPlan ? 'abono mensual del plan' : 'sin plan asignado'}
-        </p>
-        ${retorno !== null ? `<p class="sub" style="margin:6px 0 0;font-size:12px;border-top:1px dashed var(--line);padding-top:6px;">Retorno: <strong style="color:${retorno >= 1 ? 'var(--sage)' : 'var(--red)'};">${retorno.toFixed(1)}x</strong></p>` : ''}
-      </div>
-    </div>
-
-    <div style="margin-top:18px;padding:14px 16px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;font-size:13.5px;line-height:1.6;color:#166534;">
-      ${veredicto}
-    </div>
-    ${hayUsdSinCotizar ? `<p class="sub" style="margin:10px 0 0;font-size:11.5px;">El retorno no incluye las comisiones en dólares: no se pudo leer la cotización. Se muestran por separado arriba.</p>` : ''}
-  </div>
-
-  <!-- ============ EMBUDO ============ -->
-  <div class="card" style="margin-top:16px;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
-      <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">De la búsqueda al cierre &middot; ${esc(nombreMes)}</strong>
-      <button class="kpi-info-btn" style="position:static;" onclick="openKpiInfo('Embudo del mes','Muestra dónde se corta el proceso. Si caen las búsquedas cargadas, el equipo no está usando la herramienta. Si hay matches pero pocos contactos, las oportunidades se enfrían adentro de la agencia. Si hay contactos pero pocos cierres, el problema está en el precio, la unidad o la contraparte. Aclaración técnica: los matches se generan cuando alguien de la agencia abre la aplicación, así que la fecha del match dice cuándo se vio la oportunidad, no cuándo apareció.')"><i class="fa-solid fa-circle-info"></i></button>
-    </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;">
-      ${paso('Búsquedas cargadas', misBusquedasReal.filter(b => enMes(b.createdAtRaw)).length)}
-      ${flecha}
-      ${paso('Matches', generadosEsteMes.length)}
-      ${flecha}
-      ${paso('Contactados', contactadosEsteMes.length)}
-      ${flecha}
-      ${paso('Concretadas', `<span style="color:var(--sage);">${concretadas.length}</span>`)}
-      ${flecha}
-      ${paso('Caídas', `<span style="color:var(--red);">${caidas.length}</span>`)}
-    </div>
-    <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr);margin:20px 0 0;">
-      <div class="kpi">
-        <button class="kpi-info-btn" onclick="openKpiInfo('Tasa de cierre','Operaciones concretadas sobre el total de operaciones que se cerraron este mes, contando las caídas. Con pocas operaciones por mes este porcentaje salta mucho de un mes a otro: mirá el número absoluto de cierres antes que el porcentaje.')"><i class="fa-solid fa-circle-info"></i></button>
-        <div class="lbl"><i class="fa-solid fa-percent"></i>Tasa de cierre</div>
-        <div class="val">${totalCerradas ? tasaConversion + '%' : '—'}</div>
-        <p class="sub" style="margin:8px 0 0;font-size:12px;">${totalCerradas ? `sobre ${totalCerradas} ${totalCerradas === 1 ? 'operación cerrada' : 'operaciones cerradas'}` : 'sin operaciones cerradas este mes'}</p>
-      </div>
-      <div class="kpi">
-        <button class="kpi-info-btn" onclick="openKpiInfo('Cobertura de tu demanda','Porcentaje de las búsquedas activas de tus clientes que tienen al menos una unidad compatible en la red. Es el mejor indicador de si la red te sirve: si está bajo, no importa cuántos autos haya publicados, no hay lo que tus clientes piden.')"><i class="fa-solid fa-circle-info"></i></button>
-        <div class="lbl"><i class="fa-solid fa-bullseye"></i>Cobertura de tu demanda</div>
-        <div class="val" style="color:${cobertura === null ? 'inherit' : (cobertura >= 50 ? 'var(--sage)' : 'var(--red)')};">${cobertura === null ? '—' : cobertura + '%'}</div>
-        <p class="sub" style="margin:8px 0 0;font-size:12px;">${busquedasActivas.length ? `${busquedasActivas.length - busquedasSinMatch.length} de ${busquedasActivas.length} búsquedas activas con match` : 'sin búsquedas activas'}</p>
-      </div>
+      ${currentAgencia?.plan === 'premium' ? `<button id="perf-export-btn" class="btn btn-solid" onclick="exportarInformePerformance()"><i class="fa-solid fa-file-arrow-down"></i> Importar informe</button>` : ''}
     </div>
   </div>
 
-  <!-- ============ DÓNDE SE ESTÁ PERDIENDO PLATA ============ -->
-  <div class="card" style="margin-top:16px;">
-    <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Dónde se está perdiendo plata ahora</strong>
-    <p class="sub" style="margin:6px 0 18px;">No depende del mes elegido: es el estado actual de la agencia.</p>
+  <!-- ============ RESUMEN DEL MES (compacto) ============ -->
+  <div class="perf-resumen-banner">
+    <div>
+      <div class="perf-resumen-eyebrow">Resumen de ${esc(nombreMes)}</div>
+      <div class="perf-resumen-title">${(comisiones.ARS || comisiones.USD) ? `${perfMoneda(comisiones)} en comisiones cobradas` : `${concretadas.length} ${concretadas.length === 1 ? 'operación concretada' : 'operaciones concretadas'}`}</div>
+      <div class="perf-resumen-sub">${(comisiones.ARS || comisiones.USD) ? `${concretadas.length} ${concretadas.length === 1 ? 'operación concretada' : 'operaciones concretadas'}` : 'sin comisiones cobradas este mes'}${unidadesPropiasVendidas ? ` · ${unidadesPropiasVendidas} ${unidadesPropiasVendidas === 1 ? 'unidad propia vendida' : 'unidades propias vendidas'}` : ''}${concretadasSinComisionCargada ? ` · ${concretadasSinComisionCargada} sin comisión cargada` : ''}${pctCambioGenere !== null ? ` · ${pctCambioGenere >= 0 ? '+' : ''}${pctCambioGenere}% vs. ${MESES_ES[perfMesAntMes - 1]}` : ''}</div>
+    </div>
+    <div class="perf-resumen-pill"><i class="fa-solid fa-circle-info"></i> ${totalCerradas ? `${tasaConversion}% de cierre este mes` : 'Sin operaciones cerradas este mes'}</div>
+  </div>
 
-    <div style="display:flex;gap:24px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:280px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <i class="fa-solid fa-phone-slash" style="color:var(--red);"></i>
-          <strong style="font-size:13.5px;">Oportunidades sin contactar (${sinContactar.length})</strong>
-        </div>
-        ${sinContactar.length ? `
-        <div style="border:1px solid #fdba8c;background:#fff7ed;border-radius:10px;padding:12px 14px;">
-          <table>
-            <tbody>
-              ${sinContactar.slice(0, 5).map(m => {
-                const dias = perfDiasDesde(m.createdAtRaw);
-                return `<tr>
-                  <td>${esc(m.vehiculo)}<br><span class="sub" style="font-size:11.5px;">${esc(m.soyVendedor ? 'Te consultó ' + m.otraAgencia : 'Para ' + m.clienteNombre)}</span></td>
-                  <td style="text-align:right;white-space:nowrap;"><span class="pill ${dias !== null && dias >= 3 ? 'pill-brick' : ''}">${dias === null ? '—' : (dias === 0 ? 'hoy' : 'hace ' + dias + (dias === 1 ? ' día' : ' días'))}</span></td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-          <button class="btn btn-sm" onclick="showApp('matches')" style="margin-top:12px;">Ver todas las oportunidades</button>
-        </div>
-        ` : `<p class="sub" style="margin:0;display:flex;align-items:center;gap:7px;"><i class="fa-solid fa-circle-check" style="color:var(--sage);"></i> Todo contactado. Bien ahí.</p>`}
+  <!-- ============ 4 KPI COMPACTOS ============ -->
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+    <div class="kpi">
+      <button class="kpi-info-btn" onclick="openKpiInfo('Generé','Comisiones que cobraste este mes por operaciones cerradas en las que vos pusiste el cliente. Se cuentan al cerrarse la operación, no al pactarse. Abajo aparecen además las unidades de tu propio stock que se vendieron gracias a la red: esa plata es facturación tuya, no comisión, por eso se muestra aparte.')"><i class="fa-solid fa-circle-info"></i></button>
+      <div class="perf-kpi-icon" style="background:#DCFCE7;color:#166534;"><i class="fa-solid fa-arrow-trend-up"></i></div>
+      <div class="lbl">Generé</div>
+      <div class="val" style="font-size:${(comisiones.ARS || comisiones.USD) ? '20px' : '15px'};">${(comisiones.ARS || comisiones.USD) ? perfMoneda(comisiones) : (unidadesPropiasVendidas ? 'Sin comisiones' : '—')}</div>
+      ${unidadesPropiasVendidas ? `<p class="sub" style="margin:6px 0 0;font-size:11px;">+ ${unidadesPropiasVendidas} de ${concretadas.length} ${unidadesPropiasVendidas === 1 ? 'operación fue unidad propia vendida' : 'operaciones fueron unidades propias vendidas'}</p>` : ''}
+      ${concretadasSinComisionCargada ? `<p class="sub" style="margin:4px 0 0;font-size:11px;color:var(--red);">${concretadasSinComisionCargada} ${concretadasSinComisionCargada === 1 ? 'operación cerrada sin comisión cargada' : 'operaciones cerradas sin comisión cargada'}</p>` : ''}
+    </div>
+    <div class="kpi">
+      <button class="kpi-info-btn" onclick="openKpiInfo('Dejé sobre la mesa','Dos fugas distintas. Primero: oportunidades que la red ya te trajo y que nadie del equipo contactó todavía. Segundo: búsquedas activas de tus clientes que no tienen ninguna unidad compatible en la red. La primera es un problema de uso interno y se arregla hoy; la segunda es falta de oferta y se arregla pidiéndole esa unidad a la red.')"><i class="fa-solid fa-circle-info"></i></button>
+      <div class="perf-kpi-icon" style="background:#FEE2E2;color:var(--red);"><i class="fa-solid fa-hourglass-half"></i></div>
+      <div class="lbl">Dejé sobre la mesa</div>
+      <div class="val" style="font-size:20px;">${sinContactar.length + busquedasSinMatch.length}</div>
+    </div>
+    <div class="kpi">
+      <button class="kpi-info-btn" onclick="openKpiInfo('Me costó','Abono mensual de tu plan. Es el número contra el que se mide todo lo demás: si las comisiones cobradas no lo superan de forma sostenida, la red todavía no se está pagando sola.')"><i class="fa-solid fa-circle-info"></i></button>
+      <div class="perf-kpi-icon" style="background:#F5F4F0;color:var(--paper-dim);"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+      <div class="lbl">Me costó</div>
+      <div class="val" style="font-size:20px;">${costoPlan ? fmtMoney(costoPlan, 'ARS') : '—'}</div>
+    </div>
+    <div class="kpi">
+      <button class="kpi-info-btn" onclick="openKpiInfo('Tasa de cierre','Operaciones concretadas sobre el total de operaciones que se cerraron este mes, contando las caídas. Con pocas operaciones por mes este porcentaje salta mucho de un mes a otro: mirá el número absoluto de cierres antes que el porcentaje.')"><i class="fa-solid fa-circle-info"></i></button>
+      <div class="perf-kpi-icon" style="background:#DBEAFE;color:#1e40af;"><i class="fa-solid fa-percent"></i></div>
+      <div class="lbl">Tasa de cierre</div>
+      <div class="val" style="font-size:20px;">${totalCerradas ? tasaConversion + '%' : '—'}</div>
+    </div>
+  </div>
+
+  <!-- ============ EMBUDO + COBERTURA (compacto) ============ -->
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+    <div class="card" style="flex:1.4;min-width:280px;margin-top:0;">
+      <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Embudo de oportunidades</strong>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;margin-top:14px;">
+        ${paso('Búsquedas', misBusquedasReal.filter(b => enMes(b.createdAtRaw)).length)}
+        ${paso('Matches', generadosEsteMes.length)}
+        ${paso('Contactados', contactadosEsteMes.length)}
+        ${paso('Concretadas', `<span style="color:var(--sage);">${concretadas.length}</span>`)}
       </div>
+      ${caidasConContacto ? `<p class="sub" style="margin:12px 0 0;font-size:11.5px;display:flex;align-items:flex-start;gap:6px;"><i class="fa-solid fa-triangle-exclamation" style="color:var(--red);font-size:11px;margin-top:1px;"></i><span>${caidasConContacto} ${caidasConContacto === 1 ? 'caída ocurrió' : 'caídas ocurrieron'} después de contactar: no es falta de uso, algo se rompe en la negociación.</span></p>` : ''}
+    </div>
+    <div class="card" style="flex:1;min-width:220px;margin-top:0;text-align:center;">
+      <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Cobertura de demanda</strong>
+      <div class="perf-donut" style="background:conic-gradient(var(--sage) 0% ${cobertura || 0}%, var(--line) ${cobertura || 0}% 100%);">
+        <div class="perf-donut-inner"><span style="font-family:var(--font-display);font-weight:700;font-size:20px;">${cobertura === null ? '—' : cobertura + '%'}</span></div>
+      </div>
+      <p class="sub" style="margin:0;font-size:12px;">${busquedasActivas.length ? `${busquedasActivas.length - busquedasSinMatch.length} de ${busquedasActivas.length} búsquedas con match` : 'sin búsquedas activas'}</p>
+    </div>
+  </div>
 
-      <div style="flex:1;min-width:280px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <i class="fa-solid fa-user-clock" style="color:var(--brick);"></i>
-          <strong style="font-size:13.5px;">Clientes esperando una unidad (${busquedasSinMatch.length})</strong>
-        </div>
-        ${busquedasSinMatch.length ? `
-        <div style="border:1px solid #fdba8c;background:#fff7ed;border-radius:10px;padding:12px 14px;">
-          <table>
-            <tbody>
-              ${busquedasSinMatch.slice(0, 5).map(b => {
-                const dias = perfDiasDesde(b.createdAtRaw);
-                return `<tr>
-                  <td>${esc(b.nombre)}<br><span class="sub" style="font-size:11.5px;">${esc(b.tipo)}</span></td>
-                  <td style="text-align:right;white-space:nowrap;"><span class="pill ${dias !== null && dias >= 7 ? 'pill-brick' : ''}">${dias === null ? '—' : (dias === 0 ? 'hoy' : 'hace ' + dias + (dias === 1 ? ' día' : ' días'))}</span></td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-          <button class="btn btn-sm" onclick="showApp('busquedas')" style="margin-top:12px;">Ver todas las búsquedas</button>
-        </div>
-        ` : `<p class="sub" style="margin:0;display:flex;align-items:center;gap:7px;"><i class="fa-solid fa-circle-check" style="color:var(--sage);"></i> ${busquedasActivas.length ? 'Todas tus búsquedas activas tienen al menos un match.' : 'No hay búsquedas activas cargadas.'}</p>`}
+  <!-- ============ REQUIERE TU ATENCIÓN + STOCK (compacto) ============ -->
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px;">
+    <div class="card" style="flex:1.4;min-width:280px;margin-top:0;">
+      <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Requiere tu atención</strong>
+      <div style="margin-top:14px;">
+        ${itemsAtencion.length ? itemsAtencion.map(it => `
+          <div class="perf-attn-item" onclick="showApp('${it.cta}')">
+            <div class="perf-attn-icon" style="background:${it.bg};color:${it.color};"><i class="fa-solid ${it.icono}"></i></div>
+            <div class="perf-attn-body"><strong>${it.titulo}</strong><span>${it.detalle}</span></div>
+            <i class="fa-solid fa-chevron-right perf-attn-arrow"></i>
+          </div>`).join('') : `<p class="sub" style="margin:0;display:flex;align-items:center;gap:7px;"><i class="fa-solid fa-circle-check" style="color:var(--sage);"></i> Todo al día. Nada urgente pendiente.</p>`}
+      </div>
+    </div>
+    <div class="card" style="flex:1;min-width:220px;margin-top:0;">
+      <strong style="color:var(--red);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;">Unidades vendidas en la red</strong>
+      <div style="margin-top:14px;">
+        ${unidadesPropiasVendidas ? concretadas.filter(m => m.soyVendedor).map((m, i, arr) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;${i < arr.length - 1 ? 'border-bottom:1px dashed var(--line);' : ''}">
+            <span style="font-size:12.5px;">${esc(m.vehiculo)}</span>
+            <span class="mono" style="font-size:12.5px;font-weight:700;white-space:nowrap;">${fmtMoney(m.precioVehiculoNumerico || 0, m.monedaVehiculo === 'USD' ? 'USD' : 'ARS')}</span>
+          </div>`).join('') : `<p class="sub" style="margin:0;">Sin unidades vendidas este mes.</p>`}
       </div>
     </div>
   </div>
