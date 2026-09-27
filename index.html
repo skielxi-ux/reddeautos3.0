@@ -1071,7 +1071,7 @@
   .radar-wrap{border:1px solid #E4E0F5;border-radius:14px;background:#F1EFFB;margin-bottom:22px;overflow:hidden;}
   .radar-header{display:flex;align-items:center;gap:14px;padding:14px 18px;cursor:pointer;}
   .radar-header:hover{background:#ECE7F9;}
-  .radar-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--ink),var(--red));display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-size:16px;flex-shrink:0;}
+  .radar-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:#FFFFFF url('assets/radar-avatar.png') center/cover no-repeat;}
   .radar-body{flex:1;min-width:0;}
   .radar-body strong{display:block;font-family:var(--font-display);font-size:14px;color:var(--ink);}
   .radar-body span{font-size:12.5px;color:var(--paper-dim);}
@@ -8926,7 +8926,7 @@ function dashRadarHTML(){
   return `
   <div class="radar-wrap">
     <div class="radar-header" onclick="toggleDashRadar()">
-      <div class="radar-avatar"><i class="fa-solid fa-satellite-dish"></i></div>
+      <div class="radar-avatar"></div>
       <div class="radar-body">
         <strong>Radar</strong>
         <span>${n ? `Detecté ${n} cosa${n > 1 ? 's' : ''} que conviene mirar hoy` : 'Todo en orden, no hay pendientes urgentes'}</span>
